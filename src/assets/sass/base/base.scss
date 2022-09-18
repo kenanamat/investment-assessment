@@ -1,0 +1,75 @@
+#login {
+  max-width: 1200px;
+  margin-inline: auto;
+  text-align: start;
+  #validIds {
+    display: flex;
+    margin-inline: auto;
+    text-align: center;
+    left: 3rem;
+    width: fit-content;
+    background-color: #465e64;
+    padding: 1rem;
+    color: white;
+    align-items: center;
+    box-shadow: -10px 10px 0 rgba($color: #2c3a3d, $alpha: 0.5);
+    ul {
+      padding-right: 3rem;
+      border-right: 2px solid white;
+      list-style: none;
+    }
+    > div{
+      margin-left: 3rem;
+      input {
+        width: 200px;
+        height: 30px;
+      }
+      button {
+        background-color: #d22c2a;
+        border-radius: 0px;
+        padding: 1rem;
+        margin-top: 1rem;
+        width: 160px;
+        margin-inline: auto ;
+        color: white;
+        border: 0;
+        font-weight: 800;
+        box-shadow: 0 3px 0 rgba($color: #2c3a3d, $alpha: 0.6);
+      }
+    }
+  }
+  span {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 3rem;
+    &.valid {
+      background-color: #42b983;
+    }
+    &.invalid {
+      background-color: #d22c2a;
+      color: white;
+    }
+  }
+}
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+nav {
+  padding: 30px;
+
+  a {
+    font-weight: bold;
+    color: #2c3e50;
+
+    &.router-link-exact-active {
+      color: #42b983;
+    }
+  }
+}

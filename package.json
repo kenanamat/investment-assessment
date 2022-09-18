@@ -1,0 +1,26 @@
+{
+  "name": "investment-assesment",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "firebase": "^8.10.0",
+    "vue": "^3.2.13",
+    "vue-router": "^4.0.3",
+    "vuefire": "^2.2.5",
+    "vuex": "^4.0.0",
+    "vuexfire": "^3.2.5"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-router": "~5.0.0",
+    "@vue/cli-plugin-typescript": "~5.0.0",
+    "@vue/cli-plugin-vuex": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "sass": "^1.32.7",
+    "sass-loader": "^12.0.0",
+    "typescript": "~4.5.5"
+  }
+}
