@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="currentUser == null">
     <div id="validIds">
       <ul>
         <li v-for="user in userList">
@@ -18,7 +18,7 @@
           v-model="groupid"
         />
         <br/>
-        <button @click="isValid = store.dispatch('initiateUser', {userid, groupid})">Check je iD</button>
+        <button @click="store.dispatch('initiateUser', {userid, groupid})">Check je iD</button>
       </div>
     </div>
     <br/>
@@ -26,8 +26,15 @@
     <br/>
     <span :class="isValid ? 'valid' : 'invalid'">{{isValid}}</span>
   </div>
-  <div>
-
+  <div v-else-if="currentUser == 'admin'">
+    {{router.push('/admin')}}
+  </div>
+  <div v-else>
+    {{currentUser}}
+    Je bent al ingelogd
+    <br/>
+    {{users[currentUser].active}}
+    <button @click="store.dispatch('removeLocalUser', currentUser)">done</button>
   </div>
 </template>
 
@@ -35,10 +42,12 @@
 import { computed } from '@vue/reactivity';
 import { useStore } from 'vuex';
 import { ref } from 'vue';
+import router from '@/router';
 
 const store = useStore()
 await store.dispatch('bindDatabase')
 
+const currentUser = localStorage.getItem('userid')
 const users = computed(() => store.getters['getUsers']())
 const userList = Object.keys(users.value)
 

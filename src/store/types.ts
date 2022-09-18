@@ -13,7 +13,8 @@ export interface UserState {
   group: {},
   questions: {},
   id: string,
-  active: false
+  active: boolean,
+  questionnaires: {}
 }
 
 export interface QuestionState {
@@ -28,7 +29,8 @@ export interface GroupState {
 }
 
 export interface SessionState {
+  id: string,
   date: string,
   groups: {}
-  active: false
+  active: boolean
 }
