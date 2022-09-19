@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>QUESTIONNAIRE WOOO</h1>
-    <Questions :questionnaire="questionnaire"/>
+    <Question :questionnaire="questionnaire" :user="currentUser" />
   </div>
 </template>
 
@@ -9,7 +9,7 @@
   import router from '@/router';
   import { computed } from '@vue/reactivity';
   import { useStore } from 'vuex';
-  import Questions from '../components/Questions.vue';
+  import Question from '../components/Question.vue';
   const store = useStore()
   await store.dispatch('bindDatabase')
 
@@ -17,10 +17,15 @@
   var questionnaire = ''
   if ( currentUser && store.getters['isActiveUser'](currentUser) && currentUser != 'admin' ) {
     // get questionnaire from path in session
-    questionnaire = 'midRound'
-
+    const pathLoc = localStorage.getItem('pathLoc')
+    if ( pathLoc == null ) {
+      localStorage.setItem('pathLoc', '0')
+    }
+    questionnaire = store.getters['getActiveSession']()['path'][Number(pathLoc)]
+    
     store.dispatch('addQuestionnaireToUser', {questionnaireId: questionnaire, userId: currentUser})
   } else {
     router.push('/')
   }
+
 </script>

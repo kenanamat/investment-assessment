@@ -11,7 +11,6 @@ export interface DbState {
 
 export interface UserState {
   group: {},
-  questions: {},
   id: string,
   active: boolean,
   questionnaires: {}
@@ -20,7 +19,8 @@ export interface UserState {
 export interface QuestionState {
   answer: string,
   question: string,
-  type: string
+  type: string,
+  answers: {[letter: string]: string}
 }
 
 export interface GroupState {
@@ -31,6 +31,7 @@ export interface GroupState {
 export interface SessionState {
   id: string,
   date: string,
-  groups: {}
-  active: boolean
+  groups: {},
+  active: boolean,
+  path: []
 }

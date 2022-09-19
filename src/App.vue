@@ -1,7 +1,5 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-  </nav>
+  <Header/>
   <div id="login">
     <Suspense>
       <router-view/>
@@ -11,4 +9,5 @@
 </template>
 
 <script lang="ts" setup>
+import Header from './components/Header.vue';
 </script>

@@ -1,5 +1,41 @@
+body {
+  margin: 0;
+}
+
+input {
+  background-color: var(--light-grey);
+  color: var(--grey);
+  padding: 11px 10px 9px;
+  border: 0;
+}
+
+$buttonbg: var(--grey);
+$buttonbgalt: var(--yellow);
+button {
+  border: 0;
+  position: relative;
+  background-color: $buttonbg;
+  color: white;
+  padding: 1rem 2rem;
+  font-weight: 700;
+  font-size: 18px;
+  margin: 1rem;
+  transition: all 0.2s ease;
+  border: solid 1px $buttonbg;
+  &:hover {
+    cursor: pointer;
+    border: solid 1px var(--light-grey);
+    opacity: 0.5;
+  }
+  &.alt {
+    background-color: $buttonbgalt;
+    color: var(--grey);
+    border: solid 1px $buttonbgalt;
+  }
+}
+
 #login {
-  max-width: 1200px;
+  max-width: 1450px;
   margin-inline: auto;
   text-align: start;
   #validIds {
