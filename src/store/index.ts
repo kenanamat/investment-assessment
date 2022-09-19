@@ -103,7 +103,7 @@ export default createStore<RootState>({
           active: false
         })
       }
-      router.push('/')
+      router.go(0)
     },
     initiateUser( 
       context: ActionContext<RootState, RootState>,
