@@ -13,15 +13,20 @@
         </div>
       </div>
     </div>
-
     <div id="next-buttons">
-      <button v-if="currentQuestionIdx > 1" class="prev alt">
+      <button v-if="currentQuestion.id > 1" class="prev alt" @click="store.dispatch('gotoPrevQuestion', {
+          userId: user,
+          questionnaire: questionnaire,
+          currentQuestionId: currentQuestion.id,
+          answer: currentQuestion.answer
+        })"
+      >
         Previous question
       </button>
       <button class="next" @click="store.dispatch('gotoNextQuestion', {
           userId: user,
           questionnaire: questionnaire,
-          currentQuestionIdx: currentQuestionIdx,
+          currentQuestionId: currentQuestion.id,
           answer: currentQuestion.answer
         })"
       >
@@ -33,7 +38,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { useStore } from 'vuex';
+  import { computed } from '@vue/reactivity';
+  import { ref } from 'vue'
+import { useStore } from 'vuex';
 
   const store = useStore()
   const props = defineProps<{
@@ -41,9 +48,7 @@
     user: string | null
   }>();
 
-  const currentQuestion = store.getters['getCurrentQuestion'](props.user, props.questionnaire)
-  const currentQuestionIdx = store.getters['getCurrentQuestionIdx'](props.user, props.questionnaire)
-  const questionnaireLen = Object.keys(store.getters['getUserQuestionnaire'](props.user, props.questionnaire)).length
+  const currentQuestion = computed(() => store.getters['getCurrentQuestion'](props.user, props.questionnaire))
 
 </script>
 

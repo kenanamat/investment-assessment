@@ -5,7 +5,7 @@ export interface RootState {
 export interface DbState {
   users: { [id: string]: UserState },
   questionnaires: { id: { id: QuestionState } },
-  groups: { id: GroupState },
+  groups: { [id: string]: GroupState },
   sessions: { id: SessionState }
 }
 
@@ -17,6 +17,7 @@ export interface UserState {
 }
 
 export interface QuestionState {
+  id: string,
   answer: string,
   question: string,
   type: string,
@@ -24,6 +25,8 @@ export interface QuestionState {
 }
 
 export interface GroupState {
+  id: string,
+  number: number,
   session: string,
   users: {}
 }
@@ -33,5 +36,11 @@ export interface SessionState {
   date: string,
   groups: {},
   active: boolean,
-  path: []
+  path: {[id: number]: pathItemState}
+}
+
+export interface pathItemState {
+  completed: boolean,
+  type: string,
+  id: string
 }

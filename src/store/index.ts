@@ -1,4 +1,4 @@
-import { createStore, ActionContext } from 'vuex'
+import { createStore, ActionContext, storeKey } from 'vuex'
 import { vuexfireMutations, firebaseAction } from 'vuexfire'
 import { rootDatabase } from '@/data/db'
 import firebase from 'firebase/app'
@@ -55,7 +55,10 @@ export default createStore<RootState>({
     getGroupsInSession: (state: RootState, getters: any) => (sessionId: string) => {
       const groups = getters['getGroups']()
       return Object.keys(groups).filter((s:any) => groups[s].session == sessionId)
-    }, 
+    },
+    getNumber: (state: RootState, getters: any) => (groupId: string) => {
+      return getters['getGroup'](groupId)['number']
+    },
     getSessions: (state: RootState) => () => {
       if ( state.db.sessions == undefined ) return false
       else return state.db.sessions
@@ -89,12 +92,12 @@ export default createStore<RootState>({
     },
     getCurrentQuestion: (state: RootState, getters: any) => ( userId: string, questionnaireId: string ) => {
       const questionnaire = getters['getUserQuestionnaire'](userId, questionnaireId)
-      return Object.values(questionnaire).find((q:any) => q['answer'] == '')
+      const currentQuestion = Object.values(questionnaire).find((q:any) => q['active'] == true)
+      return currentQuestion
     },
-    getCurrentQuestionIdx: (state: RootState, getters: any) => ( userId: string, questionnaireId: string ) => {
+    getCurrentQuestionByIdx: (state: RootState, getters: any) => ( userId: string, questionnaireId: string, idx: number ) => {
       const questionnaire = getters['getUserQuestionnaire'](userId, questionnaireId)
-      const currentQuestion = getters['getCurrentQuestion'](userId, questionnaireId)
-      return Object.keys(questionnaire).find(key => questionnaire[key] === currentQuestion);
+      return questionnaire[idx]
     },
     getRandomUserId: (state: any) => () => {
       return state.words.adjectives[Math.floor(Math.random() * state.words.adjectives.length)] + state.words.nouns[Math.floor(Math.random() * state.words.nouns.length)];
@@ -112,7 +115,14 @@ export default createStore<RootState>({
         payload.userId + '/' +
         'questionnaires/' +
         payload.questionnaire + '/' +
-        payload.currentQuestionIdx).update({answer: payload.answer});
+        payload.currentQuestionId).update({answer: payload.answer});
+    },
+    UPDATE_QUESTIONACTIVE(state: RootState, payload) {
+      firebase.database().ref('db/users/' + 
+        payload.userId + '/' +
+        'questionnaires/' +
+        payload.questionnaire + '/' +
+        payload.currentQuestionId).update({active: payload.active});
     },
     ADD_GROUP(state: RootState, payload) {
       firebase.database().ref('db/groups/' + payload.id).set(payload);
@@ -128,6 +138,9 @@ export default createStore<RootState>({
     },
     UPDATE_SESSION(state: RootState, payload: UserState) {
       firebase.database().ref('db/sessions/' + payload.id).update(payload);
+    },
+    UPDATE_VALUE(state: RootState, value: number){
+      firebase.database().ref('db/groups/group_0/').update({number: value});
     },
     ...vuexfireMutations,
   },
@@ -176,7 +189,6 @@ export default createStore<RootState>({
 
         if ( uid == 'admin' && gid == 'dashboard' ) router.push('/admin')
         else router.push('/questionnaire')
-
       }
     },
     createUser(
@@ -252,7 +264,23 @@ export default createStore<RootState>({
         active: true,
         groups: groups,
         date: dateToday,
-        path: ['entry', 'game', 'midRound']
+        path: {
+          0: {
+            completed: false,
+            type: 'questionnaire',
+            id: 'entry'
+          },
+          1: {
+            completed: false,
+            type: 'game',
+            id: 'game'
+          },
+          2: {
+            completed: false,
+            type: 'questionnaire',
+            id: 'game'
+          }
+        }
       })
     },
     endSession(
@@ -294,23 +322,68 @@ export default createStore<RootState>({
       payload: {
         userId: string,
         questionnaire: string,
-        currentQuestionIdx: number,
+        currentQuestionId: string,
         answer: string
       }
     ){
-      context.commit('UPDATE_USERANSWER', {
+      if ( Number(payload.currentQuestionId) == Object.keys(context.getters['getUserQuestionnaire'](payload.userId, payload.questionnaire)).length ) {
+        var pathLoc = Number(localStorage.getItem('pathLoc'))
+        pathLoc += 1
+        localStorage.setItem('pathLoc', String(pathLoc))
+        context.commit('UPDATE_USERANSWER', {
+          userId: payload.userId,
+          questionnaire: payload.questionnaire,
+          currentQuestionId: payload.currentQuestionId,
+          answer: payload.answer,
+          active: false
+        })
+      } else {
+        context.commit('UPDATE_USERANSWER', {
+          userId: payload.userId,
+          questionnaire: payload.questionnaire,
+          currentQuestionId: payload.currentQuestionId,
+          answer: payload.answer
+        })
+        context.commit('UPDATE_QUESTIONACTIVE', {
+          userId: payload.userId,
+          questionnaire: payload.questionnaire,
+          currentQuestionId: payload.currentQuestionId,
+          active: false
+        })
+        context.commit('UPDATE_QUESTIONACTIVE', {
+          userId: payload.userId,
+          questionnaire: payload.questionnaire,
+          currentQuestionId: String(Number(payload.currentQuestionId) + 1),
+          active: true
+        })
+      }
+    },
+    gotoPrevQuestion(
+      context,
+      payload: {
+        userId: string,
+        questionnaire: string,
+        currentQuestionId: string
+      }
+    ){
+      context.commit('UPDATE_QUESTIONACTIVE', {
         userId: payload.userId,
         questionnaire: payload.questionnaire,
-        currentQuestionIdx: payload.currentQuestionIdx,
-        answer: payload.answer
+        currentQuestionId: payload.currentQuestionId,
+        active: false
       })
-      if ( payload.currentQuestionIdx == Object.keys(context.getters['getUserQuestionnaire'](payload.userId, payload.questionnaire)).length ) {
-        var pathLoc = Number(localStorage.getItem('pathLoc'))
-        pathLoc += 1    
-        
-        localStorage.setItem('pathLoc', String(pathLoc))
-      }
-      router.go(0)
+      context.commit('UPDATE_QUESTIONACTIVE', {
+        userId: payload.userId,
+        questionnaire: payload.questionnaire,
+        currentQuestionId: String(Number(payload.currentQuestionId) - 1),
+        active: true
+      })
+    },
+    updateNumber(
+      context,
+      value: number
+    ){
+      context.commit('UPDATE_VALUE', value)
     },
   }
 })

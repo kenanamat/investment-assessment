@@ -1,7 +1,11 @@
 <template>
-  <div>
+  <div v-if="pathItem.type == 'questionnaire'">
     <h1>QUESTIONNAIRE WOOO</h1>
-    <Question :questionnaire="questionnaire" :user="currentUser" />
+    <Question :questionnaire="pathItem.id" :user="currentUser" />
+  </div>
+  <div v-else-if="pathItem.type == 'game'">
+    <h1>It's gamer time</h1>
+    <Game :questionnaire="pathItem.id" :user="currentUser" />
   </div>
 </template>
 
@@ -10,20 +14,26 @@
   import { computed } from '@vue/reactivity';
   import { useStore } from 'vuex';
   import Question from '../components/Question.vue';
+  import { pathItemState } from '../store/types'
+  import Game from '@/components/Game.vue';
   const store = useStore()
   await store.dispatch('bindDatabase')
 
   const currentUser = localStorage.getItem('userid')
-  var questionnaire = ''
+  var pathItem: pathItemState = {
+    completed: false,
+    type: 'questionnaire',
+    id: 'entry'
+  }
   if ( currentUser && store.getters['isActiveUser'](currentUser) && currentUser != 'admin' ) {
     // get questionnaire from path in session
     const pathLoc = localStorage.getItem('pathLoc')
     if ( pathLoc == null ) {
       localStorage.setItem('pathLoc', '0')
     }
-    questionnaire = store.getters['getActiveSession']()['path'][Number(pathLoc)]
+    pathItem = store.getters['getActiveSession']()['path'][Number(pathLoc)]
     
-    store.dispatch('addQuestionnaireToUser', {questionnaireId: questionnaire, userId: currentUser})
+    store.dispatch('addQuestionnaireToUser', {questionnaireId: pathItem.id, userId: currentUser})
   } else {
     router.push('/')
   }
