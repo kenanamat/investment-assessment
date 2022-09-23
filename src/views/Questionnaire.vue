@@ -1,12 +1,28 @@
 <template>
-  <div v-if="pathItem.type == 'questionnaire'">
-    <h1>QUESTIONNAIRE WOOO</h1>
-    <Question :questionnaire="pathItem.id" :user="currentUser" />
+
+
+  <div v-if="pathItem.type == 'questionnaire'" id="questionnaire">
+    <div v-if="!pathItem.completed && isReady">
+      <h1>Please wait enzo</h1>
+      <h2>Ready from your group:</h2>
+      <div id="validIds">
+        <ul>
+          <li v-for="user in unReadyFromGroup">
+            <p>{{user}}</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div v-else>
+      <Question :questionnaire="pathItem.id" :user="currentUser" />
+    </div>
   </div>
+
   <div v-else-if="pathItem.type == 'game'">
     <h1>It's gamer time</h1>
-    <Game :questionnaire="pathItem.id" :user="currentUser" />
+    <Game :user="currentUser" />
   </div>
+
 </template>
 
 <script lang="ts" setup>
@@ -19,21 +35,20 @@
   const store = useStore()
   await store.dispatch('bindDatabase')
 
+
+  store.dispatch('checkPath')
   const currentUser = localStorage.getItem('userid')
-  var pathItem: pathItemState = {
-    completed: false,
-    type: 'questionnaire',
-    id: 'entry'
-  }
+  var isReady: any = false
+  const pathItem = computed(() => store.getters['getPathLoc']())
+
+  const groupId = store.getters['getUser'](currentUser).group
+  const unReadyFromGroup = computed(() => store.getters['getUnreadyUsers'](groupId))
+
   if ( currentUser && store.getters['isActiveUser'](currentUser) && currentUser != 'admin' ) {
-    // get questionnaire from path in session
-    const pathLoc = localStorage.getItem('pathLoc')
-    if ( pathLoc == null ) {
-      localStorage.setItem('pathLoc', '0')
-    }
-    pathItem = store.getters['getActiveSession']()['path'][Number(pathLoc)]
-    
-    store.dispatch('addQuestionnaireToUser', {questionnaireId: pathItem.id, userId: currentUser})
+    isReady = computed(() => store.getters['getGroup'](groupId).ready[currentUser])
+    pathItem.value.type == 'questionnaire' ? 
+      store.dispatch('addQuestionnaireToUser', {questionnaireId: pathItem.value.id, userId: currentUser}) : 
+      store.dispatch('addGameToGroup', groupId)
   } else {
     router.push('/')
   }

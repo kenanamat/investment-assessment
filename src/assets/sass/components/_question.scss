@@ -1,8 +1,49 @@
 #question-wrapper {
+  margin-left: 20rem;
+  margin-top: 8rem;
+  width: 600px;
   #question {
-    
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    input:focus-visible { outline: none; }
+    input[type=text] {
+      width: 550px;
+      background: transparent;
+      border-bottom: 2px solid var(--grey);
+      border-left: 2px solid var(--grey);
+      padding: 1rem;
+      font-size: 32px;
+    }
+    label.radio {
+      display: flex;
+      position: relative;
+      background-color: var(--accent-grey);
+      width: 430px;
+      margin-top: 1rem;
+      padding: 1rem;
+      .letter {
+        position: absolute;
+        left: 10px;
+        background-color: white;
+        padding: 4px
+      }
+      .answer {
+        margin-left: 20px;
+      }
+      input {
+        visibility: hidden;
+        position: absolute;
+        &:checked + div.letter {
+          background-color: var(--yellow);
+        }
+      }
+    }
   }
   #next-buttons {
     display: flex;
+    div{flex: 1 1 auto}
   }
 }

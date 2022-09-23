@@ -2,17 +2,30 @@
   <div id="question-wrapper">
     <div id="question">
       <div class="input" v-if="currentQuestion.type == 'input'">
-        <h3>{{currentQuestion.question}}</h3>
-        <input v-model="currentQuestion.answer" type="text" placeholder="Help"/>
+        <div class="title">
+          <small>{{currentQuestion.id}}</small>
+          <h2>{{currentQuestion.question}}</h2>
+        </div>
+        <input v-model="currentQuestion.answer" type="text" placeholder="Type your answer here..."/>
       </div>
       <div class="multiple" v-else-if="currentQuestion.type == 'multiple'">
-        <h3>{{currentQuestion.question}}</h3>
-        <div class="radio" v-for="letter in Object.keys(currentQuestion.answers)" :key="letter">
+        <div class="title">
+          <small>{{currentQuestion.id}}</small>
+          <h2>{{currentQuestion.question}}</h2>
+        </div>
+        <!-- <div class="radio" v-for="letter in Object.keys(currentQuestion.answers)" :key="letter">
+          <div class="letter">{{letter}}</div>
           <input type="radio" :id="letter" :value="currentQuestion.answers[letter]" v-model="currentQuestion.answer"/>
           <label :for="letter">{{currentQuestion.answers[letter]}}</label>
-        </div>
+        </div> -->
+        <label class="radio" v-for="letter in Object.keys(currentQuestion.answers)" :key="letter">
+          <input type="radio" :id="letter" :value="currentQuestion.answers[letter]" v-model="currentQuestion.answer"/>
+          <div class="letter">{{letter}}</div>
+          <div class="answer">{{currentQuestion.answers[letter]}}</div>
+        </label>
       </div>
     </div>
+    <br/>
     <div id="next-buttons">
       <button v-if="currentQuestion.id > 1" class="prev alt" @click="store.dispatch('gotoPrevQuestion', {
           userId: user,
@@ -23,6 +36,7 @@
       >
         Previous question
       </button>
+      <div v-else></div>
       <button class="next" @click="store.dispatch('gotoNextQuestion', {
           userId: user,
           questionnaire: questionnaire,

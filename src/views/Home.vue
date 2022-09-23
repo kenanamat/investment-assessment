@@ -2,7 +2,7 @@
   <div v-if="currentUser == null">
     <div id="validIds">
       <ul>
-        <li v-for="user in userList">
+        <li v-for="user in users">
           <p>{{user}}</p>
         </li>
       </ul>
@@ -30,10 +30,9 @@
     {{router.push('/admin')}}
   </div>
   <div v-else>
-    {{currentUser}}
+    <h2>{{currentUser}}</h2>
     Je bent al ingelogd
     <br/>
-    {{users[currentUser].active}}
     <button @click="store.dispatch('removeLocalUser', currentUser)">done</button>
   </div>
 </template>
@@ -48,8 +47,8 @@ const store = useStore()
 await store.dispatch('bindDatabase')
 
 const currentUser = localStorage.getItem('userid')
-const users = computed(() => store.getters['getUsers']())
-const userList = Object.keys(users.value)
+const sessionId = computed(() => store.getters['getActiveSession']().id)
+const users = computed(() => store.getters['getUsersInSession'](sessionId.value))
 
 const userid = ref("")
 const groupid = ref("")
