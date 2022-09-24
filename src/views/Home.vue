@@ -21,10 +21,6 @@
         <button @click="store.dispatch('initiateUser', {userid, groupid})">Check je iD</button>
       </div>
     </div>
-    <br/>
-    <br/>
-    <br/>
-    <span :class="isValid ? 'valid' : 'invalid'">{{isValid}}</span>
   </div>
   <div v-else-if="currentUser == 'admin'">
     {{router.push('/admin')}}
