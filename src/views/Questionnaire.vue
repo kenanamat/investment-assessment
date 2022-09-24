@@ -1,13 +1,12 @@
 <template>
-
-
+  <div v-show="false">{{store.dispatch('addQuestionnaireToUser', {questionnaireId: pathItem.id, userId: currentUser})}}</div> 
   <div v-if="pathItem.type == 'questionnaire'" id="questionnaire">
     <div v-if="!pathItem.completed && isReady">
       <h1>Please wait enzo</h1>
-      <h2>Ready from your group:</h2>
+      <h2>Not ready from your group:</h2>
       <div id="validIds">
         <ul>
-          <li v-for="user in unReadyFromGroup">
+          <li v-for="user in unreadyFromGroup">
             <p>{{user}}</p>
           </li>
         </ul>
@@ -37,18 +36,18 @@
 
 
   store.dispatch('checkPath')
+  
   const currentUser = localStorage.getItem('userid')
   var isReady: any = false
+  // const pathItem = computed(() => store.getters['getPathLoc']())
   const pathItem = computed(() => store.getters['getPathLoc']())
-
+  store.dispatch('addQuestionnaireToUser', {questionnaireId: pathItem.value.id, userId: currentUser})
+  
   const groupId = store.getters['getUser'](currentUser).group
-  const unReadyFromGroup = computed(() => store.getters['getUnreadyUsers'](groupId))
+  const unreadyFromGroup = computed(() => store.getters['getUnreadyUsers'](groupId))
 
   if ( currentUser && store.getters['isActiveUser'](currentUser) && currentUser != 'admin' ) {
-    isReady = computed(() => store.getters['getGroup'](groupId).ready[currentUser])
-    pathItem.value.type == 'questionnaire' ? 
-      store.dispatch('addQuestionnaireToUser', {questionnaireId: pathItem.value.id, userId: currentUser}) : 
-      store.dispatch('addGameToGroup', groupId)
+    isReady = computed( () => store.getters['getGroup'](groupId).ready[currentUser] )
   } else {
     router.push('/')
   }
