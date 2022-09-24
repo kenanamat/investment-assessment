@@ -27,12 +27,21 @@ export interface QuestionState {
 }
 
 export interface GameState {
-  rounds: {},
+  rounds: [RoundState],
   time: number
+}
+
+export interface RoundState {
+  completed: boolean,
+  index: number,
+  profit: number,
+  values: {},
+  answers: {}
 }
 
 export interface GroupState {
   id: string,
+  game: GameState,
   number: number,
   session: string,
   users: {},

@@ -54,7 +54,7 @@
 <script lang="ts" setup>
   import { computed } from '@vue/reactivity';
   import { ref } from 'vue'
-import { useStore } from 'vuex';
+  import { useStore } from 'vuex';
 
   const store = useStore()
   const props = defineProps<{
