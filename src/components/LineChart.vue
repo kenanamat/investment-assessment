@@ -46,7 +46,7 @@ const chartOptions = {
   responsive: false,
   scales: {
     y: {
-      max: 400,
+      max: 1000,
       min: 0,
     }
   }

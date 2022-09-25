@@ -1,11 +1,22 @@
 <template>
   <div id="leaderboard" v-if="groupSubmitted">
-    <div v-for="group in groupsInSession">
-      {{group.game.rounds[currentRound].profit}}<br/>
-    </div>
+    <Leaderboard/>
+
+    <!-- <LineChart
+      chartId="bar-chart"
+      :chartData="{
+        labels: Array.from(Array(currentRound + 1).keys()),
+        datasets: [ { data: store.getters['getGroupProfits'](userGroup.id) } ]
+      }"
+      datasetIdKey='label'
+      :width="400"
+      :height="400"
+      cssClasses=''
+      styles=''
+    />
     <button v-if="userGroup.leader == currentUser" @click="store.dispatch('readyUp', userGroup.id)">
       Ready
-    </button>
+    </button> -->
   </div>
   <div v-else id="game">
     <input type="range" min="1" max="100" v-model="rdVal" 
@@ -60,6 +71,7 @@
   import { useStore } from 'vuex';
   import BarChart from './BarChart.vue';
   import LineChart from './LineChart.vue';
+  import Leaderboard from './Leaderboard.vue';
 
 
   const store = useStore()
@@ -68,7 +80,9 @@
   // store.dispatch('checkRound')
   const currentUser = localStorage.getItem('userid')
   const activeSession = store.getters['getActiveSession']()
+
   const currentRound = computed(() => store.getters['getCurrentRound']())
+
   const userGroup = computed(() => store.getters['getUserGroup'](currentUser))
   const groupRound = computed(() => store.getters['getGroupGameRound'](userGroup.value.id, currentRound.value))
   const groupSubmitted = computed(() => groupRound.value.completed)
@@ -78,6 +92,7 @@
     groupsInSessionIds.forEach((g:string) => groups.push(store.getters['getGroup'](g)))
     return groups
   })
+  const maxRounds = userGroup.value.game.rounds.length - 1
 
   const rdVal = computed({
     // getter
