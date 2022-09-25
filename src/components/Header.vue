@@ -1,7 +1,7 @@
 <template>
   <header>
     <div class="header-container">
-      <img :src="logoDark"/>
+      <img :src="logoLight"/>
     </div>
   </header>
 </template>
