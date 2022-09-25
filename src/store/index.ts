@@ -2,7 +2,7 @@ import { createStore, ActionContext, storeKey } from 'vuex'
 import { vuexfireMutations, firebaseAction } from 'vuexfire'
 import { rootDatabase } from '@/data/db'
 import firebase from 'firebase/app'
-import { DbState, pathItemState, QuestionState, RootState, SessionState, UserState } from './types'
+import { DbState, pathItemState, QuestionState, RootState, RoundState, SessionState, UserState } from './types'
 import router from '@/router'
 import words from './words'
 
@@ -71,6 +71,12 @@ export default createStore<RootState>({
     },
     getGroupAnswer: (state: RootState, getters: any) => (groupId: string, currentRound: number, type: string) => {
       return getters['getGroup'](groupId).game.rounds[currentRound].answers[type]
+    },
+    getGroupProfits: (state: RootState, getters: any) => (groupId: string) => {
+      return getters['getGroup'](groupId).game.rounds.reduce((profits: Array<number>, round: RoundState) => {
+        profits.push(round.profit)
+        return profits
+      }, [])
     },
     getSessions: (state: RootState) => () => {
       if ( state.db.sessions == undefined ) return false
@@ -306,7 +312,10 @@ export default createStore<RootState>({
     },
     createGroup(
       context,
-      sessionId: string
+      payload: {
+        sessionId: string,
+        color: string
+      }
     ){
       const groups = context.getters['getGroups']()
       const groupsList = Object.keys(groups ?? [])
@@ -324,7 +333,8 @@ export default createStore<RootState>({
         users: {},
         ready: {},
         game: game,
-        session: sessionId,
+        color: payload.color,
+        session: payload.sessionId,
         leader: ''
       })
     },
@@ -333,6 +343,19 @@ export default createStore<RootState>({
       payload: {userAmount: number, groupAmount: number}
     ){
       const activeSession = context.getters['getActiveSession']()
+
+      var colors = [
+        "#25CCF7","#FD7272","#54a0ff","#00d2d3",
+        "#1abc9c","#2ecc71","#3498db","#9b59b6","#34495e",
+        "#16a085","#27ae60","#2980b9","#8e44ad","#2c3e50",
+        "#f1c40f","#e67e22","#e74c3c","#ecf0f1","#95a5a6",
+        "#f39c12","#d35400","#c0392b","#bdc3c7","#7f8c8d",
+        "#55efc4","#81ecec","#74b9ff","#a29bfe","#dfe6e9",
+        "#00b894","#00cec9","#0984e3","#6c5ce7","#ffeaa7",
+        "#fab1a0","#ff7675","#fd79a8","#fdcb6e","#e17055",
+        "#d63031","#feca57","#5f27cd","#54a0ff","#01a3a4"
+      ]
+
       if (activeSession) {
         context.commit('UPDATE_SESSION', {
           id: activeSession.id,
@@ -356,7 +379,7 @@ export default createStore<RootState>({
         context.dispatch('createUser', sessionId)
       }
       for (let i = 0; i < payload.groupAmount; i++) {
-        context.dispatch('createGroup', sessionId)
+        context.dispatch('createGroup', {sessionId: sessionId, color: colors.pop()})
       }
       
       var users: {[id: string]: boolean} = {}

@@ -44,6 +44,7 @@ export interface GroupState {
   game: GameState,
   number: number,
   session: string,
+  color: string,
   users: {},
   ready: {},
   leader: string
