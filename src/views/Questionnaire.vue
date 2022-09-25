@@ -1,4 +1,5 @@
 <template>
+  <div v-show="false" v-if="!pathItem">{{router.push('/thankyou')}}</div>
   <div v-show="false">{{store.dispatch('addQuestionnaireToUser', {questionnaireId: pathItem.id, userId: currentUser})}}</div> 
   <div v-if="pathItem.type == 'questionnaire'" id="questionnaire">
     <div v-if="!pathItem.completed && isReady">
@@ -19,7 +20,7 @@
 
   <div v-else-if="pathItem.type == 'game'">
     <h1>It's gamer time</h1>
-    <Game :user="currentUser" />
+    <Game />
   </div>
 
 </template>

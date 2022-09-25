@@ -6,7 +6,7 @@ body, html, #base, #app {
 
 input {
   background-color: var(--light-grey);
-  color: white;
+  color: var(--grey);
   padding: 11px 10px 9px;
   border: 0;
   &:focus-visible { outline: none; }

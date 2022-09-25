@@ -12,10 +12,11 @@
     input[type=text] {
       width: 550px;
       background: transparent;
-      border-bottom: 2px solid var(--grey);
-      border-left: 2px solid var(--grey);
+      border-bottom: 2px solid var(--accent-grey);
+      border-left: 2px solid var(--accent-grey);
       padding: 1rem;
       font-size: 32px;
+      color: white;
     }
     label.radio {
       display: flex;

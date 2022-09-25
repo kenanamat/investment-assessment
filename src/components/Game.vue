@@ -3,7 +3,7 @@
     <div v-for="group in groupsInSession">
       {{group.game.rounds[currentRound].profit}}<br/>
     </div>
-    <button v-if="userGroup.leader == user" @click="store.dispatch('readyUp', userGroup.id)">
+    <button v-if="userGroup.leader == currentUser" @click="store.dispatch('readyUp', userGroup.id)">
       Ready
     </button>
   </div>
@@ -41,7 +41,7 @@
       cssClasses=''
       styles=''
     />
-    <button v-if="userGroup.leader == user" @click="store.dispatch('submitAnswer', {
+    <button v-if="userGroup.leader == currentUser" @click="store.dispatch('submitAnswer', {
         groupId: userGroup.id, 
         answers: {rd: rdAnswer, factories: factAnswer},
         profit: rdAnswer + factAnswer
@@ -63,15 +63,13 @@
 
 
   const store = useStore()
-  const props = defineProps<{
-    user: string | null
-  }>();
+
 
   // store.dispatch('checkRound')
-
+  const currentUser = localStorage.getItem('userid')
   const activeSession = store.getters['getActiveSession']()
   const currentRound = computed(() => store.getters['getCurrentRound']())
-  const userGroup = computed(() => store.getters['getUserGroup'](props.user))
+  const userGroup = computed(() => store.getters['getUserGroup'](currentUser))
   const groupRound = computed(() => store.getters['getGroupGameRound'](userGroup.value.id, currentRound.value))
   const groupSubmitted = computed(() => groupRound.value.completed)
   const groupsInSessionIds = store.getters['getGroupsInSession'](activeSession.id)

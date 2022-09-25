@@ -17,7 +17,8 @@
     </div>
   </div>
   <div v-else>
-    {{router.push('/')}}
+    <input type="text" v-model="password">
+    <button v-if="password == 'wachtwoord1234'" @click="store.dispatch('initiateAdmin')">Authenticate</button>
   </div>
 </template>
 
@@ -31,8 +32,9 @@
 
   const currentUser = localStorage.getItem('userid')
   const currentSession = computed(() => store.getters['getActiveSession']())
-  const pathLoc = computed(() => store.getters['getPathLoc']())
+  const pathLoc = computed(() => store.getters['getPathLoc'](currentUser))
 
   const userAmount = ref(0)
   const groupAmount = ref(0)
+  const password = ref('')
 </script>

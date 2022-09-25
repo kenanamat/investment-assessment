@@ -13,9 +13,8 @@
   const store = useStore()
   await store.dispatch('bindDatabase')
 
-  const pathLoc = computed(() => store.getters['getPathLoc']())
-
   const currentUser = localStorage.getItem('userid')
+  const pathLoc = computed(() => store.getters['getPathLoc'](currentUser))
 
   if ( !(currentUser && store.getters['isActiveUser'](currentUser) && currentUser != 'admin') ) {
     router.push('/')

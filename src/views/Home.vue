@@ -1,13 +1,13 @@
 <template>
-  <div v-if="currentUser == null">
+  <div v-if="currentUser == null && sessionId">
     <div class="img-bg">
     </div>
     <div  class="row welcome"> 
-      <div class="col-5 title">
+      <div class="col-lg-5 title">
         <h3>Welcome</h3>
         <h1>Choose an available username and join a group</h1>
       </div>
-      <div class="col-3 availables">
+      <div class="col-lg-3 availables">
         <div>
           <h4>Available groups:</h4>
           <ul id="groups">
@@ -30,7 +30,7 @@
           </ul>
         </div>
       </div>
-      <div class="col-4 selected">
+      <div class="col-lg-4 selected">
         <form @submit.prevent="store.dispatch('initiateUser', {userid, groupid})" id="login">
           <h4>Your selected group:</h4>
           <input 
@@ -55,9 +55,6 @@
           <img src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg">
         </button>
       </div>
-
-
-
       <div v-if="false" id="validIds">
         <ul>
           <li v-for="user in users">
@@ -84,11 +81,22 @@
   <div v-else-if="currentUser == 'admin'">
     {{router.push('/admin')}}
   </div>
-  <div v-else>
-    <h2>{{currentUser}}</h2>
+  <div v-else-if="!sessionId">
+    <div class="img-bg">
+    </div>
+    <div  class="row welcome"> 
+      <div class="col-lg-5 title">
+        <h3>Unavailable</h3>
+        <h1>There is currently no ongoing survey</h1>
+      </div>
+    </div>
+  </div>
+  <div v-show="false" v-else>
+    {{store.dispatch('removeLocalUser', currentUser)}}
+    <!-- <h2>{{currentUser}}</h2>
     Je bent al ingelogd
     <br/>
-    <button @click="store.dispatch('removeLocalUser', currentUser)">done</button>
+    <button @click="store.dispatch('removeLocalUser', currentUser)">done</button> -->
   </div>
 </template>
 
@@ -104,8 +112,13 @@ await store.dispatch('bindDatabase')
 
 const currentUser = localStorage.getItem('userid')
 const sessionId = computed(() => store.getters['getActiveSession']().id)
+if (!sessionId) store.dispatch('removeLocalUser', currentUser)
+
 const users = computed(() => store.getters['getUsersInSession'](sessionId.value))
-const usersAvailable = computed(() => users.value.filter((u:string) => store.getters['getUser'](u).group == undefined))
+const usersAvailable = computed(() => users.value.filter((u:string) => {
+    const user = store.getters['getUser'](u)
+    return (user.group == undefined || user.active == false)
+  }))
 const groupsInSession = computed(() => store.getters['getGroupsInSession'](sessionId.value))
 const groups = computed(() => store.getters['getGroups']())
 
