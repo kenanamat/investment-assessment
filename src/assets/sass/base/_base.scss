@@ -1,6 +1,7 @@
-body, html {
+body, html, #base, #app {
   margin: 0;
   height: 100%;
+  background-color: var(--grey);
 }
 
 input {
@@ -8,11 +9,11 @@ input {
   color: var(--grey);
   padding: 11px 10px 9px;
   border: 0;
-  &:focus:not(:focus-visible) { outline: none; }
+  &:focus-visible { outline: none; }
 }
 
-$buttonbg: var(--grey);
-$buttonbgalt: var(--yellow);
+$buttonbg: var(--orange);
+$buttonbgalt: var(--red);
 button {
   border: 0;
   position: relative;
@@ -36,14 +37,97 @@ button {
   }
 }
 
-#questionnaire {
-  
+ul {
+  padding: 0;
+  li {
+    list-style: none;
+  }
 }
 
-#login {
+#main {
   max-width: 1450px;
   margin-inline: auto;
   text-align: start;
+  margin-block: auto;
+  .img-bg {
+    background-image: url(https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/uploads/2020/09/021A9574-scaled.jpg);
+    position: absolute;
+    left: -500px;
+    top: -200px;
+    width: calc(100% + 400px);
+    height: calc(100vh + 400px);
+    clip-path: polygon(500px 0, 70% 0, 50% 90%, 500px 100%);
+    z-index: 1;
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,.6);
+  }
+  .welcome {
+    position: relative;
+    display: flex;
+    align-items: start;
+    margin-top: 7rem;
+    z-index: 100;
+    .title, .selected {
+      margin-top: 10rem;
+    }
+    .availables {
+      background-color: var(--grey);
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 0 8px rgba($color: #000000, $alpha: 0.2);
+      li {
+        &.valid {
+          background-color: var(--grey);
+          margin-top: 1rem;
+          box-shadow: 0 0 6px rgba($color: #000000, $alpha: 0.2);
+          border: 1px solid var(--grey);
+          padding: 0.8rem 0.5rem;
+          transition: all 0.3s ease;
+          &:hover {
+            cursor: pointer;
+            background-color: var(--hover-grey);
+          }
+          &.active {
+            background-color: var(--active-grey);
+            border-color: var(--accent-grey);
+          }
+        }
+      }
+    }
+  }
+
+
+  #login {
+    margin-left: 3rem;
+    input {
+      background: transparent;
+      color: white;
+      width: 100%;
+      font-size: 32px;
+      padding: 0;
+      &.notEmpty {
+        font-weight: 700;
+      }
+      margin-bottom: 3rem;
+    }
+  }
+
+  button[form=login] {
+    background-color: var(--orange);
+    background: var(--orange);;
+    font-size: 50px;
+    border-radius: 100px;
+    border: transparent;
+    transition: all 0.5s ease;
+    float: right;
+    img {
+      filter: brightness(0) saturate(100%) invert(21%) sepia(35%) saturate(527%) hue-rotate(145deg) brightness(90%) contrast(90%);
+      width: 40px;
+    }
+    &:hover {
+      border-radius: 45px;
+    }
+  }
+
   #validIds {
     display: flex;
     margin-inline: auto;

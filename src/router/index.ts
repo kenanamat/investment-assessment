@@ -1,6 +1,7 @@
 import Admin from '@/views/Admin.vue'
 import Questionnaire from '@/views/Questionnaire.vue'
 import Thankyou from '@/views/Thankyou.vue'
+import Waiting from '@/views/Waiting.vue'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
 
@@ -25,6 +26,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'thankyou',
     component: Thankyou
   },
+  {
+    path: '/waiting',
+    name: 'waiting',
+    component: Waiting
+  }
 ]
 
 const router = createRouter({

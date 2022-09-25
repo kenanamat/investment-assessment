@@ -1,16 +1,23 @@
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+#app, body, #main {
+  font-family: Avenir, Helvetica, Arial, sans-serif ;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  color: white;
 }
 
 h1 {
+  color: white;
+  font-size: 3.5rem;
+  font-weight: 700;
+}
+
+h3 {
   background-color: var(--red);
   max-width: fit-content;
-  padding: 1rem;
+  padding: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 3px;
   color: white;
+  font-size: 14px;
+  font-weight: 600;
 }

@@ -3,6 +3,7 @@
     <div v-if="currentSession">
       <button @click="store.dispatch('endSession')">End Session</button>
       <button @click="store.dispatch('removeLocalUser', currentUser)">done</button>
+      <button v-if="pathLoc.canContinue == false" @click="store.dispatch('continueSession')">Resume</button>
     </div>
     <div v-else>
       <h3>How many users</h3>
@@ -16,7 +17,8 @@
     </div>
   </div>
   <div v-else>
-    {{router.push('/')}}
+    <input type="text" v-model="password">
+    <button v-if="password == 'wachtwoord1234'" @click="store.dispatch('initiateAdmin')">Authenticate</button>
   </div>
 </template>
 
@@ -30,7 +32,9 @@
 
   const currentUser = localStorage.getItem('userid')
   const currentSession = computed(() => store.getters['getActiveSession']())
+  const pathLoc = computed(() => store.getters['getPathLoc'](currentUser))
 
   const userAmount = ref(0)
   const groupAmount = ref(0)
+  const password = ref('')
 </script>

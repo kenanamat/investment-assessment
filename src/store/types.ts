@@ -62,5 +62,7 @@ export interface SessionState {
 export interface pathItemState {
   completed: boolean,
   type: string,
-  id: string
+  id: string,
+  canContinue: boolean,
+  index: number
 }

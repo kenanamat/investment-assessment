@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "bootstrap": "^5.2.1",
     "chart.js": "^3.9.1",
     "firebase": "^8.10.1",
     "fs": "^0.0.1-security",
