@@ -56,9 +56,13 @@ ul {
     top: -200px;
     width: calc(100% + 400px);
     height: calc(100vh + 400px);
-    clip-path: polygon(500px 0, 70% 0, 50% 90%, 500px 100%);
+    clip-path: polygon(0 0, 70% 0, 50% 100%, 0 100%);
     z-index: 1;
     box-shadow: inset 0 0 0 1000px rgba(0,0,0,.6);
+    &.admin {
+      background-image: url(https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/uploads/2020/09/021A9608-scaled-e1600783555147.jpg);
+      height: calc(100vh + 200px);
+    }
   }
   .welcome {
     position: relative;
@@ -110,6 +114,41 @@ ul {
       margin-bottom: 3rem;
     }
   }
+
+  #admin {
+
+    &.welcome {
+      position: relative;
+      z-index: 100;
+      margin-top: 12%;
+      .login {
+        input {
+          background: transparent;
+          width: 100%;
+          font-size: 50px;
+          color: white;
+          border-bottom: 3px solid white;
+          padding: 1rem;
+        }
+        img {
+          width: 100px;
+          margin-left: 1rem;
+          border-radius: 140px;
+          border: 3px solid transparent;
+          padding: 1rem;
+          transition: all 0.3s ease;
+          filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(1950%) hue-rotate(260deg) brightness(115%) contrast(100%);
+          &:hover {
+            cursor: pointer;
+            border-color: white;
+            width: 95px;
+            margin-left: calc(1rem + 4px);
+          }
+        }
+      }
+    }
+  }
+
 
   button[form=login] {
     background-color: var(--orange);

@@ -17,9 +17,21 @@
     </div>
   </div>
   <div v-else>
-    <input type="text" v-model="password">
-    <button v-if="password == 'wachtwoord1234'" @click="store.dispatch('initiateAdmin')">Authenticate</button>
+    <div class="img-bg admin">
+    </div>
+    <div class="row d-flex align-items-center h-100 welcome" id="admin"> 
+      <div class="col-lg-7">
+        <h3>Admin</h3>
+        <h1>You should not be here&#8230; <br/>Unless, you should</h1>
+      </div>
+      <div class="col-lg-5 d-flex align-items-center login">
+        <input type="password" v-model="password">
+        <img src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg" 
+          v-if="password == 'wachtwoord1234'" @click="store.dispatch('initiateAdmin')">
+      </div>
+    </div>
   </div>
+
 </template>
 
 <script lang="ts" setup>
