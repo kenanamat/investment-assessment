@@ -6,20 +6,15 @@
           <small>{{currentQuestion.id}}</small>
           <h2>{{currentQuestion.question}}</h2>
         </div>
-        <input v-model="currentQuestion.answer" type="text" placeholder="Type your answer here..."/>
+        <input v-model="answer" type="text" placeholder="Type your answer here..."/>
       </div>
       <div class="multiple" v-else-if="currentQuestion.type == 'multiple'">
         <div class="title">
           <small>{{currentQuestion.id}}</small>
           <h2>{{currentQuestion.question}}</h2>
         </div>
-        <!-- <div class="radio" v-for="letter in Object.keys(currentQuestion.answers)" :key="letter">
-          <div class="letter">{{letter}}</div>
-          <input type="radio" :id="letter" :value="currentQuestion.answers[letter]" v-model="currentQuestion.answer"/>
-          <label :for="letter">{{currentQuestion.answers[letter]}}</label>
-        </div> -->
         <label class="radio" v-for="letter in Object.keys(currentQuestion.answers)" :key="letter">
-          <input type="radio" :id="letter" :value="currentQuestion.answers[letter]" v-model="currentQuestion.answer"/>
+          <input type="radio" :id="letter" :value="currentQuestion.answers[letter]" v-model="answer"/>
           <div class="letter">{{letter}}</div>
           <div class="answer">{{currentQuestion.answers[letter]}}</div>
         </label>
@@ -31,7 +26,7 @@
           userId: user,
           questionnaire: questionnaire,
           currentQuestionId: currentQuestion.id,
-          answer: currentQuestion.answer
+          answer: answer
         })"
       >
         Previous question
@@ -41,7 +36,7 @@
           userId: user,
           questionnaire: questionnaire,
           currentQuestionId: currentQuestion.id,
-          answer: currentQuestion.answer
+          answer: answer
         })"
       >
         Next question
@@ -52,8 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from '@vue/reactivity';
-  import { ref } from 'vue'
+  import { ref, computed } from '@vue/reactivity';
   import { useStore } from 'vuex';
 
   const store = useStore()
@@ -63,6 +57,7 @@
   }>();
 
   const currentQuestion = computed(() => store.getters['getCurrentQuestion'](props.user, props.questionnaire))
+  const answer = ref(currentQuestion.value.answer)
 
 </script>
 
