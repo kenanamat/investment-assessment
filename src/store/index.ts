@@ -641,6 +641,20 @@ export default createStore<RootState>({
         pathLoc: pathLoc.index,
         object: {canContinue: true}
       })
+    },
+    submitInterview(
+      context,
+      payload: {
+        groupId: string,
+        answer: string
+      }
+    ){
+      const currentRound = context.getters['getCurrentRound']()
+      context.commit('UPDATE_GROUPROUND', {
+        groupId: payload.groupId,
+        currentRound: currentRound,
+        object: {interviewAnswer: payload.answer}
+      })
     }
   }
 })

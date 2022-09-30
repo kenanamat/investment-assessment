@@ -30,7 +30,6 @@
   import { computed } from '@vue/reactivity';
   import { useStore } from 'vuex';
   import Question from '../components/Question.vue';
-  import { pathItemState } from '../store/types'
   import Game from '@/components/Game.vue';
   const store = useStore()
   await store.dispatch('bindDatabase')
