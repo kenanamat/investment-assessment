@@ -17,7 +17,7 @@
           </ul> -->
           <h4>Available usernames:</h4>
           <ul>
-            <li class="valid" v-for="user in usersAvailable" @click="userid = user" :class="{'active': userid == user}">
+            <li class="valid" v-for="user in users" @click="userid = user" :class="{'active': userid == user}">
               {{user}}
             </li>
           </ul>
@@ -50,8 +50,15 @@
             required
             readonly
           />
+          <input
+            v-if="userCode"            
+            type="text" 
+            v-model="code" 
+            placeholder="Enter your code"
+            required
+          />
         </form>
-        <button type="submit" form="login">
+        <button type="submit" form="login" v-if="!userCode || code == userCode">
           <img src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg">
         </button>
       </div>
@@ -92,7 +99,8 @@
     </div>
   </div>
   <div v-show="false" v-else>
-    {{store.dispatch('removeLocalUser', currentUser)}}
+    {{router.push('/questionnaire')}}
+    <!-- {{store.dispatch('removeLocalUser', currentUser)}} -->
     <!-- <h2>{{currentUser}}</h2>
     Je bent al ingelogd
     <br/>
@@ -124,4 +132,8 @@ const groups = computed(() => store.getters['getGroups']())
 
 const userid = ref("")
 const groupid = ref("")
+
+const userCode = computed(() => store.getters['getUser'](userid.value).code ?? false)
+const code = ref("")
+
 </script>

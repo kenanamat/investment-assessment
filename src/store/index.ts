@@ -102,6 +102,10 @@ export default createStore<RootState>({
       const groupsInSession = getters['getGroupsInSession'](activeSession.id)
       return groupsInSession.every((g: string) => getters['getUsersReady'](g))
     },
+    getPathLocIndex: (state: RootState, getters: any) => () => {
+      const sessionPath = getters['getActiveSession']().path
+      return sessionPath.find((p: pathItemState) => p.completed == false ) ?? false
+    },
     getPathLoc: (state: RootState, getters: any) => (userId: string) => {
       const sessionPath = getters['getActiveSession']().path
       if ( sessionPath ) {
@@ -187,7 +191,7 @@ export default createStore<RootState>({
       firebase.database().ref('db/groups/' + payload.id).update(payload);
     },
     UPDATE_GROUPREADY(state: RootState, payload) {
-      firebase.database().ref('db/groups/' + payload.id + '/ready').update(payload.user);
+      if ( payload.id != undefined ) firebase.database().ref('db/groups/' + payload.id + '/ready').update(payload.user);
     },
     UPDATE_GROUPUSERS(state: RootState, payload) {
       firebase.database().ref('db/groups/' + payload.id + '/users').update(payload.user);
@@ -254,10 +258,98 @@ export default createStore<RootState>({
       context: ActionContext<RootState, RootState>,
       userid: string
     ){
+      // var gid = ''
+      // console.log(context.getters['getUserGroup'](userid))
+      // if ( !context.getters['getUserGroup'](userid) ) {
 
-      const activeSession = context.getters['getActiveSession']()
-      const groupsInSession = context.getters['getGroupsInSession'](activeSession.id)
-      const usersInSessionLen = context.getters['getUsersInSession'](activeSession.id).length
+      //   const activeSession = context.getters['getActiveSession']()
+      //   const pathLoc = context.getters['getPathLocIndex']()
+      //   console.log(pathLoc)
+      //   if ( pathLoc ) {
+      //     context.commit('UPDATE_SESSIONPATH', {
+      //       id: activeSession.id,
+      //       pathLoc: pathLoc.index,
+      //       object: {completed: false}
+      //     })
+      //   }
+
+      //   const groupsInSession = context.getters['getGroupsInSession'](activeSession.id)
+      //   const usersInSessionLen = context.getters['getUsersInSession'](activeSession.id).length
+  
+      //   // get max per group
+      //   var maxUsersPerGroup = Math.floor(usersInSessionLen / groupsInSession.length)
+      //   var usersInGroupInSession = 0
+      //   groupsInSession.forEach((g: string) => {
+      //     usersInGroupInSession += Object.keys(context.getters['getGroup'](g).users ?? []).length
+      //   });
+      //   if ( usersInGroupInSession >= maxUsersPerGroup * groupsInSession.length ) maxUsersPerGroup += 1
+        
+      //   const shuffledGroups = groupsInSession.sort((a: GroupState, b: GroupState) => 0.5 - Math.random())
+  
+      //   gid = shuffledGroups.pop()
+      //   if ( context.getters['getGroup'](gid).users != undefined ) {
+      //     while ( Object.keys(context.getters['getGroup'](gid).users).length >= maxUsersPerGroup) {
+      //       gid = shuffledGroups.pop()
+      //     }
+      //   }
+      // } else gid = context.getters['getUserGroup'](userid)
+      // console.log(gid)
+      // if ( context.getters['getUserGroup'](userid) ) {
+      //   console.log('wrm')
+      //   // if ( context.getters['getUser'](userid).active ) {
+      //   //   return console.log('Already logged in')
+      //   // } else {
+      //     localStorage.setItem('userid', userid)
+      //     context.commit('UPDATE_USER', {
+      //       id: userid,
+      //       active: true
+      //     })
+      //     if ( userid == 'admin' && gid == 'dashboard' ) router.push('/admin')
+      //     else router.push('/questionnaire')  
+      //   // }
+      // } else 
+      localStorage.setItem('userid', userid)
+      context.commit('UPDATE_USER', {
+        id: userid,
+        active: true
+      })
+      if ( userid == 'admin' ) router.push('/admin')
+      else router.push('/questionnaire')
+      // if ( context.getters['validUserAndGroup'](userid, gid) ) {
+      //   localStorage.setItem('userid', userid)
+      //   context.commit('UPDATE_USER', {
+      //     id: userid,
+      //     active: true,
+      //     group: gid
+      //   })
+      //   if (context.getters['getGroup'](gid).leader == '') context.commit('UPDATE_GROUP', {id: gid, leader: userid})
+      //   if ( gid != undefined ) {
+      //     context.commit('UPDATE_GROUPUSERS', {
+      //       id: gid,
+      //       user: {[userid]: true}
+      //     })
+      //     context.commit('UPDATE_GROUPREADY', {
+      //       id: gid,
+      //       user: {[userid]: false}
+      //     })
+      //   }
+       
+      //   if ( userid == 'admin' && gid == 'dashboard' ) router.push('/admin')
+      //   else router.push('/questionnaire')
+      // }
+    },
+    createUser(
+      context,
+      sessionId: string
+    ){
+      const userIds = Object.keys(context.getters['getUsers']())
+      var userId: string = context.getters['getRandomUserId']()
+      while (userIds.includes(userId)) {
+        userId = context.getters['getRandomUserId']()
+      }
+
+      const groupsInSession = context.getters['getGroupsInSession'](sessionId)
+      const usersInSessionLen = context.getters['getUsersInSession'](sessionId).length
 
       // get max per group
       var maxUsersPerGroup = Math.floor(usersInSessionLen / groupsInSession.length)
@@ -276,51 +368,21 @@ export default createStore<RootState>({
         }
       }
 
-      if ( context.getters['getUserGroup'](userid) ) {
-        if ( context.getters['getUser'](userid).active ) {
-          return console.log('Already logged in')
-        } else {
-          localStorage.setItem('userid', userid)
-          context.commit('UPDATE_USER', {
-            id: userid,
-            active: true
-          })
-          if ( userid == 'admin' && gid == 'dashboard' ) router.push('/admin')
-          else router.push('/questionnaire')  
-        }
-      } else if ( context.getters['validUserAndGroup'](userid, gid) ) {
-        localStorage.setItem('userid', userid)
-        context.commit('UPDATE_USER', {
-          id: userid,
-          active: true,
-          group: gid
-        })
-        if (context.getters['getGroup'](gid).leader == '') context.commit('UPDATE_GROUP', {id: gid, leader: userid})
-        context.commit('UPDATE_GROUPUSERS', {
-          id: gid,
-          user: {[userid]: true}
-        })
-        context.commit('UPDATE_GROUPREADY', {
-          id: gid,
-          user: {[userid]: false}
-        })
+      console.log(gid)
+      if (context.getters['getGroup'](gid).leader == '') context.commit('UPDATE_GROUP', {id: gid, leader: userId})
 
-        if ( userid == 'admin' && gid == 'dashboard' ) router.push('/admin')
-        else router.push('/questionnaire')
-      }
-    },
-    createUser(
-      context,
-      sessionId: string
-    ){
-      const userIds = Object.keys(context.getters['getUsers']())
-      var userId: string = context.getters['getRandomUserId']()
-      while (userIds.includes(userId)) {
-        userId = context.getters['getRandomUserId']()
-      }
+      context.commit('UPDATE_GROUPUSERS', {
+        id: gid,
+        user: {[userId]: true}
+      })
+      context.commit('UPDATE_GROUPREADY', {
+        id: gid,
+        user: {[userId]: false}
+      })
 
+      console.log(gid)
       context.commit('ADD_USER', {
-        group: {},
+        group: gid,
         id: userId,
         active: false,
         session: sessionId,
@@ -394,11 +456,11 @@ export default createStore<RootState>({
         var sessionId = 's' + dateToday
       }
 
-      for (let i = 0; i < payload.userAmount; i++) {
-        context.dispatch('createUser', sessionId)
-      }
       for (let i = 0; i < payload.groupAmount; i++) {
         context.dispatch('createGroup', {sessionId: sessionId, color: colors.pop()})
+      }
+      for (let i = 0; i < payload.userAmount; i++) {
+        context.dispatch('createUser', sessionId)
       }
       
       var users: {[id: string]: boolean} = {}
@@ -409,8 +471,6 @@ export default createStore<RootState>({
       context.getters['getGroupsInSession'](sessionId).forEach((u: string) => {
         groups[u] = true;
       })
-
-
 
       context.commit('ADD_SESSION', {
         id: sessionId,
@@ -675,6 +735,40 @@ export default createStore<RootState>({
         groupId: payload.groupId,
         currentRound: currentRound,
         object: {interviewAnswer: payload.answer}
+      })
+    },
+    setCode(
+      context,
+      userId: string
+    ){
+      const words = [
+        'People',
+        'History',
+        'Way',
+        'Art',
+        'World',
+        'Information',
+        'Map',
+        'Two',
+        'Family',
+        'Government',
+        'Health',
+        'System',
+        'Computer',
+        'Meat',
+        'Year',
+        'Thanks',
+        'Music',
+        'Person',
+        'Reading',
+        'Method',
+        'Data',
+        'Food'
+      ]
+      const code = words[Math.floor(Math.random() * words.length)]
+      context.commit('UPDATE_USER', {
+        id: userId,
+        code: code
       })
     }
   }
