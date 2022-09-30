@@ -22,12 +22,12 @@
             </li>
           </ul>
           <hr/>
-          <ul v-for="group in groupsInSession">
+          <!-- <ul v-for="group in groupsInSession">
             <h5>{{group}}:</h5>
             <li v-for="user in store.getters['getGroupUsers'](group)">
               {{user}}
             </li>
-          </ul>
+          </ul> -->
         </div>
       </div>
       <div class="col-lg-4 selected d-flex">
