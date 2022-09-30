@@ -2,7 +2,7 @@ import { createStore, ActionContext, storeKey } from 'vuex'
 import { vuexfireMutations, firebaseAction } from 'vuexfire'
 import { rootDatabase } from '@/data/db'
 import firebase from 'firebase/app'
-import { DbState, pathItemState, QuestionState, RootState, RoundState, SessionState, UserState } from './types'
+import { DbState, GroupState, pathItemState, QuestionState, RootState, RoundState, SessionState, UserState } from './types'
 import router from '@/router'
 import words from './words'
 
@@ -252,41 +252,60 @@ export default createStore<RootState>({
     },
     initiateUser( 
       context: ActionContext<RootState, RootState>,
-      payload: {userid: string, groupid: string}
+      userid: string
     ){
-      const uid = payload.userid
-      const gid = payload.groupid 
 
-      if ( context.getters['getUserGroup'](uid) ) {
-        if ( context.getters['getUser'](uid).active ) {
+      const activeSession = context.getters['getActiveSession']()
+      const groupsInSession = context.getters['getGroupsInSession'](activeSession.id)
+      const usersInSessionLen = context.getters['getUsersInSession'](activeSession.id).length
+
+      // get max per group
+      var maxUsersPerGroup = Math.floor(usersInSessionLen / groupsInSession.length)
+      var usersInGroupInSession = 0
+      groupsInSession.forEach((g: string) => {
+        usersInGroupInSession += Object.keys(context.getters['getGroup'](g).users ?? []).length
+      });
+      if ( usersInGroupInSession >= maxUsersPerGroup * groupsInSession.length ) maxUsersPerGroup += 1
+      
+      const shuffledGroups = groupsInSession.sort((a: GroupState, b: GroupState) => 0.5 - Math.random())
+
+      var gid = shuffledGroups.pop()
+      if ( context.getters['getGroup'](gid).users != undefined ) {
+        while ( Object.keys(context.getters['getGroup'](gid).users).length >= maxUsersPerGroup) {
+          gid = shuffledGroups.pop()
+        }
+      }
+
+      if ( context.getters['getUserGroup'](userid) ) {
+        if ( context.getters['getUser'](userid).active ) {
           return console.log('Already logged in')
         } else {
-          localStorage.setItem('userid', uid)
+          localStorage.setItem('userid', userid)
           context.commit('UPDATE_USER', {
-            id: uid,
+            id: userid,
             active: true
           })
-          if ( uid == 'admin' && gid == 'dashboard' ) router.push('/admin')
+          if ( userid == 'admin' && gid == 'dashboard' ) router.push('/admin')
           else router.push('/questionnaire')  
         }
-      } else if ( context.getters['validUserAndGroup'](uid, gid) ) {
-        localStorage.setItem('userid', uid)
+      } else if ( context.getters['validUserAndGroup'](userid, gid) ) {
+        localStorage.setItem('userid', userid)
         context.commit('UPDATE_USER', {
-          id: uid,
+          id: userid,
           active: true,
           group: gid
         })
-        if (context.getters['getGroup'](gid).leader == '') context.commit('UPDATE_GROUP', {id: gid, leader: uid})
+        if (context.getters['getGroup'](gid).leader == '') context.commit('UPDATE_GROUP', {id: gid, leader: userid})
         context.commit('UPDATE_GROUPUSERS', {
           id: gid,
-          user: {[uid]: true}
+          user: {[userid]: true}
         })
         context.commit('UPDATE_GROUPREADY', {
           id: gid,
-          user: {[uid]: false}
+          user: {[userid]: false}
         })
 
-        if ( uid == 'admin' && gid == 'dashboard' ) router.push('/admin')
+        if ( userid == 'admin' && gid == 'dashboard' ) router.push('/admin')
         else router.push('/questionnaire')
       }
     },
@@ -390,6 +409,8 @@ export default createStore<RootState>({
       context.getters['getGroupsInSession'](sessionId).forEach((u: string) => {
         groups[u] = true;
       })
+
+
 
       context.commit('ADD_SESSION', {
         id: sessionId,

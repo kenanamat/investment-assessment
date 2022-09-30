@@ -16,6 +16,8 @@
   const currentUser = localStorage.getItem('userid')
   const pathLoc = computed(() => store.getters['getPathLoc'](currentUser))
 
+  
+
   if ( !(currentUser && store.getters['isActiveUser'](currentUser) && currentUser != 'admin') ) {
     router.push('/')
   }

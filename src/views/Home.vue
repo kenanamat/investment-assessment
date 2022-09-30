@@ -9,12 +9,12 @@
       </div>
       <div class="col-lg-3 availables">
         <div>
-          <h4>Available groups:</h4>
+          <!-- <h4>Available groups:</h4>
           <ul id="groups">
             <li class="valid" v-for="group in groupsInSession" @click="groupid = group" :class="{'active': groupid == group}">
               {{group}}
             </li>
-          </ul>
+          </ul> -->
           <h4>Available usernames:</h4>
           <ul>
             <li class="valid" v-for="user in usersAvailable" @click="userid = user" :class="{'active': userid == user}">
@@ -30,9 +30,9 @@
           </ul>
         </div>
       </div>
-      <div class="col-lg-4 selected">
-        <form @submit.prevent="store.dispatch('initiateUser', {userid, groupid})" id="login">
-          <h4>Your selected group:</h4>
+      <div class="col-lg-4 selected d-flex">
+        <form @submit.prevent="store.dispatch('initiateUser', userid)" id="login">
+          <!-- <h4>Your selected group:</h4>
           <input 
             type="text" 
             placeholder="Select a group"
@@ -40,7 +40,7 @@
             v-model="groupid"
             required
             readonly
-          />
+          /> -->
           <h4>Your selected username:</h4>
           <input 
             type="text" 
