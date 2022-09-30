@@ -15,7 +15,8 @@ export interface UserState {
   id: string,
   active: boolean,
   session: string,
-  questionnaires: {}
+  questionnaires: {},
+  code: string
 }
 
 export interface QuestionState {

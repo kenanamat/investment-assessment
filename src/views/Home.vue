@@ -9,30 +9,30 @@
       </div>
       <div class="col-lg-3 availables">
         <div>
-          <h4>Available groups:</h4>
+          <!-- <h4>Available groups:</h4>
           <ul id="groups">
             <li class="valid" v-for="group in groupsInSession" @click="groupid = group" :class="{'active': groupid == group}">
               {{group}}
             </li>
-          </ul>
+          </ul> -->
           <h4>Available usernames:</h4>
           <ul>
-            <li class="valid" v-for="user in usersAvailable" @click="userid = user" :class="{'active': userid == user}">
+            <li class="valid" v-for="user in users" @click="userid = user" :class="{'active': userid == user}">
               {{user}}
             </li>
           </ul>
           <hr/>
-          <ul v-for="group in groupsInSession">
+          <!-- <ul v-for="group in groupsInSession">
             <h5>{{group}}:</h5>
             <li v-for="user in store.getters['getGroupUsers'](group)">
               {{user}}
             </li>
-          </ul>
+          </ul> -->
         </div>
       </div>
-      <div class="col-lg-4 selected">
-        <form @submit.prevent="store.dispatch('initiateUser', {userid, groupid})" id="login">
-          <h4>Your selected group:</h4>
+      <div class="col-lg-4 selected d-flex">
+        <form @submit.prevent="store.dispatch('initiateUser', userid)" id="login">
+          <!-- <h4>Your selected group:</h4>
           <input 
             type="text" 
             placeholder="Select a group"
@@ -40,7 +40,7 @@
             v-model="groupid"
             required
             readonly
-          />
+          /> -->
           <h4>Your selected username:</h4>
           <input 
             type="text" 
@@ -50,8 +50,15 @@
             required
             readonly
           />
+          <input
+            v-if="userCode"            
+            type="text" 
+            v-model="code" 
+            placeholder="Enter your code"
+            required
+          />
         </form>
-        <button type="submit" form="login">
+        <button type="submit" form="login" v-if="!userCode || code == userCode">
           <img src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg">
         </button>
       </div>
@@ -92,7 +99,8 @@
     </div>
   </div>
   <div v-show="false" v-else>
-    {{store.dispatch('removeLocalUser', currentUser)}}
+    {{router.push('/questionnaire')}}
+    <!-- {{store.dispatch('removeLocalUser', currentUser)}} -->
     <!-- <h2>{{currentUser}}</h2>
     Je bent al ingelogd
     <br/>
@@ -124,4 +132,8 @@ const groups = computed(() => store.getters['getGroups']())
 
 const userid = ref("")
 const groupid = ref("")
+
+const userCode = computed(() => store.getters['getUser'](userid.value).code ?? false)
+const code = ref("")
+
 </script>

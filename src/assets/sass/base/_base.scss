@@ -56,12 +56,13 @@ ul {
     top: -200px;
     width: calc(100% + 400px);
     height: calc(100vh + 400px);
-    clip-path: polygon(0 0, 70% 0, 50% 100%, 0 100%);
+    clip-path: polygon(0 0, 70% 0, 50% 87%, 0 100%);
     z-index: 1;
     box-shadow: inset 0 0 0 1000px rgba(0,0,0,.6);
     &.admin {
       background-image: url(https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/uploads/2020/09/021A9608-scaled-e1600783555147.jpg);
       height: calc(100vh + 200px);
+      clip-path: polygon(0 0, 70% 0, 50% 100%, 0 100%);
     }
   }
   .welcome {
