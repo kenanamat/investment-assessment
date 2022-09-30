@@ -27,7 +27,8 @@
           questionnaire: questionnaire,
           currentQuestionId: currentQuestion.id,
           answer: answer
-        })"
+        });
+        answer = currentQuestion.answer"
       >
         Previous question
       </button>
@@ -37,7 +38,8 @@
           questionnaire: questionnaire,
           currentQuestionId: currentQuestion.id,
           answer: answer
-        })"
+        }); 
+        answer = ''"
       >
         Next question
       </button>

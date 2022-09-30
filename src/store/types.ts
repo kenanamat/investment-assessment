@@ -28,13 +28,15 @@ export interface QuestionState {
 
 export interface GameState {
   rounds: [RoundState],
-  time: number
+  time: number,
+  interview: boolean
 }
 
 export interface RoundState {
   completed: boolean,
   index: number,
   profit: number,
+  interviewAnswer: string,
   values: {},
   answers: {}
 }

@@ -1,22 +1,28 @@
 <template>
-  <div id="leaderboard" v-if="groupSubmitted">
-    <Leaderboard/>
-
-    <!-- <LineChart
-      chartId="bar-chart"
-      :chartData="{
-        labels: Array.from(Array(currentRound + 1).keys()),
-        datasets: [ { data: store.getters['getGroupProfits'](userGroup.id) } ]
-      }"
-      datasetIdKey='label'
-      :width="400"
-      :height="400"
-      cssClasses=''
-      styles=''
-    />
-    <button v-if="userGroup.leader == currentUser" @click="store.dispatch('readyUp', userGroup.id)">
-      Ready
-    </button> -->
+  <div v-if="groupSubmitted">
+    <div v-if="groupGame.interview && groupRound.interviewAnswer == ''">
+      <div id="question">
+        <div class="input">
+          <div class="title">
+            <h2>Why did you choose your answer?</h2>
+          </div>
+          <textarea v-model="interviewAnswer" type="text" placeholder="Type your answer here..."/>
+        </div>
+      </div>
+      <button class="next" @click="store.dispatch('submitInterview', {
+          groupId: userGroup.id,
+          answer: interviewAnswer
+        });
+        interviewAnswer = ''"
+      >
+        Submit answer
+      </button>
+    </div>
+    <div v-else>
+      <div id="leaderboard">
+        <Leaderboard/>
+      </div>
+    </div>
   </div>
   <div v-else id="game">
     <input type="range" min="1" max="100" v-model="rdVal" 
@@ -76,7 +82,6 @@
 
   const store = useStore()
 
-
   // store.dispatch('checkRound')
   const currentUser = localStorage.getItem('userid')
   const activeSession = store.getters['getActiveSession']()
@@ -84,7 +89,11 @@
   const currentRound = computed(() => store.getters['getCurrentRound']())
 
   const userGroup = computed(() => store.getters['getUserGroup'](currentUser))
+  const groupGame = computed(() => store.getters['getGroupGame'](userGroup.value.id))
   const groupRound = computed(() => store.getters['getGroupGameRound'](userGroup.value.id, currentRound.value))
+  const interviewAnswer = ref("")
+
+
   const groupSubmitted = computed(() => groupRound.value.completed)
   const groupsInSessionIds = store.getters['getGroupsInSession'](activeSession.id)
   const groupsInSession = computed(() => {
