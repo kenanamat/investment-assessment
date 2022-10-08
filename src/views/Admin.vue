@@ -3,7 +3,7 @@
     <div v-if="currentSession">
       <button @click="store.dispatch('endSession')">End Session</button>
       <button @click="store.dispatch('removeLocalUser', currentUser)">done</button>
-      <button v-if="pathLoc.canContinue == false" @click="store.dispatch('continueSession')">Resume</button>
+      <button v-if="!nextPathItem.canContinue" @click="store.dispatch('continueSession')">Resume</button>
     </div>
     <div v-else>
       <h3>How many users</h3>
@@ -14,6 +14,9 @@
       <button @click="store.dispatch('startSession', {userAmount: userAmount, groupAmount: groupAmount})">Start Session</button>
       <br/>
       <button @click="store.dispatch('removeLocalUser', currentUser)">Log out</button>
+      <div id="hidden">
+        <button @click="store.dispatch('reset')">X</button>
+      </div>
     </div>
   </div>
   <div v-else>
@@ -44,7 +47,8 @@
 
   const currentUser = localStorage.getItem('userid')
   const currentSession = computed(() => store.getters['getActiveSession']())
-  const pathLoc = computed(() => store.getters['getPathLoc'](currentUser))
+  const pathItem = computed(() => store.getters['getPathItem'](currentUser))
+  const nextPathItem = computed(() => store.getters['getNextPathItem']())
 
   const userAmount = ref(0)
   const groupAmount = ref(0)

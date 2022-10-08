@@ -66,6 +66,4 @@
     profits[groupId] = store.getters['getGroupProfits'](groupId)
     return profits
   }, {}))
-
-  console.log(profitsGroups.value)
 </script>
