@@ -102,6 +102,7 @@ export default createStore<RootState>({
     },
     getPathItem: (state: RootState, getters: any) => (userId: string) => {
       const sessionPath = getters['getActiveSession']().path
+      console.log(sessionPath)
       if ( sessionPath ) return sessionPath.find((p: pathItemState) => !p.completed && p.canContinue ) ?? false
       else return false
     },
@@ -407,6 +408,7 @@ export default createStore<RootState>({
         users: users,
         date: dateToday,
         currentRound: 0,
+        timeLeft: 30,
         path: {
           0: {
             index: 0,
@@ -704,6 +706,35 @@ export default createStore<RootState>({
         id: userId,
         code: code
       })
+    },
+    startCountdown(
+      context,
+      seconds: number
+    ) {
+      var secondsLeft = seconds
+      const sessionId = context.getters['getActiveSession']().id
+
+      context.commit('UPDATE_SESSION', {
+        id: sessionId,
+        timeLeft: secondsLeft
+      })
+
+      const now = Date.now()
+      const end = now + seconds * 1000
+
+      const intervalTimer = setInterval(() => {
+        secondsLeft = Math.round((end - Date.now()) / 1000)
+
+        if(secondsLeft < 0) {
+          clearInterval(intervalTimer)
+          return
+        }
+
+        context.commit('UPDATE_SESSION', {
+          id: sessionId,
+          timeLeft: secondsLeft
+        })
+      }, 1000)
     },
     reset(
       context

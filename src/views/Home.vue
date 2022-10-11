@@ -4,6 +4,7 @@
     </div>
     <div  class="row welcome"> 
       <div class="col-lg-5 title">
+        <Timer/>
         <h3>Welcome</h3>
         <h1>Choose an available username and join a group</h1>
       </div>
@@ -87,6 +88,7 @@ import { computed } from '@vue/reactivity';
 import { useStore } from 'vuex';
 import { ref } from 'vue';
 import router from '@/router';
+import Timer from '@/components/Timer.vue';
 
 const store = useStore()
 await store.dispatch('bindDatabase')

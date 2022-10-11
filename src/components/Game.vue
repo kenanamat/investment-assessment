@@ -1,4 +1,5 @@
 <template>
+  <Timer/>
   <div v-if="groupSubmitted">
     <div v-if="groupGame.interview && groupRound.interviewAnswer == ''">
       <div id="question">
@@ -78,6 +79,7 @@
   import BarChart from './BarChart.vue';
   import LineChart from './LineChart.vue';
   import Leaderboard from './Leaderboard.vue';
+import Timer from './Timer.vue';
 
 
   const store = useStore()
