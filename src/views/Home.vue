@@ -4,7 +4,6 @@
     </div>
     <div  class="row welcome"> 
       <div class="col-lg-5 title">
-        <Timer/>
         <h3>Welcome</h3>
         <h1>Choose an available username and join a group</h1>
       </div>

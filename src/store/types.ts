@@ -61,7 +61,7 @@ export interface SessionState {
   active: boolean,
   path: {[id: number]: pathItemState},
   currentRound: number,
-  timeLeft: number
+  timerEnd: number
 }
 
 export interface pathItemState {

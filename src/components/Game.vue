@@ -1,5 +1,4 @@
 <template>
-  <Timer/>
   <div v-if="groupSubmitted">
     <div v-if="groupGame.interview && groupRound.interviewAnswer == ''">
       <div id="question">
@@ -26,6 +25,8 @@
     </div>
   </div>
   <div v-else id="game">
+    <Timer :time="groupGame.time" v-if="groupGame"/>
+
     <input type="range" min="1" max="100" v-model="rdVal" 
       @input ="datasets = {
         labels: [ 'January', 'February', 'March' ],

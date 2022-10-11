@@ -1,5 +1,7 @@
 <template>
- {{getTime(secondsLeft)}}
+  <div id="timer">
+    {{getTime(timeLeft)}}
+  </div>
 </template>
 
 
@@ -18,7 +20,29 @@ const getTime = (sec: number) => {
   return `${zeroPadded(minutes)}:${zeroPadded(seconds)}`
 }
 
-const secondsLeft = computed(() => store.getters['getActiveSession']().timeLeft)
-store.dispatch('startCountdown', 90)
+interface Props {
+  time?: number
+}
+const props = withDefaults(defineProps<Props>(), {
+  time: 30
+})
 
+const endTime = computed(() => store.getters['getActiveSession']().timerEnd)
+if ( endTime.value <= Date.now() || endTime.value == null ) store.dispatch('setTimerEnd', props.time)
+
+const timeLeft = ref(props.time)
+
+const intervalTimer = setInterval(() => {
+  timeLeft.value = Math.round((endTime.value - Date.now()) / 1000)
+
+  if(timeLeft.value < 0) {
+    clearInterval(intervalTimer)
+    return
+  }
+
+}, 1000)
 </script>
+
+<style lang="scss">
+  @use '@/assets/sass/components/timer';
+</style>
