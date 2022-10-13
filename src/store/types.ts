@@ -1,5 +1,6 @@
 export interface RootState {
-  db: DbState
+  db: DbState,
+  timeLeft: number
 }
 
 export interface DbState {

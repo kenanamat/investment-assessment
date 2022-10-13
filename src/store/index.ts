@@ -11,7 +11,8 @@ export default createStore<RootState>({
     words
   },
   state: {
-    db: {}
+    db: {},
+    timeLeft: 1
   } as RootState,
   getters: {
     getDb: (state: RootState) => () => {
