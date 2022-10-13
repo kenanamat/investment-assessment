@@ -87,6 +87,7 @@ import { computed } from '@vue/reactivity';
 import { useStore } from 'vuex';
 import { ref } from 'vue';
 import router from '@/router';
+import Timer from '@/components/Timer.vue';
 
 const store = useStore()
 await store.dispatch('bindDatabase')

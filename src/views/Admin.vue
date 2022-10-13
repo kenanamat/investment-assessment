@@ -3,7 +3,7 @@
     <div v-if="currentSession">
       <button @click="store.dispatch('endSession')">End Session</button>
       <button @click="store.dispatch('removeLocalUser', currentUser)">done</button>
-      <button v-if="!nextPathItem.canContinue" @click="store.dispatch('continueSession')">Resume</button>
+      <button v-if="nextPathItem && !nextPathItem.canContinue" @click="store.dispatch('continueSession')">Resume</button>
     </div>
     <div v-else>
       <h3>How many users</h3>

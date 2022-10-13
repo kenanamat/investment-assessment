@@ -11,7 +11,8 @@ export default createStore<RootState>({
     words
   },
   state: {
-    db: {}
+    db: {},
+    timeLeft: 1
   } as RootState,
   getters: {
     getDb: (state: RootState) => () => {
@@ -407,6 +408,7 @@ export default createStore<RootState>({
         users: users,
         date: dateToday,
         currentRound: 0,
+        timerEnd: null,
         path: {
           0: {
             index: 0,
@@ -703,6 +705,16 @@ export default createStore<RootState>({
       context.commit('UPDATE_USER', {
         id: userId,
         code: code
+      })
+    },
+    setTimerEnd(
+      context,
+      seconds: number
+    ) {
+      const session = context.getters['getActiveSession']()
+      context.commit('UPDATE_SESSION', {
+        id: session.id,
+        timerEnd: Date.now() + (seconds * 1000)
       })
     },
     reset(

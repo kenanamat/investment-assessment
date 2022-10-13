@@ -25,6 +25,9 @@
     </div>
   </div>
   <div v-else id="game">
+    {{store.state.timeLeft}}
+    <Timer :time="groupGame.time" v-if="groupGame"/>
+
     <input type="range" min="1" max="100" v-model="rdVal" 
       @input ="datasets = {
         labels: [ 'January', 'February', 'March' ],
@@ -32,7 +35,7 @@
       }"
     >
     {{rdVal}}
-    <BarChart
+    <!-- <BarChart
       chartId="bar-chart"
       :chartData="{
         labels: [ 'January', 'February', 'March' ],
@@ -43,10 +46,10 @@
       :height="400"
       cssClasses=''
       styles=''
-    />
+    /> -->
     <input type="range" min="1" max="100" v-model="factVal">
     {{factVal}}
-    <LineChart
+    <!-- <LineChart
       chartId="bar-chart"
       :chartData="{
         labels: randomData[1],
@@ -57,7 +60,17 @@
       :height="400"
       cssClasses=''
       styles=''
-    />
+    /> -->
+    <div v-show="false" v-if="userGroup.leader == currentUser && store.state.timeLeft < 0">
+      {{
+        store.dispatch('submitAnswer', {
+          groupId: userGroup.id, 
+          answers: {rd: rdAnswer, factories: factAnswer},
+          profit: rdAnswer + factAnswer
+        })
+      }}
+      {{store.state.timeLeft = 10}}
+    </div>
     <button v-if="userGroup.leader == currentUser" @click="store.dispatch('submitAnswer', {
         groupId: userGroup.id, 
         answers: {rd: rdAnswer, factories: factAnswer},
@@ -78,6 +91,7 @@
   import BarChart from './BarChart.vue';
   import LineChart from './LineChart.vue';
   import Leaderboard from './Leaderboard.vue';
+  import Timer from './Timer.vue';
 
 
   const store = useStore()

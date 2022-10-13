@@ -1,5 +1,6 @@
 export interface RootState {
-  db: DbState
+  db: DbState,
+  timeLeft: number
 }
 
 export interface DbState {
@@ -60,7 +61,8 @@ export interface SessionState {
   users: {},
   active: boolean,
   path: {[id: number]: pathItemState},
-  currentRound: number
+  currentRound: number,
+  timerEnd: number
 }
 
 export interface pathItemState {

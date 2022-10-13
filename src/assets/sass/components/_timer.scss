@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
+
+#timer {
+  font-family: 'Silkscreen', cursive;
+  font-size: 5rem;
+  position: absolute;
+  width: 400px;
+  top: 0;
+  right: 0;
+  background-color: var(--hover-grey);
+  border: solid 4px white;
+  border-radius: 16px;
+  padding: 1rem;
+  transition: background-color 20s ease-in;
+}
+#timer.stressed {
+  background-color: var(--red);
+  animation: pulse 1.5s ease-out infinite;
+}
+
+
+@keyframes pulse {
+  0%    { box-shadow: 0 0 0 0 var(--red); }
+  100%  { box-shadow: 0 0 0 16px rgba(52,106,180,0); }
+}
