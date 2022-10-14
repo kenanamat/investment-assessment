@@ -31,7 +31,8 @@ export interface QuestionState {
 export interface GameState {
   rounds: [RoundState],
   time: number,
-  interview: boolean
+  interview: boolean,
+  groupEdit: boolean
 }
 
 export interface RoundState {

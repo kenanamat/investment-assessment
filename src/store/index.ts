@@ -487,6 +487,7 @@ export default createStore<RootState>({
       const maxRounds = context.getters['getGroup'](context.getters['getGroupsInSession'](context.getters['getActiveSession']().id)[0]).game.rounds.length - 1
 
       if ( context.getters['getGroupsReady']() && activeSession ) {
+        context.dispatch('unreadyAll')
         if (currentRound >= maxRounds) {
           const pathItem = context.getters['getPathItem']()
           if ( pathItem ) {
@@ -502,7 +503,7 @@ export default createStore<RootState>({
             currentRound: currentRound + 1
           })
         }
-        context.dispatch('unreadyAll')
+        context.dispatch('setTimerEnd', 0)
       }
     },
     addQuestionnaireToUser(

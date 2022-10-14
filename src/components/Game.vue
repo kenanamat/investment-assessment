@@ -1,22 +1,25 @@
 <template>
   <div v-if="groupSubmitted">
     <div v-if="groupGame.interview && groupRound.interviewAnswer == ''">
-      <div id="question">
+      <div id="question" v-if="userGroup.leader == currentUser">
         <div class="input">
           <div class="title">
             <h2>Why did you choose your answer?</h2>
           </div>
           <textarea v-model="interviewAnswer" type="text" placeholder="Type your answer here..."/>
         </div>
+        <button class="next" @click="store.dispatch('submitInterview', {
+            groupId: userGroup.id,
+            answer: interviewAnswer
+          });
+          interviewAnswer = ''"
+        >
+          Submit answer
+        </button>
       </div>
-      <button class="next" @click="store.dispatch('submitInterview', {
-          groupId: userGroup.id,
-          answer: interviewAnswer
-        });
-        interviewAnswer = ''"
-      >
-        Submit answer
-      </button>
+      <div v-else>
+        Discuss with group leader
+      </div>
     </div>
     <div v-else>
       <div id="leaderboard">
@@ -25,7 +28,6 @@
     </div>
   </div>
   <div v-else id="game">
-    {{store.state.timeLeft}}
     <Timer :time="groupGame.time" v-if="groupGame"/>
 
     <input type="range" min="1" max="100" v-model="rdVal" 
@@ -75,7 +77,8 @@
         groupId: userGroup.id, 
         answers: {rd: rdAnswer, factories: factAnswer},
         profit: rdAnswer + factAnswer
-      })"
+      });
+      store.state.timeLeft = 10"
     >
       verder
     </button>
@@ -115,36 +118,42 @@
     groupsInSessionIds.forEach((g:string) => groups.push(store.getters['getGroup'](g)))
     return groups
   })
-  const maxRounds = userGroup.value.game.rounds.length - 1
 
-  const rdVal = computed({
-    // getter
-    get() {
-      return store.getters['getGroupValue'](userGroup.value.id, currentRound.value, 'rd')
-    },
-    // setter
-    set(newNumber) {
-      store.dispatch('updateNumber', {
-        groupId: userGroup.value.id,
-        value: Number(newNumber),
-        type: 'rd'
-      })
-    }
-  })
-  const factVal = computed({
-    // getter
-    get() {
-      return store.getters['getGroupValue'](userGroup.value.id, currentRound.value, 'factories')
-    },
-    // setter
-    set(newNumber) {
-      store.dispatch('updateNumber', {
-        groupId: userGroup.value.id,
-        value: Number(newNumber),
-        type: 'factories'
-      })
-    }
-  })
+
+  var rdVal = ref(store.getters['getGroupValue'](userGroup.value.id, currentRound.value, 'rd'))
+  var factVal = ref(store.getters['getGroupValue'](userGroup.value.id, currentRound.value, 'factories'))
+  
+  if ( groupGame.value.groupEdit || (!groupGame.value.groupEdit && userGroup.value.leader == currentUser) ) {
+    rdVal = computed({
+      // getter
+      get() {
+        return store.getters['getGroupValue'](userGroup.value.id, currentRound.value, 'rd')
+      },
+      // setter
+      set(newNumber) {
+        store.dispatch('updateNumber', {
+          groupId: userGroup.value.id,
+          value: Number(newNumber),
+          type: 'rd'
+        })
+      }
+    })
+    factVal = computed({
+      // getter
+      get() {
+        return store.getters['getGroupValue'](userGroup.value.id, currentRound.value, 'factories')
+      },
+      // setter
+      set(newNumber) {
+        store.dispatch('updateNumber', {
+          groupId: userGroup.value.id,
+          value: Number(newNumber),
+          type: 'factories'
+        })
+      }
+    })
+  }
+
 
   const rdAnswer = computed(() => rdVal.value * 10)
   const factAnswer = computed(() => Math.round(factVal.value / 2))
