@@ -5,6 +5,7 @@
         <div class="title">
           <small>{{currentQuestion.id}}</small>
           <h2>{{currentQuestion.question}}</h2>
+          <p>{{currentQuestion.comment}}</p>
         </div>
         <input v-model="answer" type="text" placeholder="Type your answer here..."/>
       </div>
@@ -19,6 +20,27 @@
           <div class="answer">{{currentQuestion.answers[letter]}}</div>
         </label>
       </div>
+      <div class="followup" v-if="currentQuestion.followup && answer == 'Yes'">
+        <div class="input" v-if="currentQuestion.followup.type == 'input'">
+          <div class="title">
+            <small>{{currentQuestion.followup.id}}</small>
+            <h2>{{currentQuestion.followup.question}}</h2>
+            <p>{{currentQuestion.followup.comment}}</p>
+          </div>
+          <input v-model="followupAnswer" type="text" placeholder="Type your answer here..."/>
+        </div>
+        <div class="multiple" v-else-if="currentQuestion.followup.type == 'multiple'">
+          <div class="title">
+            <small>{{currentQuestion.followup.id}}</small>
+            <h2>{{currentQuestion.followup.question}}</h2>
+          </div>
+          <label class="radio" v-for="letter in Object.keys(currentQuestion.followup.answers)" :key="letter">
+            <input type="radio" :id="letter" :value="currentQuestion.followup.answers[letter]" v-model="followupAnswer"/>
+            <div class="letter">{{letter}}</div>
+            <div class="answer">{{currentQuestion.followup.answers[letter]}}</div>
+          </label>
+        </div>
+      </div>
     </div>
     <br/>
     <div id="next-buttons">
@@ -28,7 +50,8 @@
           currentQuestionId: currentQuestion.id,
           answer: answer
         });
-        answer = currentQuestion.answer"
+        answer = currentQuestion.answer;
+        followupAnswer = currentQuestion.followup.answer"
       >
         Previous question
       </button>
@@ -37,9 +60,11 @@
           userId: user,
           questionnaire: questionnaire,
           currentQuestionId: currentQuestion.id,
-          answer: answer
+          answer: answer,
+          followup: followupAnswer
         }); 
-        answer = ''"
+        answer = '';
+        followupAnswer = ''"
       >
         Next question
       </button>
@@ -60,6 +85,7 @@
 
   const currentQuestion = computed(() => store.getters['getCurrentQuestion'](props.user, props.questionnaire))
   const answer = ref(currentQuestion.value.answer)
+  const followupAnswer = ref(currentQuestion.value.followup.answer)
 
 </script>
 

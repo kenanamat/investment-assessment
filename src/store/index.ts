@@ -173,6 +173,13 @@ export default createStore<RootState>({
         payload.questionnaire + '/' +
         payload.currentQuestionId).update({answer: payload.answer});
     },
+    UPDATE_USERFOLLOWUP(state: RootState, payload) {
+      firebase.database().ref('db/users/' +
+      payload.userId + '/' +
+      'questionnaires/' +
+      payload.questionnaire + '/' +
+      payload.currentQuestionId + '/followup').update({answer: payload.answer});
+    },
     UPDATE_QUESTIONACTIVE(state: RootState, payload) {
       firebase.database().ref('db/users/' + 
         payload.userId + '/' +
@@ -415,7 +422,7 @@ export default createStore<RootState>({
             canContinue: true,
             completed: false,
             type: 'questionnaire',
-            id: 'entry'
+            id: 'Ex-ante'
           },
           1: {
             index: 1,
@@ -534,9 +541,18 @@ export default createStore<RootState>({
         userId: string,
         questionnaire: string,
         currentQuestionId: string,
-        answer: string
+        answer: string,
+        followup: string
       }
     ){
+      if (payload.followup != "") {
+        context.commit('UPDATE_USERFOLLOWUP', {
+          userId: payload.userId,
+          questionnaire: payload.questionnaire,
+          currentQuestionId: payload.currentQuestionId,
+          answer: payload.followup
+        })
+      }
       if ( Number(payload.currentQuestionId) == Object.keys(context.getters['getUserQuestionnaire'](payload.userId, payload.questionnaire)).length ) {
         context.commit('UPDATE_GROUPREADY', {
           id: context.getters['getUserGroup'](payload.userId).id,
