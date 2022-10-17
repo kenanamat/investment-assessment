@@ -154,6 +154,23 @@ export default createStore<RootState>({
     },
     getRandomUserId: (state: any) => () => {
       return state.words.adjectives[Math.floor(Math.random() * state.words.adjectives.length)] + state.words.nouns[Math.floor(Math.random() * state.words.nouns.length)];
+    },
+    getShuffled: (state: RootState) => ( array: number[] | string[] ) => {
+      let currentIndex = array.length,  randomIndex;
+    
+      // While there remain elements to shuffle.
+      while (currentIndex != 0) {
+    
+        // Pick a remaining element.
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+    
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+          array[randomIndex], array[currentIndex]];
+      }
+    
+      return array;
     }
   },
   mutations: {
@@ -292,7 +309,7 @@ export default createStore<RootState>({
       if ( usersInGroupInSession >= maxUsersPerGroup * groupsInSession.length ) maxUsersPerGroup += 1
       
       // add to shuffled group
-      const shuffledGroups = groupsInSession.sort((a: GroupState, b: GroupState) => 0.5 - Math.random())
+      const shuffledGroups = context.getters['getShuffled'](groupsInSession)
       var gid = shuffledGroups.pop()
       if ( gid && context.getters['getGroup'](gid).users != undefined ) {
         while ( context.getters['getGroup'](gid).users != undefined && Object.keys(context.getters['getGroup'](gid).users).length >= maxUsersPerGroup ) {
@@ -748,6 +765,6 @@ export default createStore<RootState>({
           active: false
         })
       } else return
-    }
+    },
   }
 })

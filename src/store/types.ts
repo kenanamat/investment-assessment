@@ -25,7 +25,10 @@ export interface QuestionState {
   answer: string,
   question: string,
   type: string,
-  answers: {[letter: string]: string}
+  answers: {[letter: string]: string},
+  comment: string,
+  followup: QuestionState,
+  max: number
 }
 
 export interface GameState {
