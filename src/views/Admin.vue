@@ -6,6 +6,10 @@
       <button @click="download()">Download excel</button>
       <button @click="backup()">backup database</button>
       <button v-if="nextPathItem && !nextPathItem.canContinue" @click="store.dispatch('continueSession')">Resume</button>
+      <h3>Users in session:</h3>
+      <div v-for="user in store.getters['getUsersInSession'](currentSession.id)" :key="user.id">
+        <p>{{user}} | {{store.getters['getUser'](user).code}}</p>
+      </div>
     </div>
     <div v-else>
       <h3>How many users</h3>
