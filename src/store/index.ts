@@ -154,6 +154,23 @@ export default createStore<RootState>({
     },
     getRandomUserId: (state: any) => () => {
       return state.words.adjectives[Math.floor(Math.random() * state.words.adjectives.length)] + state.words.nouns[Math.floor(Math.random() * state.words.nouns.length)];
+    },
+    getShuffled: (state: RootState) => ( array: number[] | string[] ) => {
+      let currentIndex = array.length,  randomIndex;
+    
+      // While there remain elements to shuffle.
+      while (currentIndex != 0) {
+    
+        // Pick a remaining element.
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+    
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+          array[randomIndex], array[currentIndex]];
+      }
+    
+      return array;
     }
   },
   mutations: {
@@ -172,6 +189,13 @@ export default createStore<RootState>({
         'questionnaires/' +
         payload.questionnaire + '/' +
         payload.currentQuestionId).update({answer: payload.answer});
+    },
+    UPDATE_USERFOLLOWUP(state: RootState, payload) {
+      firebase.database().ref('db/users/' +
+      payload.userId + '/' +
+      'questionnaires/' +
+      payload.questionnaire + '/' +
+      payload.currentQuestionId + '/followup').update({answer: payload.answer});
     },
     UPDATE_QUESTIONACTIVE(state: RootState, payload) {
       firebase.database().ref('db/users/' + 
@@ -285,7 +309,7 @@ export default createStore<RootState>({
       if ( usersInGroupInSession >= maxUsersPerGroup * groupsInSession.length ) maxUsersPerGroup += 1
       
       // add to shuffled group
-      const shuffledGroups = groupsInSession.sort((a: GroupState, b: GroupState) => 0.5 - Math.random())
+      const shuffledGroups = context.getters['getShuffled'](groupsInSession)
       var gid = shuffledGroups.pop()
       if ( gid && context.getters['getGroup'](gid).users != undefined ) {
         while ( context.getters['getGroup'](gid).users != undefined && Object.keys(context.getters['getGroup'](gid).users).length >= maxUsersPerGroup ) {
@@ -415,7 +439,7 @@ export default createStore<RootState>({
             canContinue: true,
             completed: false,
             type: 'questionnaire',
-            id: 'entry'
+            id: 'Ex-ante'
           },
           1: {
             index: 1,
@@ -534,9 +558,18 @@ export default createStore<RootState>({
         userId: string,
         questionnaire: string,
         currentQuestionId: string,
-        answer: string
+        answer: string,
+        followup: string
       }
     ){
+      if (payload.followup != "") {
+        context.commit('UPDATE_USERFOLLOWUP', {
+          userId: payload.userId,
+          questionnaire: payload.questionnaire,
+          currentQuestionId: payload.currentQuestionId,
+          answer: payload.followup
+        })
+      }
       if ( Number(payload.currentQuestionId) == Object.keys(context.getters['getUserQuestionnaire'](payload.userId, payload.questionnaire)).length ) {
         context.commit('UPDATE_GROUPREADY', {
           id: context.getters['getUserGroup'](payload.userId).id,
@@ -732,6 +765,6 @@ export default createStore<RootState>({
           active: false
         })
       } else return
-    }
+    },
   }
 })

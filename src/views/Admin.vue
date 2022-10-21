@@ -3,7 +3,13 @@
     <div v-if="currentSession">
       <button @click="store.dispatch('endSession')">End Session</button>
       <button @click="store.dispatch('removeLocalUser', currentUser)">done</button>
+      <button @click="download()">Download excel</button>
+      <button @click="backup()">backup database</button>
       <button v-if="nextPathItem && !nextPathItem.canContinue" @click="store.dispatch('continueSession')">Resume</button>
+      <h3>Users in session:</h3>
+      <div v-for="user in store.getters['getUsersInSession'](currentSession.id)" :key="user.id">
+        <p>{{user}} | {{store.getters['getUser'](user).code}}</p>
+      </div>
     </div>
     <div v-else>
       <h3>How many users</h3>
@@ -39,6 +45,7 @@
 
 <script lang="ts" setup>
   import router from '@/router';
+  import exportFromJSON from "export-from-json"
   import { computed } from '@vue/reactivity';
   import { useStore } from 'vuex';
   import { ref } from 'vue';
@@ -53,4 +60,19 @@
   const userAmount = ref(0)
   const groupAmount = ref(0)
   const password = ref('')
+
+  const download = () => {
+    var data = JSON.parse(JSON.stringify(Object.values(store.state.db.users)))
+    var fileName = "np-data" + Date.now()
+    var exportType = exportFromJSON.types.xls
+
+    if (data) exportFromJSON({ data, fileName, exportType })
+  }
+  const backup = () => {
+    var data = JSON.parse(JSON.stringify(store.state))
+    var fileName = "np-data" + Date.now() + "bak"
+    var exportType = exportFromJSON.types.json
+
+    if (data) exportFromJSON({ data, fileName, exportType })
+  }
 </script>
