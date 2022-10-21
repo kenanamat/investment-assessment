@@ -11,36 +11,43 @@
 </template>
 
 <script lang="ts" setup>
-import { Bar } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-import { computed } from '@vue/reactivity';
-import { useStore } from 'vuex';
-import { ref } from 'vue'
+import { Bar } from "vue-chartjs";
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+} from "chart.js";
+import { computed } from "@vue/reactivity";
+import { useStore } from "vuex";
+import { ref } from "vue";
 
-const store = useStore()
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+const store = useStore();
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 interface Props {
-  chartId?: string,
-  datasetIdKey?: string,
-  width?: number,
-  height?: number,
-  cssClasses?: string,
-  number?: number,
-  styles?: string,
-  value?: any
+  chartId?: string;
+  datasetIdKey?: string;
+  width?: number;
+  height?: number;
+  cssClasses?: string;
+  number?: number;
+  styles?: string;
+  value?: any;
 }
 const props = withDefaults(defineProps<Props>(), {
-  chartId: 'bar-chart',
-  datasetIdKey: 'label', 
+  chartId: "bar-chart",
+  datasetIdKey: "label",
   width: 100,
   height: 100,
-  cssClasses: '',
+  cssClasses: "",
   number: 0,
-  styles: '',
-  value: ''
-})
-
+  styles: "",
+  value: "",
+});
 
 const chartOptions = {
   responsive: false,
@@ -48,8 +55,7 @@ const chartOptions = {
     y: {
       max: 100,
       min: 0,
-    }
-  }
-}
-
+    },
+  },
+};
 </script>

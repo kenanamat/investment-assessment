@@ -5,20 +5,37 @@
       <button @click="store.dispatch('removeLocalUser', currentUser)">done</button>
       <button @click="download()">Download excel</button>
       <button @click="backup()">backup database</button>
-      <button v-if="nextPathItem && !nextPathItem.canContinue" @click="store.dispatch('continueSession')">Resume</button>
+      <button
+        v-if="nextPathItem && !nextPathItem.canContinue"
+        @click="store.dispatch('continueSession')"
+      >
+        Resume
+      </button>
       <h3>Users in session:</h3>
-      <div v-for="user in store.getters['getUsersInSession'](currentSession.id)" :key="user.id">
-        <p>{{user}} | {{store.getters['getUser'](user).code}}</p>
+      <div
+        v-for="user in store.getters['getUsersInSession'](currentSession.id)"
+        :key="user.id"
+      >
+        <p>{{ user }} | {{ store.getters["getUser"](user).code }}</p>
       </div>
     </div>
     <div v-else>
       <h3>How many users</h3>
-      <input type="number" v-model="userAmount"/>
+      <input type="number" v-model="userAmount" />
       <h3>How many groups</h3>
-      <input type="number" v-model="groupAmount"/>
-      <br/>
-      <button @click="store.dispatch('startSession', {userAmount: userAmount, groupAmount: groupAmount})">Start Session</button>
-      <br/>
+      <input type="number" v-model="groupAmount" />
+      <br />
+      <button
+        @click="
+          store.dispatch('startSession', {
+            userAmount: userAmount,
+            groupAmount: groupAmount,
+          })
+        "
+      >
+        Start Session
+      </button>
+      <br />
       <button @click="store.dispatch('removeLocalUser', currentUser)">Log out</button>
       <div id="hidden">
         <button @click="store.dispatch('reset')">X</button>
@@ -26,53 +43,54 @@
     </div>
   </div>
   <div v-else>
-    <div class="img-bg admin">
-    </div>
-    <div class="row d-flex align-items-center h-100 welcome" id="admin"> 
+    <div class="img-bg admin"></div>
+    <div class="row d-flex align-items-center h-100 welcome" id="admin">
       <div class="col-lg-7">
         <h3>Admin</h3>
-        <h1>You should not be here&#8230; <br/>Unless, you should</h1>
+        <h1>You should not be here&#8230; <br />Unless, you should</h1>
       </div>
       <div class="col-lg-5 d-flex align-items-center login">
-        <input type="password" v-model="password">
-        <img src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg" 
-          v-if="password == 'wachtwoord1234'" @click="store.dispatch('initiateAdmin')">
+        <input type="password" v-model="password" />
+        <img
+          src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg"
+          v-if="password == 'wachtwoord1234'"
+          @click="store.dispatch('initiateAdmin')"
+        />
       </div>
     </div>
   </div>
-
 </template>
 
 <script lang="ts" setup>
-  import router from '@/router';
-  import exportFromJSON from "export-from-json"
-  import { computed } from '@vue/reactivity';
-  import { useStore } from 'vuex';
-  import { ref } from 'vue';
-  const store = useStore()
-  await store.dispatch('bindDatabase')
+import router from "@/router";
+import exportFromJSON from "export-from-json";
+import { computed } from "@vue/reactivity";
+import { useStore } from "vuex";
+import { ref } from "vue";
+const store = useStore();
+await store.dispatch("bindDatabase");
 
-  const currentUser = localStorage.getItem('userid')
-  const currentSession = computed(() => store.getters['getActiveSession']())
-  const pathItem = computed(() => store.getters['getPathItem'](currentUser))
-  const nextPathItem = computed(() => store.getters['getNextPathItem']())
+const currentUser = localStorage.getItem("userid");
+const currentSession = computed(() => store.getters["getActiveSession"]());
+const pathItem = computed(() => store.getters["getPathItem"](currentUser));
+const nextPathItem = computed(() => store.getters["getNextPathItem"]());
 
-  const userAmount = ref(0)
-  const groupAmount = ref(0)
-  const password = ref('')
+const userAmount = ref(0);
+const groupAmount = ref(0);
+const password = ref("");
 
-  const download = () => {
-    var data = JSON.parse(JSON.stringify(Object.values(store.state.db.users)))
-    var fileName = "np-data" + Date.now()
-    var exportType = exportFromJSON.types.xls
+const download = () => {
+  var data = JSON.parse(JSON.stringify(Object.values(store.state.db.users)));
+  var fileName = "np-data" + Date.now();
+  var exportType = exportFromJSON.types.xls;
 
-    if (data) exportFromJSON({ data, fileName, exportType })
-  }
-  const backup = () => {
-    var data = JSON.parse(JSON.stringify(store.state))
-    var fileName = "np-data" + Date.now() + "bak"
-    var exportType = exportFromJSON.types.json
+  if (data) exportFromJSON({ data, fileName, exportType });
+};
+const backup = () => {
+  var data = JSON.parse(JSON.stringify(store.state));
+  var fileName = "np-data" + Date.now() + "bak";
+  var exportType = exportFromJSON.types.json;
 
-    if (data) exportFromJSON({ data, fileName, exportType })
-  }
+  if (data) exportFromJSON({ data, fileName, exportType });
+};
 </script>

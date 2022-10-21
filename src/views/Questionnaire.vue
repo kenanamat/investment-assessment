@@ -1,11 +1,18 @@
 <template>
-  <div v-show="false">{{store.dispatch('addQuestionnaireToUser', {questionnaireId: pathItem.id, userId: currentUser})}}</div> 
+  <div v-show="false">
+    {{
+      store.dispatch("addQuestionnaireToUser", {
+        questionnaireId: pathItem.id,
+        userId: currentUser,
+      })
+    }}
+  </div>
 
-  <div v-show="false" v-if="!nextPathItem && isReady || !pathItem">
-    {{router.push('/thankyou')}}
+  <div v-show="false" v-if="(!nextPathItem && isReady) || !pathItem">
+    {{ router.push("/thankyou") }}
   </div>
   <div v-show="false" v-else-if="nextPathItem && !nextPathItem.canContinue && isReady">
-    {{router.push('/waiting')}}
+    {{ router.push("/waiting") }}
   </div>
 
   <div v-else-if="pathItem.type == 'questionnaire'" id="questionnaire">
@@ -15,7 +22,7 @@
       <div id="validIds">
         <ul>
           <li v-for="user in unreadyFromGroup">
-            <p>{{user}}</p>
+            <p>{{ user }}</p>
           </li>
         </ul>
       </div>
@@ -28,36 +35,37 @@
     <h1>It's gamer time</h1>
     <Game />
   </div>
-
 </template>
 
 <script lang="ts" setup>
-  import router from '@/router';
-  import { computed } from '@vue/reactivity';
-  import { useStore } from 'vuex';
-  import Question from '../components/Question.vue';
-  import Game from '@/components/Game.vue';
-  const store = useStore()
-  await store.dispatch('bindDatabase')
+import router from "@/router";
+import { computed } from "@vue/reactivity";
+import { useStore } from "vuex";
+import Question from "../components/Question.vue";
+import Game from "@/components/Game.vue";
+const store = useStore();
+await store.dispatch("bindDatabase");
 
-  store.dispatch('checkPath')
-  
-  const currentUser = localStorage.getItem('userid')
-  var isReady: any = false
+store.dispatch("checkPath");
 
-  const pathItem = computed(() => store.getters['getPathItem']())
-  const nextPathItem = computed(() => store.getters['getNextPathItem']())
-  // const lastPathItem = computed(() => store.getters['getActiveSession']().path.at(-1))
+const currentUser = localStorage.getItem("userid");
+var isReady: any = false;
 
-  store.dispatch('addQuestionnaireToUser', {questionnaireId: pathItem.value.id, userId: currentUser})
+const pathItem = computed(() => store.getters["getPathItem"]());
+const nextPathItem = computed(() => store.getters["getNextPathItem"]());
+// const lastPathItem = computed(() => store.getters['getActiveSession']().path.at(-1))
 
-  const groupId = store.getters['getUser'](currentUser).group
-  const unreadyFromGroup = computed(() => store.getters['getUnreadyUsers'](groupId))
+store.dispatch("addQuestionnaireToUser", {
+  questionnaireId: pathItem.value.id,
+  userId: currentUser,
+});
 
-  if ( currentUser && store.getters['isActiveUser'](currentUser) && currentUser != 'admin' ) {
-    isReady = computed( () => store.getters['getGroup'](groupId).ready[currentUser] )
-  } else {
-    router.push('/')
-  }
+const groupId = store.getters["getUser"](currentUser).group;
+const unreadyFromGroup = computed(() => store.getters["getUnreadyUsers"](groupId));
 
+if (currentUser && store.getters["isActiveUser"](currentUser) && currentUser != "admin") {
+  isReady = computed(() => store.getters["getGroup"](groupId).ready[currentUser]);
+} else {
+  router.push("/");
+}
 </script>
