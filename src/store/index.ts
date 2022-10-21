@@ -67,11 +67,14 @@ export default createStore<RootState>({
       const groups = getters['getGroups']()
       return Object.keys(groups ?? []).filter((s:any) => groups[s].session == sessionId)
     },
-    getGroupValue: (state: RootState, getters: any) => (groupId: string, currentRound: number, type: string) => {
-      return getters['getGroup'](groupId).game.rounds[currentRound].values[type]
+    getGroupInputs: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
+      return getters['getGroup'](groupId).game.rounds[currentRound].inputs
     },
-    getGroupAnswer: (state: RootState, getters: any) => (groupId: string, currentRound: number, type: string) => {
-      return getters['getGroup'](groupId).game.rounds[currentRound].answers[type]
+    getGroupOutputs: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
+      return getters['getGroup'](groupId).game.rounds[currentRound].outputs
+    },
+    getGroupResults: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
+      return getters['getGroup'](groupId).game.rounds[currentRound].results
     },
     getGroupProfits: (state: RootState, getters: any) => (groupId: string) => {
       return getters['getGroup'](groupId).game.rounds.reduce((profits: Array<number>, round: RoundState) => {

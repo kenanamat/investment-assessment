@@ -43,8 +43,9 @@ export interface RoundState {
   index: number,
   profit: number,
   interviewAnswer: string,
-  values: {},
-  answers: {}
+  inputs: {},
+  outputs: {},
+  results: {}
 }
 
 export interface GroupState {
