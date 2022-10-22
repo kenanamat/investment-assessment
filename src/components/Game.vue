@@ -36,170 +36,307 @@
   <div v-else id="game">
     <Timer :time="groupGame.time" v-if="groupGame" />
 
-    <input
-      type="range"
-      min="1"
-      max="100"
-      v-model="rdVal"
-      @input="
-        datasets = {
-          labels: ['January', 'February', 'March'],
-          datasets: [{ data: [10, Number(rdVal), 12] }],
-        }
-      "
-    />
-    {{ rdVal }}
-    <!-- <BarChart
-      chartId="bar-chart"
-      :chartData="{
-        labels: [ 'January', 'February', 'March' ],
-        datasets: [ { data: [10, Number(rdVal), 12] } ]
-      }"
-      datasetIdKey='label'
-      :width="400"
-      :height="400"
-      cssClasses=''
-      styles=''
-    /> -->
-    <input type="range" min="1" max="100" v-model="factVal" />
-    {{ factVal }}
-    <!-- <LineChart
-      chartId="bar-chart"
-      :chartData="{
-        labels: randomData[1],
-        datasets: [ { data: randomData[0] } ]
-      }"
-      datasetIdKey='label'
-      :width="400"
-      :height="400"
-      cssClasses=''
-      styles=''
-    /> -->
-    <div
-      v-show="false"
-      v-if="userGroup.leader == currentUser && store.state.timeLeft < 0"
-    >
-      {{
-        store.dispatch("submitAnswer", {
-          groupId: userGroup.id,
-          answers: { rd: rdAnswer, factories: factAnswer },
-          profit: rdAnswer + factAnswer,
-        })
-      }}
-      {{ (store.state.timeLeft = 10) }}
+    <div class="row">
+      <div class="col-6">
+        <div
+          v-for="input in Object.keys(inputs)"
+          :key="input"
+          class="d-flex align-items-center justify-content-between"
+        >
+          <h2>{{ input }}</h2>
+          <input
+            type="range"
+            min="1"
+            :max="1000"
+            v-model.number="currInputs[input as keyof InputState]"
+            @input="checkBudget(input)"
+          />
+          <input
+            type="number"
+            min="1"
+            :max="1000"
+            v-model.number="currInputs[input as keyof InputState]"
+            @input="checkBudget(input)"
+          />
+        </div>
+        {{ inputs }}<br />
+        {{ currInputs }}
+      </div>
+      <div class="col-6 d-flex">
+        <pre>{{ JSON.stringify(outputs, null, 2) }}</pre>
+        <pre>{{ JSON.stringify(startValues, null, 2) }}</pre>
+        <pre>{{ JSON.stringify(constants, null, 2) }}</pre>
+      </div>
     </div>
-    <button
-      v-if="userGroup.leader == currentUser"
-      @click="
-        store.dispatch('submitAnswer', {
-          groupId: userGroup.id,
-          answers: { rd: rdAnswer, factories: factAnswer },
-          profit: rdAnswer + factAnswer,
-        });
-        store.state.timeLeft = 10;
-      "
-    >
-      verder
-    </button>
+    <pre>{{ JSON.stringify(results, null, 2) }}</pre>
   </div>
+  <button
+    v-if="userGroup.leader == currentUser"
+    @click="
+      store.dispatch('submitAnswer', {
+        groupId: userGroup.id,
+        values: {
+          inputs: inputs,
+          outputs: outputs,
+          results: results,
+        },
+      });
+      store.state.timeLeft = 10;
+    "
+  >
+    Verder
+  </button>
 </template>
 
 <script lang="ts" setup>
-import { GroupState } from "@/store/types";
+import { RoundState, InputState } from "@/store/types";
 import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 import { useStore } from "vuex";
-import BarChart from "./BarChart.vue";
-import LineChart from "./LineChart.vue";
 import Leaderboard from "./Leaderboard.vue";
 import Timer from "./Timer.vue";
 
 const store = useStore();
 
-// store.dispatch('checkRound')
 const currentUser = localStorage.getItem("userid");
-const activeSession = store.getters["getActiveSession"]();
 
 const currentRound = computed(() => store.getters["getCurrentRound"]());
-
 const userGroup = computed(() => store.getters["getUserGroup"](currentUser));
 const groupGame = computed(() => store.getters["getGroupGame"](userGroup.value.id));
 const groupRound = computed(() =>
   store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value)
 );
+const prevGroupRound = computed(() =>
+  store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value - 1)
+);
+const prevOutput = (variable: string) => {
+  return prevGroupRound.value ? prevGroupRound.value.outputs[variable] : 1;
+};
+const prevInvestment = () => {
+  return prevGroupRound.value ? prevGroupRound.value.outputs.I : 0;
+};
+const roundInput = (variable: string, index: number) => {
+  return groupGame.value.rounds[index]
+    ? groupGame.value.rounds[index].inputs[variable]
+    : 1;
+};
+const roundResult = (variable: string, index: number) => {
+  return groupGame.value.rounds[index]
+    ? groupGame.value.rounds[index].results[variable]
+    : 0;
+};
+const groupSubmitted = computed(() => groupRound.value.completed);
+
 const interviewAnswer = ref("");
 
-const groupSubmitted = computed(() => groupRound.value.completed);
-const groupsInSessionIds = store.getters["getGroupsInSession"](activeSession.id);
-const groupsInSession = computed(() => {
-  var groups: Array<GroupState> = [];
-  groupsInSessionIds.forEach((g: string) => groups.push(store.getters["getGroup"](g)));
-  return groups;
+const inputs = ref(
+  prevGroupRound.value?.inputs ??
+    store.getters["getGroupInputs"](userGroup.value.id, currentRound.value)
+);
+const currInputs = ref({
+  E: inputs.value.E,
+  R_E: inputs.value.R_E,
+  R_K: inputs.value.R_K,
+  R_L: inputs.value.R_L,
+  q: inputs.value.q,
+  w: inputs.value.w,
 });
 
-var rdVal = ref(
-  store.getters["getGroupValue"](userGroup.value.id, currentRound.value, "rd")
+const results = computed(() =>
+  store.getters["getGroupResults"](userGroup.value.id, currentRound.value)
 );
-var factVal = ref(
-  store.getters["getGroupValue"](userGroup.value.id, currentRound.value, "factories")
-);
-
-if (
-  groupGame.value.groupEdit ||
-  (!groupGame.value.groupEdit && userGroup.value.leader == currentUser)
-) {
-  rdVal = computed({
-    // getter
-    get() {
-      return store.getters["getGroupValue"](userGroup.value.id, currentRound.value, "rd");
-    },
-    // setter
-    set(newNumber) {
-      store.dispatch("updateNumber", {
-        groupId: userGroup.value.id,
-        value: Number(newNumber),
-        type: "rd",
-      });
-    },
-  });
-  factVal = computed({
-    // getter
-    get() {
-      return store.getters["getGroupValue"](
-        userGroup.value.id,
-        currentRound.value,
-        "factories"
-      );
-    },
-    // setter
-    set(newNumber) {
-      store.dispatch("updateNumber", {
-        groupId: userGroup.value.id,
-        value: Number(newNumber),
-        type: "factories",
-      });
-    },
-  });
-}
-
-const rdAnswer = computed(() => rdVal.value * 10);
-const factAnswer = computed(() => Math.round(factVal.value / 2));
-
-const datasets = ref({
-  labels: ["January", "February", "March"],
-  datasets: [{ data: [10, Number(rdVal.value), 12] }],
+const constants = Object.assign(groupGame.value.constants, {
+  phi: 1 / groupGame.value.constants.M,
 });
 
-const randomData = computed(() => {
-  var y = 0;
-  var limit = 6;
-  var dataLabels = [];
-  var dataPoints = [];
-  for (var i = 0; i < limit; i += 1) {
-    y += Math.random() * factVal.value;
-    dataLabels.push(i - limit / 2);
-    dataPoints.push(y);
+const startValues = groupGame.value.startValues;
+
+// standard formulas
+const labour = (w: number) => {
+  return Math.max(10 * (-7 + 3 * w), 0);
+};
+const p_research = (A: number) => {
+  return (3 / 2) * A ** 3;
+};
+const payoff_research = (delta: number, R: number, A: number) => {
+  return (1 - delta) * A + (Math.sqrt(1.5 * R) / 80) * A;
+};
+const min_wage = (w: number, min_w: number) => {
+  if (w > min_w) return 2 * (w - min_w);
+  else return 0.1 * (w - min_w);
+};
+const A_benefit = (A_L: number, L: number) => {
+  return 0.01 * A_L * L;
+};
+
+const outputs = ref(
+  store.getters["getGroupOutputs"](userGroup.value.id, currentRound.value)
+);
+const checkBudget = (input: string) => {
+  if (getUse() > constants.budget) {
+    currInputs.value[input as keyof InputState] = inputs.value[input];
+  } else {
+    inputs.value[input] = currInputs.value[input as keyof InputState];
+    setValues();
   }
-  return [dataPoints, dataLabels];
-});
+};
+const setValues = () => {
+  // Cost of labour.
+  outputs.value.L = labour(inputs.value.w);
+  // Productivity.
+  outputs.value.A_L = payoff_research(
+    startValues.delta_A_L,
+    inputs.value.R_L,
+    prevOutput("A_L")
+  );
+  outputs.value.A_K = payoff_research(
+    startValues.delta_A_K,
+    inputs.value.R_K,
+    prevOutput("A_K")
+  );
+  outputs.value.A_E = payoff_research(
+    startValues.delta_A_E,
+    inputs.value.R_E,
+    prevOutput("A_E")
+  );
+  // Cost of research.
+  outputs.value.p_R_L = p_research(outputs.value.A_L);
+  outputs.value.p_R_K = p_research(outputs.value.A_K);
+  outputs.value.p_R_E = p_research(outputs.value.A_E);
+
+  // Budget constraints
+  outputs.value.use =
+    outputs.value.L * inputs.value.w +
+    startValues.p_E * inputs.value.E +
+    inputs.value.q +
+    inputs.value.R_L * outputs.value.p_R_L +
+    inputs.value.R_K * outputs.value.p_R_K +
+    inputs.value.R_E * outputs.value.p_R_E;
+  outputs.value.left_over_budget = constants.budget - outputs.value.use;
+
+  // CHECK DIT KLOPT ROUNDINPUT??????---------------------------------------------
+  // Calculation of capital stock
+  outputs.value.K =
+    (1 - startValues.delta_K) * prevOutput("K") +
+    0.5 * roundInput("q", currentRound.value - constants.M);
+
+  // Calculation of Q stock
+  outputs.value.Q =
+    ((outputs.value.A_L * outputs.value.L) ** constants.sigma_Q +
+      (outputs.value.A_K * outputs.value.K) ** constants.sigma_Q) **
+    (1 / constants.sigma_Q);
+
+  // Calculation of y stock (total number of rubber units)
+  outputs.value.Y =
+    1000 *
+    ((startValues.A_Q * outputs.value.Q) ** constants.sigma_Y +
+      (outputs.value.A_E * inputs.value.E) ** constants.sigma_Y) **
+      (1 / constants.sigma_Y);
+
+  // Calculate investment
+  results.value.q = inputs.value.q * constants.phi;
+
+  outputs.value.I =
+    results.value.q +
+    prevInvestment() -
+    roundResult("q", currentRound.value - constants.M);
+
+  // The calculation of capital adjustment costs
+  results.value.Ca =
+    0.5 *
+    roundResult("q", currentRound.value - constants.M) *
+    ((startValues.eta / 2) *
+      (roundResult("q", currentRound.value - constants.M) / outputs.value.K -
+        startValues.delta_C) **
+        2);
+
+  // Calculation of all the firm results
+  results.value.K = outputs.value.K;
+  results.value.L = outputs.value.L;
+  results.value.E = inputs.value.E;
+  results.value.Q = outputs.value.Q;
+  results.value.Y = outputs.value.Y;
+
+  results.value.return = Math.round(startValues.p_Y * outputs.value.Y * 100) / 100;
+  results.value.cost =
+    Math.round(
+      inputs.value.w * outputs.value.L +
+        startValues.r_K * outputs.value.K +
+        results.value.Ca +
+        startValues.p_E * inputs.value.E +
+        outputs.value.p_R_L * inputs.value.R_L +
+        outputs.value.p_R_K * inputs.value.R_K +
+        outputs.value.p_R_E * inputs.value.R_E +
+        outputs.value.I
+    ) /
+      100 +
+    constants.fixed_costs;
+  results.value.left_over_budget = Math.round(outputs.value.left_over_budget * 100) / 100;
+  results.value.profit_pre_tax =
+    Math.round(
+      (results.value.return - results.value.cost + results.value.left_over_budget) * 100
+    ) / 100;
+  results.value.profit_post_tax =
+    results.value.profit_pre_tax > 0
+      ? Math.round(results.value.profit_pre_tax * (1 - constants.tax_rate) * 100) / 100
+      : results.value.profit_pre_tax;
+  results.value.footprint_environment =
+    Math.round(
+      (-(constants.omega_E * inputs.value.E) - constants.omega_K * outputs.value.K) * 100
+    ) / 100;
+  results.value.footprint_labour =
+    Math.round(
+      (min_wage(inputs.value.w, startValues.min_w) * outputs.value.L +
+        A_benefit(outputs.value.A_L, outputs.value.L) * outputs.value.L) *
+        100
+    ) / 100;
+
+  results.value.tot_footprint_environment = groupGame.value.rounds.reduce(
+    (sum: number, obj: RoundState) => obj.results.footprint_environment + sum,
+    0
+  );
+  results.value.tot_footprint_labour = groupGame.value.rounds.reduce(
+    (sum: number, obj: RoundState) => obj.results.footprint_labour + sum,
+    0
+  );
+  results.value.tot_profit_post_tax = groupGame.value.rounds.reduce(
+    (sum: number, obj: RoundState) => obj.results.profit_post_tax + sum,
+    0
+  );
+};
+const getUse = () => {
+  // Cost of labour.
+  let L = labour(currInputs.value.w);
+  // Productivity.
+  let A_L = payoff_research(
+    startValues.delta_A_L,
+    currInputs.value.R_L,
+    prevOutput("A_L")
+  );
+  let A_K = payoff_research(
+    startValues.delta_A_K,
+    currInputs.value.R_K,
+    prevOutput("A_K")
+  );
+  let A_E = payoff_research(
+    startValues.delta_A_E,
+    currInputs.value.R_E,
+    prevOutput("A_E")
+  );
+  // Cost of research.
+  let p_R_L = p_research(A_L);
+  let p_R_K = p_research(A_K);
+  let p_R_E = p_research(A_E);
+
+  // Budget constraints
+  return (
+    L * currInputs.value.w +
+    startValues.p_E * currInputs.value.E +
+    currInputs.value.q +
+    currInputs.value.R_L * p_R_L +
+    currInputs.value.R_K * p_R_K +
+    currInputs.value.R_E * p_R_E
+  );
+};
+setValues();
 </script>

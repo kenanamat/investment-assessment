@@ -43,8 +43,9 @@ export interface RoundState {
   index: number,
   profit: number,
   interviewAnswer: string,
-  values: {},
-  answers: {}
+  inputs: InputState,
+  outputs: OutputState,
+  results: ResultState
 }
 
 export interface GroupState {
@@ -75,4 +76,49 @@ export interface pathItemState {
   id: string,
   canContinue: boolean,
   index: number
+}
+
+export interface ResultState {
+  Ca: number,
+  E: number,
+  K: number,
+  L: number,
+  Q: number,
+  Y: number,
+  cost: number,
+  footprint_environment: number,
+  footprint_labour: number,
+  left_over_budget: number,
+  profit_post_tax: number,
+  profit_pre_tax: number,
+  q: number,
+  return: number,
+  tot_footprint_environment: number,
+  tot_footprint_labour: number,
+  tot_profit_post_tax: number
+}
+
+export interface InputState {
+  E: number, 
+  R_E: number, 
+  R_K: number, 
+  R_L: number, 
+  q: number, 
+  w: number
+}
+
+export interface OutputState {
+  A_E: number,
+  A_K: number,
+  A_L: number,
+  I: number,
+  K: number,
+  L: number,
+  Q: number,
+  Y: number,
+  left_over_budget: number,
+  p_R_E: number,
+  p_R_K: number,
+  p_R_L: number,
+  use: number
 }

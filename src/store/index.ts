@@ -67,11 +67,14 @@ export default createStore<RootState>({
       const groups = getters['getGroups']()
       return Object.keys(groups ?? []).filter((s:any) => groups[s].session == sessionId)
     },
-    getGroupValue: (state: RootState, getters: any) => (groupId: string, currentRound: number, type: string) => {
-      return getters['getGroup'](groupId).game.rounds[currentRound].values[type]
+    getGroupInputs: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
+      return getters['getGroup'](groupId).game.rounds[currentRound].inputs
     },
-    getGroupAnswer: (state: RootState, getters: any) => (groupId: string, currentRound: number, type: string) => {
-      return getters['getGroup'](groupId).game.rounds[currentRound].answers[type]
+    getGroupOutputs: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
+      return getters['getGroup'](groupId).game.rounds[currentRound].outputs
+    },
+    getGroupResults: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
+      return getters['getGroup'](groupId).game.rounds[currentRound].results
     },
     getGroupProfits: (state: RootState, getters: any) => (groupId: string) => {
       return getters['getGroup'](groupId).game.rounds.reduce((profits: Array<number>, round: RoundState) => {
@@ -644,19 +647,14 @@ export default createStore<RootState>({
       context,
       payload: {
         groupId: string,
-        answers: {
-          rd: number,
-          factories: number
+        values: {
+          inputs: Object,
+          outputs: Object,
+          results: Object
         }
-        profit: number
       }
     ){
       const currentRound = context.getters['getCurrentRound']()
-      context.commit('UPDATE_GROUPANSWER', {
-        groupId: payload.groupId,
-        currentRound: currentRound,
-        answers: payload.answers
-      })
       context.commit('UPDATE_GROUPROUND', {
         groupId: payload.groupId,
         currentRound: currentRound,
@@ -665,7 +663,7 @@ export default createStore<RootState>({
       context.commit('UPDATE_GROUPROUND', {
         groupId: payload.groupId,
         currentRound: currentRound,
-        object: {profit: payload.profit}
+        object: payload.values
       })
     },
     readyUp(
