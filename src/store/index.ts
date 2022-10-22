@@ -647,19 +647,14 @@ export default createStore<RootState>({
       context,
       payload: {
         groupId: string,
-        answers: {
-          rd: number,
-          factories: number
+        values: {
+          inputs: Object,
+          outputs: Object,
+          results: Object
         }
-        profit: number
       }
     ){
       const currentRound = context.getters['getCurrentRound']()
-      context.commit('UPDATE_GROUPANSWER', {
-        groupId: payload.groupId,
-        currentRound: currentRound,
-        answers: payload.answers
-      })
       context.commit('UPDATE_GROUPROUND', {
         groupId: payload.groupId,
         currentRound: currentRound,
@@ -668,7 +663,7 @@ export default createStore<RootState>({
       context.commit('UPDATE_GROUPROUND', {
         groupId: payload.groupId,
         currentRound: currentRound,
-        object: {profit: payload.profit}
+        object: payload.values
       })
     },
     readyUp(
