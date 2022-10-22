@@ -1,29 +1,55 @@
 <template>
   <div v-if="groupSubmitted">
-    <div v-if="groupGame.interview && groupRound.interviewAnswer == ''">
-      <div id="question" v-if="userGroup.leader == currentUser">
-        <div class="input">
-          <div class="title">
-            <h2>Why did you choose your answer?</h2>
-          </div>
-          <textarea
-            v-model="interviewAnswer"
-            type="text"
-            placeholder="Type your answer here..."
-          />
-        </div>
-        <button
-          class="next"
-          @click="
+    <div v-if="groupGame.interview && groupRound.interviewAnswered == false">
+      <div v-show="false">
+        {{
+          store.dispatch("addQuestionnaireToGroupRound", {
+            groupId: userGroup.id,
+            currentRound: currentRound,
+            questionnaireId: "Ex-durante",
+          })
+        }}
+      </div>
+      <div id="question-wrapper" v-if="userGroup.leader == currentUser">
+        <form
+          id="question"
+          @submit.prevent="
             store.dispatch('submitInterview', {
               groupId: userGroup.id,
-              answer: interviewAnswer,
-            });
-            interviewAnswer = '';
+              questionnaire: groupRound.questionnaire,
+              currentRound: currentRound,
+            })
           "
         >
-          Submit answer
-        </button>
+          <QuestionType
+            v-if="currentRound === 0"
+            v-model:answer="groupRound.questionnaire[1].answer"
+            :question="groupRound.questionnaire[1]"
+            :key="groupRound.questionnaire[1].id"
+          />
+          <QuestionType
+            v-model:answer="groupRound.questionnaire[2].answer"
+            :question="groupRound.questionnaire[2]"
+            :key="groupRound.questionnaire[2].id"
+          />
+          <QuestionType
+            v-model:answer="groupRound.questionnaire[3].answer"
+            :question="groupRound.questionnaire[3]"
+            :key="groupRound.questionnaire[3].id"
+          />
+          <QuestionType
+            v-model:answer="groupRound.questionnaire[4].answer"
+            :question="groupRound.questionnaire[4]"
+            :key="groupRound.questionnaire[4].id"
+          />
+          <QuestionType
+            v-if="currentRound == groupGame.rounds.length - 1"
+            v-model:answer="groupRound.questionnaire[5].answer"
+            :question="groupRound.questionnaire[5]"
+            :key="groupRound.questionnaire[5].id"
+          />
+        </form>
+        <button type="submit" form="question" class="next">Submit answers</button>
       </div>
       <div v-else>Discuss with group leader</div>
     </div>
@@ -69,23 +95,23 @@
       </div>
     </div>
     <pre>{{ JSON.stringify(results, null, 2) }}</pre>
+    <button
+      v-if="userGroup.leader == currentUser"
+      @click="
+        store.dispatch('submitAnswer', {
+          groupId: userGroup.id,
+          values: {
+            inputs: inputs,
+            outputs: outputs,
+            results: results,
+          },
+        });
+        store.state.timeLeft = 10;
+      "
+    >
+      Verder
+    </button>
   </div>
-  <button
-    v-if="userGroup.leader == currentUser"
-    @click="
-      store.dispatch('submitAnswer', {
-        groupId: userGroup.id,
-        values: {
-          inputs: inputs,
-          outputs: outputs,
-          results: results,
-        },
-      });
-      store.state.timeLeft = 10;
-    "
-  >
-    Verder
-  </button>
 </template>
 
 <script lang="ts" setup>
@@ -95,6 +121,7 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 import Leaderboard from "./Leaderboard.vue";
 import Timer from "./Timer.vue";
+import QuestionType from "./QuestionType.vue";
 
 const store = useStore();
 
@@ -126,8 +153,6 @@ const roundResult = (variable: string, index: number) => {
     : 0;
 };
 const groupSubmitted = computed(() => groupRound.value.completed);
-
-const interviewAnswer = ref("");
 
 const inputs = ref(
   prevGroupRound.value?.inputs ??

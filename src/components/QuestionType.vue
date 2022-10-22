@@ -46,7 +46,7 @@
         v-model="first"
         type="text"
         @drop="
-          first = $event.dataTransfer.getData('selection');
+          first = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
           $emit('update:answer', first + ', ' + second + ', ' + third);
         "
         @dragover.prevent
@@ -60,7 +60,7 @@
         v-model="second"
         type="text"
         @drop="
-          second = $event.dataTransfer.getData('selection');
+          second = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
           $emit('update:answer', first + ', ' + second + ', ' + third);
         "
         @dragover.prevent
@@ -74,7 +74,7 @@
         v-model="third"
         type="text"
         @drop="
-          third = $event.dataTransfer.getData('selection');
+          third = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
           $emit('update:answer', first + ', ' + second + ', ' + third);
         "
         @dragover.prevent
@@ -118,10 +118,12 @@ const shuffledAnswers = computed(() =>
     ? store.getters["getShuffled"](props.question.answers)
     : []
 );
-const startDrag = (evt, selection: string | number) => {
-  evt.dataTransfer.dropEffect = "move";
-  evt.dataTransfer.effectAllowed = "move";
-  evt.dataTransfer.setData("selection", selection);
+const startDrag = (e: DragEvent, selection: string) => {
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("selection", selection);
+  }
 };
 const first = ref("");
 const second = ref("");

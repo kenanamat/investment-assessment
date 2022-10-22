@@ -134,6 +134,9 @@ export default createStore<RootState>({
     getUserQuestionnaire: (state: RootState, getters: any) => ( userId: string, questionnaireId: string ) => {
       return getters['getUserQuestionnaires'](userId)[questionnaireId] ?? false
     },
+    getGroupRoundQuestionnaire: (state: RootState, getters: any) => ( groupId: string, currentRound: number ) => {
+      return getters['getGroupGameRound'](groupId, currentRound)['questionnaire'] ?? false
+    },
     getGame: (state: RootState) => () => {
       return state.db.game
     },
@@ -455,7 +458,7 @@ export default createStore<RootState>({
             completed: false,
             canContinue: true,
             type: 'questionnaire',
-            id: 'midRound'
+            id: 'Ex-post'
           }
         }
       })
@@ -552,6 +555,24 @@ export default createStore<RootState>({
         context.commit('UPDATE_USER', {
           id: uid,
           questionnaires: adjustedQuestionnaire
+        })
+      }
+    },
+    addQuestionnaireToGroupRound(
+      context,
+      payload: {questionnaireId: string, groupId: string, currentRound: number}
+    ){
+      const qid = payload.questionnaireId
+      const gid = payload.groupId
+      const cr = payload.currentRound
+      if ( context.getters['getGroupRoundQuestionnaire'](gid, cr)) {
+        return
+      } else if ( context.getters['getQuestionnaire'](qid) ) {
+        const questionnaire = context.getters['getQuestionnaire'](qid)
+        context.commit('UPDATE_GROUPROUND', {
+          groupId: gid,
+          currentRound: cr,
+          object: {questionnaire: questionnaire}
         })
       }
     },
@@ -695,14 +716,17 @@ export default createStore<RootState>({
       context,
       payload: {
         groupId: string,
-        answer: string
+        questionnaire: Object,
+        currentRound: number
       }
     ){
-      const currentRound = context.getters['getCurrentRound']()
       context.commit('UPDATE_GROUPROUND', {
         groupId: payload.groupId,
-        currentRound: currentRound,
-        object: {interviewAnswer: payload.answer}
+        currentRound: payload.currentRound,
+        object: {
+          questionnaire: payload.questionnaire,
+          interviewAnswered: true
+        }
       })
     },
     setCode(
