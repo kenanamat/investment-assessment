@@ -47,14 +47,14 @@
           <input
             type="range"
             min="1"
-            max="100"
+            :max="input == 'w' ? 10 : 1000"
             v-model.number="inputs[input]"
             @input="setValues"
           />
           <input
             type="number"
             min="1"
-            max="100"
+            :max="input == 'w' ? 10 : 1000"
             v-model.number="inputs[input]"
             @input="setValues"
           />
@@ -110,7 +110,10 @@ const inputs = computed(() =>
 const results = computed(() =>
   store.getters["getGroupResults"](userGroup.value.id, currentRound.value)
 );
-const constants = groupGame.value.constants;
+const constants = Object.assign(groupGame.value.constants, {
+  phi: 1 / groupGame.value.constants.M,
+});
+
 const startValues = groupGame.value.startValues;
 
 // standard formulas
@@ -187,7 +190,7 @@ const setValues = () => {
       (1 / constants.sigma_Y);
 
   // Calculate investment
-  results.value.q = inputs.value.q;
+  results.value.q = inputs.value.q * constants.phi;
 
   outputs.value.I = groupGame.value.rounds.reduce(
     (sum: number, obj: RoundState) => obj.results.q + sum,
@@ -229,7 +232,7 @@ const setValues = () => {
     results.value.profit_pre_tax > 0
       ? Math.round(results.value.profit_pre_tax * (1 - constants.tax_rate) * 100) / 100
       : results.value.profit_pre_tax;
-  results.value.footprint_enviroment =
+  results.value.footprint_environment =
     Math.round(
       (-(constants.omega_E * inputs.value.E) - constants.omega_K * outputs.value.K) * 100
     ) / 100;
@@ -239,5 +242,18 @@ const setValues = () => {
         A_benefit(outputs.value.A_L, outputs.value.L) * outputs.value.L) *
         100
     ) / 100;
+
+  results.value.tot_footprint_environment = groupGame.value.rounds.reduce(
+    (sum: number, obj: RoundState) => obj.results.footprint_environment + sum,
+    0
+  );
+  results.value.tot_footprint_labour = groupGame.value.rounds.reduce(
+    (sum: number, obj: RoundState) => obj.results.footprint_labour + sum,
+    0
+  );
+  results.value.tot_profit_post_tax = groupGame.value.rounds.reduce(
+    (sum: number, obj: RoundState) => obj.results.profit_post_tax + sum,
+    0
+  );
 };
 </script>
