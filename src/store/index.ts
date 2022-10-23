@@ -5,10 +5,12 @@ import firebase from 'firebase/app'
 import { DbState, GroupState, pathItemState, QuestionState, RootState, RoundState, SessionState, UserState } from './types'
 import router from '@/router'
 import words from './words'
+import translations from './translations'
 
 export default createStore<RootState>({
   modules: {
-    words
+    words,
+    translations
   },
   state: {
     db: {},

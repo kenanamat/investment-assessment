@@ -25,7 +25,6 @@ import { computed } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { ref } from "vue";
 
-const store = useStore();
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 interface Props {
@@ -37,6 +36,7 @@ interface Props {
   number?: number;
   styles?: string;
   value?: any;
+  chartOptions?: any;
 }
 const props = withDefaults(defineProps<Props>(), {
   chartId: "bar-chart",
@@ -47,15 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
   number: 0,
   styles: "",
   value: "",
+  chartOptions: "",
 });
 
-const chartOptions = {
-  responsive: false,
-  scales: {
-    y: {
-      max: 100,
-      min: 0,
-    },
-  },
-};
 </script>

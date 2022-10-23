@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@headlessui/vue": "^1.7.3",
     "bootstrap": "^5.2.1",
     "chart.js": "^3.9.1",
     "export-from-json": "^1.7.0",

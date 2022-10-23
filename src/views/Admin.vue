@@ -20,6 +20,7 @@
       </div>
     </div>
     <div v-else>
+      <form id="question"></form>
       <h3>How many users</h3>
       <input min="1" type="number" v-model="userAmount" />
       <h3>How many groups</h3>
