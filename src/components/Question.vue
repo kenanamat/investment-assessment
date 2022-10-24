@@ -5,7 +5,9 @@
       :style="{ width: (currentQuestion.id / currentQuestionnaire.length) * 100 + '%' }"
     ></div>
     <div class="header text-center">
-      <small>Question {{ currentQuestion.id }}/{{ currentQuestionnaire.length }} </small>
+      <small
+        >Question {{ currentQuestion.id }}/{{ currentQuestionnaire.length - 1 }}
+      </small>
       <h2 class="mt-2">{{ currentQuestion.question }}</h2>
       <p>{{ currentQuestion.comment }}</p>
     </div>
@@ -43,6 +45,7 @@
           v-model:answer="followupAnswer"
           :question="currentQuestion.followup"
           :key="currentQuestion.id"
+          :req="currentQuestion.followup && (answer == 'Yes' || answer > 0)"
         />
       </div>
     </form>

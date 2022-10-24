@@ -5,7 +5,7 @@
       type="text"
       placeholder="Type your answer here..."
       @input="$emit('update:answer', ($event.target as HTMLInputElement).value)"
-      required
+      :required="req"
     />
   </div>
   <div class="number" v-else-if="question.type == 'number'">
@@ -14,7 +14,7 @@
       type="number"
       placeholder="..."
       @input="$emit('update:answer', ($event.target as HTMLInputElement).value)"
-      required
+      :required="req"
     />
     <div class="chevrons">
       <i class="fa-solid fa-chevron-up" @click="(answer as number)++"></i>
@@ -35,7 +35,7 @@
         :value="question.answers[letter]"
         v-model="answer"
         @input="$emit('update:answer', ($event.target as HTMLInputElement).value)"
-        required
+        :required="req"
       />
       <div class="letter d-flex align-items-center justify-content-center">
         {{ alphabet[Number(letter) - 1] }}
@@ -50,7 +50,7 @@
       :max="Number(question.answers.length) - 1"
       v-model.number="answer"
       @input="$emit('update:answer', answer)"
-      required
+      :required="req"
     />
     <label>
       <div
@@ -80,7 +80,7 @@
         :value="question.answers[letter]"
         v-model="answer"
         @input="$emit('update:answer', ($event.target as HTMLInputElement).value)"
-        required
+        :required="req"
       />
       <div class="letter d-flex align-items-center justify-content-center">
         {{ alphabet[Number(letter) - 1] }}
@@ -145,7 +145,7 @@
         :value="question.answers[letter]"
         v-model="answer"
         @input="$emit('update:answer', ($event.target as HTMLInputElement).value)"
-        required
+        :required="req"
       />
       <div class="answer"><i class="fa-solid fa-check"></i></div>
       <div
@@ -190,7 +190,7 @@
           :value="question.answers[letter]"
           v-model="(answer as string[])[question.questions.map((qs: string) => qs).indexOf(q)]"
           @input="$emit('update:answer', answer)"
-          required
+          :required="req"
         />
         <div class="answer"><i class="fa-solid fa-check"></i></div>
         <div
@@ -200,11 +200,12 @@
               1 - Math.abs(key - (Number(question.answers.length) - 1) / 2) / 10
             })`,
           }"
-        ></div>
+        >
+          {{ question.answers[letter] }}
+        </div>
       </label>
     </div>
     <hr />
-    {{ answer }}
   </div>
   <div class="text" v-else-if="question.type == 'text'">
     <h4 class="my-4 mt-5">{{ question.question }}</h4>
@@ -214,7 +215,7 @@
       type="text"
       maxlength="1250"
       placeholder="Type your answer here..."
-      required
+      :required="req"
     />
   </div>
   <div class="ranking" v-else-if="question.type == 'ranking'">
@@ -229,7 +230,7 @@
         "
         @dragover.prevent
         @dragenter.prevent
-        required
+        :required="req"
         readonly
       />
       <br />
@@ -243,7 +244,7 @@
         "
         @dragover.prevent
         @dragenter.prevent
-        required
+        :required="req"
         readonly
       />
       <br />
@@ -257,7 +258,7 @@
         "
         @dragover.prevent
         @dragenter.prevent
-        required
+        :required="req"
         readonly
       />
     </div>
@@ -281,10 +282,16 @@ import { computed, ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 
 const store = useStore();
-const props = defineProps<{
-  answer: string | number | string[];
+interface Props {
+  answer?: string | number | string[];
   question: QuestionState;
-}>();
+  req?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  answer: "",
+  req: true,
+});
 const emits = defineEmits<{
   "update:answer": string | number | string[];
 }>();
