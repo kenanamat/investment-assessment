@@ -32,7 +32,6 @@
     </div>
   </div>
   <div v-else-if="pathItem.type == 'game'">
-    <h1>It's gamer time</h1>
     <Game />
   </div>
 </template>

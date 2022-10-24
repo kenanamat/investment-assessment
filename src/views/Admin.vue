@@ -20,23 +20,37 @@
       </div>
     </div>
     <div v-else>
-      <h3>How many users</h3>
-      <input min="1" type="number" v-model="userAmount" />
-      <h3>How many groups</h3>
-      <input min="1" type="number" v-model="groupAmount" />
-      <br />
-      <button
-        @click="
+      <form
+        id="amounts"
+        @submit.prevent="
           store.dispatch('startSession', {
             userAmount: userAmount,
             groupAmount: groupAmount,
           })
         "
       >
-        Start Session
-      </button>
+        <h3>How many users</h3>
+        <input min="1" type="number" v-model="userAmount" required />
+        <h3>How many groups</h3>
+        <input
+          min="1"
+          :max="Math.max(1, userAmount)"
+          type="number"
+          v-model="groupAmount"
+          required
+        />
+      </form>
+      <br />
+      <button type="submit" form="amounts">Start Session</button>
       <br />
       <button @click="store.dispatch('removeLocalUser', currentUser)">Log out</button>
+      <div id="values">
+        <div v-for="(value, key) in startValues" :key="value.id">
+          <h4>{{ key }}</h4>
+          <input type="number" v-model="startValues[key]" step="0.01" min="0" />
+        </div>
+      </div>
+      <button @click="store.dispatch('setStartValues', startValues)">Save Values</button>
       <div id="hidden">
         <button @click="store.dispatch('reset')">X</button>
       </div>
@@ -78,6 +92,7 @@ const nextPathItem = computed(() => store.getters["getNextPathItem"]());
 const userAmount = ref(0);
 const groupAmount = ref(0);
 const password = ref("");
+const startValues = ref(store.getters["getGame"]().startValues);
 
 const download = () => {
   var data = JSON.parse(JSON.stringify(Object.values(store.state.db.users)));

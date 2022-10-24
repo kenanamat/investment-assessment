@@ -28,7 +28,8 @@ export interface QuestionState {
   answers: {[letter: string]: string},
   comment: string,
   followup: QuestionState,
-  max: number
+  max: number,
+  questions: string[]
 }
 
 export interface GameState {

@@ -5,10 +5,12 @@ import firebase from 'firebase/app'
 import { DbState, GroupState, pathItemState, QuestionState, RootState, RoundState, SessionState, UserState } from './types'
 import router from '@/router'
 import words from './words'
+import translations from './translations'
 
 export default createStore<RootState>({
   modules: {
-    words
+    words,
+    translations
   },
   state: {
     db: {},
@@ -224,6 +226,9 @@ export default createStore<RootState>({
     },
     UPDATE_GROUPGAME(state: RootState, payload) {
       firebase.database().ref('db/groups/' + payload.id ).update({game: payload.game});
+    },
+    UPDATE_GAME(state: RootState, payload) {
+      firebase.database().ref('db/game/').update(payload);
     },
     ADD_SESSION(state: RootState, payload: SessionState) {
       firebase.database().ref('db/sessions/' + payload.id).set(payload);
@@ -771,6 +776,14 @@ export default createStore<RootState>({
       context.commit('UPDATE_SESSION', {
         id: session.id,
         timerEnd: Date.now() + (seconds * 1000)
+      })
+    },
+    setStartValues(
+      context,
+      startValues: Object
+    ){
+      context.commit('UPDATE_GAME', {
+        startValues: startValues
       })
     },
     reset(

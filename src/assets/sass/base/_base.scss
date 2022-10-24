@@ -12,6 +12,22 @@ input {
   &:focus-visible { outline: none; }
 }
 
+#values {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  input {
+    width: 100%;
+    background-color: var(--grey);
+    color: var(--light-grey);
+  }
+  div {
+    border: solid 3px var(--light-grey);
+  }
+  h4 {
+    border-bottom: solid 3px var(--light-grey);
+  }
+}
+
 #hidden {
   width: 100px;
   height: 100px;
@@ -76,7 +92,7 @@ ul {
 }
 
 #main {
-  max-width: 1450px;
+  max-width: 1550px;
   margin-inline: auto;
   text-align: start;
   margin-block: auto;

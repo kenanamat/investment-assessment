@@ -1,0 +1,33 @@
+export default {
+  namespaced: true,
+  state: {
+    E: "Energy usage",
+    R_E: "R&D in energy efficiency",
+    R_K: "R&D in capital efficiency",
+    R_L: "R&D in labour efficiency",
+    q: "Investment in capital",
+    w: "Wage",
+    A_E: "Productivity in energy efficiency",
+    A_K: "Productivity in capital efficiency",
+    A_L: "Productivity in labour efficiency",
+    I: "Investment",
+    K: "Capital stock",
+    L: "Labour supply",
+    Q: "Q stock",
+    Y: "Y stock (rubber units)",
+    left_over_budget: "Left over budget",
+    p_R_E: "Cost of research for energy efficiency",
+    p_R_K: "Cost of research for capital efficiency",
+    p_R_L: "Cost of research for labour efficiency",
+    use: "Used from budget",
+    M: "Total periods",
+    budget: "Budget",
+    fixed_costs: "Fixed costs",
+    omega_E: "The weight of emissions of energy to the footprint",
+    omega_K: "The weight of emissions of capital (natural production) to the footprint",
+    sigma_Q: "The sigma in the CES-function of Q",
+    sigma_Y: "The sigma in thee CES-function of Y",
+    tax_rate: "The tax rate",
+    phi: "Determining phi"
+  }
+}

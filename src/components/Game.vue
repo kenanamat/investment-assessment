@@ -11,8 +11,15 @@
         }}
       </div>
       <div id="question-wrapper" v-if="userGroup.leader == currentUser">
+        <div class="header text-center">
+          <small>Strategy </small>
+          <h2 class="mt-2">Explain yourself</h2>
+          <p></p>
+        </div>
+        <hr />
         <form
           id="question"
+          class="d-block px-5"
           @submit.prevent="
             store.dispatch('submitInterview', {
               groupId: userGroup.id,
@@ -63,35 +70,90 @@
     <Timer :time="groupGame.time" v-if="groupGame" />
 
     <div class="row">
-      <div class="col-6">
-        <div
-          v-for="input in Object.keys(inputs)"
-          :key="input"
-          class="d-flex align-items-center justify-content-between"
-        >
-          <h2>{{ input }}</h2>
-          <input
-            type="range"
-            min="1"
-            :max="1000"
-            v-model.number="currInputs[input as keyof InputState]"
-            @input="checkBudget(input)"
-          />
-          <input
-            type="number"
-            min="1"
-            :max="1000"
-            v-model.number="currInputs[input as keyof InputState]"
-            @input="checkBudget(input)"
-          />
+      <div class="col-5">
+        <div id="inputs-controller">
+          <h2>Your allocations</h2>
+          <div
+            v-for="input in Object.keys(inputs)"
+            :key="input"
+            class="inputs-wrapper d-flex"
+          >
+            <div class="slider flex-fill">
+              <h4>{{ store.state.translations[input] }}</h4>
+              <input
+                type="range"
+                :min="0"
+                :max="getMax(input)"
+                :step="input === 'w' ? 0.5 : 1"
+                v-model.number="currInputs[input as keyof InputState]"
+                @input="checkBudget(input)"
+              />
+            </div>
+            <div class="number">
+              <input
+                type="number"
+                :min="0"
+                :max="getMax(input)"
+                :step="input === 'w' ? 0.5 : 1"
+                v-model.number="currInputs[input as keyof InputState]"
+                @input="checkBudget(input)"
+              />
+              <div class="chevrons">
+                <i
+                  class="fa-solid fa-chevron-up"
+                  @click="currInputs[input as keyof InputState]++;
+                  checkBudget(input)"
+                ></i>
+                <i
+                  class="fa-solid fa-chevron-down"
+                  @click="currInputs[input as keyof InputState]--;checkBudget(input)"
+                ></i>
+              </div>
+            </div>
+          </div>
         </div>
-        {{ inputs }}<br />
-        {{ currInputs }}
       </div>
-      <div class="col-6 d-flex">
-        <pre>{{ JSON.stringify(outputs, null, 2) }}</pre>
-        <pre>{{ JSON.stringify(startValues, null, 2) }}</pre>
-        <pre>{{ JSON.stringify(constants, null, 2) }}</pre>
+      <div class="col-7">
+        <BarChart
+          :chartData="{
+            labels: [
+              store.state.translations.A_E,
+              store.state.translations.A_K,
+              store.state.translations.A_L,
+              store.state.translations.p_R_E,
+              store.state.translations.p_R_K,
+              store.state.translations.p_R_L,
+            ],
+            datasets: [
+              {
+                data: [
+                  outputs.A_E,
+                  outputs.A_K,
+                  outputs.A_L,
+                  outputs.p_R_E,
+                  outputs.p_R_K,
+                  outputs.p_R_L,
+                ],
+              },
+            ],
+          }"
+          :options="{
+            responsive: false,
+            indexAxis: 'y',
+            scales: {
+              x: {
+                max: 2,
+                min: 0.8,
+              },
+            },
+          }"
+        />
+        <h3>Left over budget</h3>
+        {{ results.left_over_budget }}
+        <h3>Profit post tax</h3>
+        {{ results.profit_post_tax }}
+        <h3>Total profit post tax</h3>
+        {{ results.tot_profit_post_tax }}
       </div>
     </div>
     <pre>{{ JSON.stringify(results, null, 2) }}</pre>
@@ -115,13 +177,17 @@
 </template>
 
 <script lang="ts" setup>
-import { RoundState, InputState } from "@/store/types";
+import { RoundState, InputState, OutputState } from "@/store/types";
 import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 import { useStore } from "vuex";
 import Leaderboard from "./Leaderboard.vue";
 import Timer from "./Timer.vue";
 import QuestionType from "./QuestionType.vue";
+import { BarChart } from "vue-chart-3";
+import { Chart, registerables } from "chart.js";
+
+Chart.register(...registerables);
 
 const store = useStore();
 
@@ -166,6 +232,16 @@ const currInputs = ref({
   q: inputs.value.q,
   w: inputs.value.w,
 });
+const getMax = (input: string) => {
+  switch (input) {
+    case "w":
+      return 15;
+    case "q":
+      return 2000;
+    default:
+      return 500;
+  }
+};
 
 const results = computed(() =>
   store.getters["getGroupResults"](userGroup.value.id, currentRound.value)
@@ -197,6 +273,7 @@ const A_benefit = (A_L: number, L: number) => {
 const outputs = ref(
   store.getters["getGroupOutputs"](userGroup.value.id, currentRound.value)
 );
+
 const checkBudget = (input: string) => {
   if (getUse() > constants.budget) {
     currInputs.value[input as keyof InputState] = inputs.value[input];
@@ -316,18 +393,27 @@ const setValues = () => {
         100
     ) / 100;
 
-  results.value.tot_footprint_environment = groupGame.value.rounds.reduce(
-    (sum: number, obj: RoundState) => obj.results.footprint_environment + sum,
-    0
-  );
-  results.value.tot_footprint_labour = groupGame.value.rounds.reduce(
-    (sum: number, obj: RoundState) => obj.results.footprint_labour + sum,
-    0
-  );
-  results.value.tot_profit_post_tax = groupGame.value.rounds.reduce(
-    (sum: number, obj: RoundState) => obj.results.profit_post_tax + sum,
-    0
-  );
+  results.value.tot_footprint_environment =
+    Math.round(
+      groupGame.value.rounds.reduce(
+        (sum: number, obj: RoundState) => obj.results.footprint_environment + sum,
+        0
+      ) * 100
+    ) / 100;
+  results.value.tot_footprint_labour =
+    Math.round(
+      groupGame.value.rounds.reduce(
+        (sum: number, obj: RoundState) => obj.results.footprint_labour + sum,
+        0
+      ) * 100
+    ) / 100;
+  results.value.tot_profit_post_tax =
+    Math.round(
+      groupGame.value.rounds.reduce(
+        (sum: number, obj: RoundState) => obj.results.profit_post_tax + sum,
+        0
+      ) * 100
+    ) / 100;
 };
 const getUse = () => {
   // Cost of labour.
@@ -365,3 +451,7 @@ const getUse = () => {
 };
 setValues();
 </script>
+
+<style lang="scss">
+@use '@/assets/sass/components/controller';
+</style>

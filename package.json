@@ -7,13 +7,14 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@headlessui/vue": "^1.7.3",
     "bootstrap": "^5.2.1",
     "chart.js": "^3.9.1",
     "export-from-json": "^1.7.0",
     "firebase": "^8.10.1",
     "fs": "^0.0.1-security",
     "vue": "^3.2.13",
-    "vue-chartjs": "^4.1.1",
+    "vue-chart-3": "^3.1.8",
     "vue-router": "^4.0.3",
     "vuefire": "^2.2.5",
     "vuex": "^4.0.0",

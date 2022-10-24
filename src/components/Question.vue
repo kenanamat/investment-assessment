@@ -1,7 +1,18 @@
 <template>
   <div id="question-wrapper">
+    <div
+      id="progress-bar"
+      :style="{ width: (currentQuestion.id / currentQuestionnaire.length) * 100 + '%' }"
+    ></div>
+    <div class="header text-center">
+      <small>Question {{ currentQuestion.id }}/{{ currentQuestionnaire.length }} </small>
+      <h2 class="mt-2">{{ currentQuestion.question }}</h2>
+      <p>{{ currentQuestion.comment }}</p>
+    </div>
+    <hr />
     <form
       id="question"
+      :class="'question-' + currentQuestion.type"
       @submit.prevent="
         store.dispatch('gotoNextQuestion', {
           userId: user,
@@ -18,7 +29,16 @@
         :question="currentQuestion"
         :key="currentQuestion.id"
       />
-      <div class="followup" v-if="currentQuestion.followup && answer == 'Yes'">
+      <div
+        v-if="currentQuestion.followup"
+        class="followup"
+        :class="{ valid: currentQuestion.followup && (answer == 'Yes' || answer > 0) }"
+      >
+        <div class="title">
+          <h4>{{ currentQuestion.followup.question }}</h4>
+          <p>{{ currentQuestion.followup.comment }}</p>
+        </div>
+
         <QuestionType
           v-model:answer="followupAnswer"
           :question="currentQuestion.followup"
@@ -27,10 +47,10 @@
       </div>
     </form>
     <br />
-    <div id="next-buttons">
+    <div id="next-buttons" class="d-flex justify-content-between align-items-center">
       <button
         v-if="currentQuestion.id > 1"
-        class="prev alt"
+        class="prev"
         @click="
           store.dispatch('gotoPrevQuestion', {
             userId: user,
@@ -42,9 +62,12 @@
         "
       >
         Previous question
+        <i class="fa-solid fa-chevron-left"></i>
       </button>
       <div v-else></div>
-      <button type="submit" form="question" class="next">Next question</button>
+      <button type="submit" form="question" class="next">
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
     </div>
   </div>
 </template>
@@ -62,6 +85,9 @@ const props = defineProps<{
 
 const currentQuestion = computed(() =>
   store.getters["getCurrentQuestion"](props.user, props.questionnaire)
+);
+const currentQuestionnaire = computed(() =>
+  store.getters["getQuestionnaire"](props.questionnaire)
 );
 const answer = ref(currentQuestion.value.answer);
 const followupAnswer = ref(currentQuestion.value.followup?.answer);
