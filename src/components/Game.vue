@@ -11,8 +11,15 @@
         }}
       </div>
       <div id="question-wrapper" v-if="userGroup.leader == currentUser">
+        <div class="header text-center">
+          <small>Strategy </small>
+          <h2 class="mt-2">Explain yourself</h2>
+          <p></p>
+        </div>
+        <hr />
         <form
           id="question"
+          class="d-block px-5"
           @submit.prevent="
             store.dispatch('submitInterview', {
               groupId: userGroup.id,
@@ -108,7 +115,6 @@
       </div>
       <div class="col-7">
         <BarChart
-          chartId="bar-chart"
           :chartData="{
             labels: [
               store.state.translations.A_E,
@@ -131,12 +137,7 @@
               },
             ],
           }"
-          datasetIdKey="label"
-          :width="400"
-          :height="400"
-          cssClasses=""
-          styles=""
-          :chartOptions="{
+          :options="{
             responsive: false,
             indexAxis: 'y',
             scales: {
@@ -183,7 +184,10 @@ import { useStore } from "vuex";
 import Leaderboard from "./Leaderboard.vue";
 import Timer from "./Timer.vue";
 import QuestionType from "./QuestionType.vue";
-import BarChart from "./BarChart.vue";
+import { BarChart } from "vue-chart-3";
+import { Chart, registerables } from "chart.js";
+
+Chart.register(...registerables);
 
 const store = useStore();
 

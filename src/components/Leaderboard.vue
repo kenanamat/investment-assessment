@@ -1,15 +1,9 @@
 <template>
   <LineChart
-    chartId="bar-chart"
     :chartData="{
       labels: roundList,
       datasets: profitsGroupsDataset.slice(0, 10),
     }"
-    datasetIdKey="label"
-    :width="400"
-    :height="400"
-    cssClasses=""
-    styles=""
   />
   <button
     v-if="userGroup.leader == currentUser && !display"
@@ -41,7 +35,8 @@
 <script lang="ts" setup>
 import { computed } from "@vue/reactivity";
 import { useStore } from "vuex";
-import LineChart from "./LineChart.vue";
+import { LineChart } from "vue-chart-3";
+import { Chart, registerables } from "chart.js";
 
 const store = useStore();
 
