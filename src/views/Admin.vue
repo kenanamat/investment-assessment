@@ -76,36 +76,39 @@
 </template>
 
 <script lang="ts" setup>
-import router from "@/router";
-import exportFromJSON from "export-from-json";
-import { computed } from "@vue/reactivity";
-import { useStore } from "vuex";
-import { ref } from "vue";
-const store = useStore();
-await store.dispatch("bindDatabase");
+import router from "@/router"
+import exportFromJSON from "export-from-json"
+import { computed } from "@vue/reactivity"
+import { useStore } from "vuex"
+import { ref } from "vue"
+const store = useStore()
+await store.dispatch("bindDatabase")
 
-const currentUser = localStorage.getItem("userid");
-const currentSession = computed(() => store.getters["getActiveSession"]());
-const pathItem = computed(() => store.getters["getPathItem"](currentUser));
-const nextPathItem = computed(() => store.getters["getNextPathItem"]());
+const currentUser = localStorage.getItem("userid")
+const currentSession = computed(() => store.getters["getActiveSession"]())
+const pathItem = computed(() => store.getters["getPathItem"](currentUser))
+const nextPathItem = computed(() => store.getters["getNextPathItem"]())
 
-const userAmount = ref(0);
-const groupAmount = ref(0);
-const password = ref("");
-const startValues = ref(store.getters["getGame"]().startValues);
+const userAmount = ref(0)
+const groupAmount = ref(0)
+const password = ref("")
+const startValues = ref(store.getters["getGame"]().startValues)
+
+console.log(store.getters["getExcelFormat"]())
 
 const download = () => {
-  var data = JSON.parse(JSON.stringify(Object.values(store.state.db.users)));
-  var fileName = "np-data" + Date.now();
-  var exportType = exportFromJSON.types.xls;
+  var data = store.getters["getExcelFormat"]()
+  var fileName = "np-data" + Date.now()
+  var exportType = exportFromJSON.types.xls
 
-  if (data) exportFromJSON({ data, fileName, exportType });
-};
+  if (data) exportFromJSON({ data, fileName, exportType })
+  else throw 'DATA DOES NOT EXIST'
+}
 const backup = () => {
-  var data = JSON.parse(JSON.stringify(store.state));
-  var fileName = "np-data" + Date.now() + "bak";
-  var exportType = exportFromJSON.types.json;
+  var data = JSON.parse(JSON.stringify(store.state))
+  var fileName = "np-data" + Date.now() + "bak"
+  var exportType = exportFromJSON.types.json
 
-  if (data) exportFromJSON({ data, fileName, exportType });
-};
+  if (data) exportFromJSON({ data, fileName, exportType })
+}
 </script>

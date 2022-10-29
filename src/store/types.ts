@@ -36,7 +36,10 @@ export interface GameState {
   rounds: [RoundState],
   time: number,
   interview: boolean,
-  groupEdit: boolean
+  groupEdit: boolean,
+  points: number,
+  constants: {[id: string]: number},
+  startValues: {[id: string]: number}
 }
 
 export interface RoundState {
@@ -46,7 +49,8 @@ export interface RoundState {
   interviewAnswer: string,
   inputs: InputState,
   outputs: OutputState,
-  results: ResultState
+  results: ResultState,
+  questionnaire: QuestionState[]
 }
 
 export interface GroupState {
