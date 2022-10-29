@@ -57,6 +57,12 @@ export default createStore<RootState>({
     getGroups: (state: RootState) => () => {
       return state.db.groups
     },
+    getGroupsFromSession: (state: RootState, getters: any) => (sessionId: string) => {
+      const groups = getters['getGroups']()
+      return Object.fromEntries(Object.entries(groups ?? []).filter(([key,val]) => 
+        (val as GroupState).session == sessionId
+      ))
+    },
     getGroup: (state: RootState, getters: any) => (groupId: string) => {
       return getters['getGroups']()[groupId] ?? false
     },

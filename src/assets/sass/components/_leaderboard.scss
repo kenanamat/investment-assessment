@@ -1,0 +1,37 @@
+#leaderboard {
+  #top-5-wrapper {
+    #top-5 {
+    }
+  }
+  #group-graphs-wrapper {
+    padding: 2rem;
+    #group-graphs {
+      nav {
+        display: flex;
+        align-items: end;
+        div {position: relative;}
+        h6 {
+          background-color: var(--accent-grey);
+          height: 100%;
+          width: 100%;
+          margin: 0;
+          padding: 0.4rem;
+          color: var(--grey);
+          font-weight: 700;
+          border-radius: 16px 16px 0 0;
+          border: solid 2px var(--subtitle-grey);
+          font-size: 12px;
+          cursor: pointer;
+          transition: all 300ms ease;
+          &.active {
+            background-color: var(--light-grey);
+          }
+        }
+      }
+    }
+    #graphs {
+      padding: 4rem;
+      background-color: var(--accent-grey);
+    }
+  }
+}
