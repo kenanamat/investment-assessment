@@ -173,11 +173,27 @@
     >
       Verder
     </button>
+    <div
+      v-show="false"
+      v-if="userGroup.leader == currentUser && store.state.timeLeft < 0"
+    >
+      {{
+        store.dispatch("submitAnswer", {
+          groupId: userGroup.id,
+          values: {
+            inputs: inputs,
+            outputs: outputs,
+            results: results,
+          },
+        })
+      }}
+      {{ (store.state.timeLeft = 10) }}
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { RoundState, InputState, OutputState } from "@/store/types";
+import { RoundState, InputState } from "@/store/types";
 import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 import { useStore } from "vuex";

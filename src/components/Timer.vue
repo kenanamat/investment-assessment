@@ -36,7 +36,7 @@ if (endTime.value <= Date.now() || endTime.value == null) {
 }
 
 const timeLeft = ref(props.time);
-const stressTime = 30;
+const stressTime = 120;
 const shakeRight = ref(0);
 const shakeTop = ref(0);
 
