@@ -1,0 +1,101 @@
+#settings {
+  padding: 2rem;
+  max-width: 1400px;
+  color: var(--grey);
+  #settings-block-wrapper {
+    #settings-block {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      height: 500px;
+      background-color: var(--light-grey);
+      border-radius: 16px;
+      nav {
+        padding-block: 1rem;
+        border-right: solid 1px var(--accent-grey);
+        div {
+          border-bottom: solid 1px var(--light-grey);
+          padding: 1rem;
+          cursor: pointer;
+          transition: all 150ms ease;
+          i {opacity: 0.6;}
+          &.active {
+            color: var(--green);
+            border-left: 4px solid var(--green);
+            position: relative;
+            &::after {
+              content: "";
+              display: block;
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background-color: var(--green);
+              opacity: 0.1;
+            }
+          }
+        }
+      }
+      .settings {
+        padding: 1rem;
+        overflow-y: auto;
+        position: relative;
+        .amount {
+          margin-top: 1rem;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+        #values {
+          th {
+            border-bottom: 2px solid var(--grey);
+          }
+          .period {
+            width: 100px;
+            border-right: 2px solid var(--grey);
+          }
+          input{
+            width: 100px;
+          }
+        }
+      }
+    }
+  }
+  .number {
+    display: flex;
+    input[type=number] {
+      border-bottom: solid 4px var(--grey);
+      width: 80px;
+      height: 40px;
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      -moz-appearance: textfield;
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    }
+    .chevrons {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      border-left: solid 4px var(--active-grey);
+      position: relative;
+      i {
+        width: 100%;
+        padding: 0 1rem;
+        font-size: 1rem;
+        transition: all 300ms ease;
+        &:hover {
+          cursor: pointer;
+          color: var(--grey);
+          transform: scale(1.1);
+        }
+        &:active {
+          transform: scale(0.9);
+        }
+      }
+    }
+  }
+}

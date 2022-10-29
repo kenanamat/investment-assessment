@@ -82,7 +82,7 @@
               <h4>{{ store.state.translations[input] }}</h4>
               <input
                 type="range"
-                :min="0"
+                :min="input === 'w' ? 3 : 0"
                 :max="getMax(input)"
                 :step="input === 'w' ? 0.5 : 1"
                 v-model.number="currInputs[input as keyof InputState]"
@@ -92,7 +92,7 @@
             <div class="number">
               <input
                 type="number"
-                :min="0"
+                :min="input === 'w' ? 3 : 0"
                 :max="getMax(input)"
                 :step="input === 'w' ? 0.5 : 1"
                 v-model.number="currInputs[input as keyof InputState]"
@@ -251,7 +251,7 @@ const currInputs = ref({
 const getMax = (input: string) => {
   switch (input) {
     case "w":
-      return 15;
+      return 9;
     case "q":
       return 2000;
     default:
@@ -266,7 +266,7 @@ const constants = Object.assign(groupGame.value.constants, {
   phi: 1 / groupGame.value.constants.M,
 });
 
-const startValues = groupGame.value.startValues;
+const startValues = groupGame.value.startValues[currentRound.value];
 
 // standard formulas
 const labour = (w: number) => {

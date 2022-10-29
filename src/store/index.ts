@@ -187,14 +187,13 @@ export default createStore<RootState>({
       return array;
     },
     getExcelFormat: (state: RootState, getters: any) => () => {
-      var excelFormat: any = []
+      var excelFormat: Object[] = []
 
       const users = getters['getUsers']()
 
       Object.values(users as {[id:string]: UserState}).forEach((user: UserState) => {
         if (user.id == 'admin') return false
         var questions = {}
-        var userGroup = getters['getGroup'](user.group)
 
         if (user.questionnaires){
           Object.values(user.questionnaires as {[id:string]: QuestionState[]}).forEach(
@@ -207,21 +206,34 @@ export default createStore<RootState>({
                 Object.assign(questions, {
                   [q.question]: q.answer
                 })
+                if (q.followup) {
+                  Object.assign(questions, {
+                    [q.question + '-' + q.followup.question]: q.followup.answer
+                  })
+                }
               }
             })
           )
         }
 
         var gameQuestions = {}
-        userGroup.game.rounds.forEach((round: RoundState) => {
-          if (round.questionnaire) {
-            round.questionnaire.forEach((rq: QuestionState) => {
-              Object.assign(gameQuestions, {
-                [round.index + ' ' + rq.question]: rq.answer
+        var userGroup = getters['getGroup'](user.group)
+        var results = undefined
+        var points = undefined
+
+        if ( userGroup ) {
+          userGroup.game.rounds.forEach((round: RoundState) => {
+            if (round.questionnaire) {
+              round.questionnaire.forEach((rq: QuestionState) => {
+                Object.assign(gameQuestions, {
+                  [round.index + ' ' + rq.question]: rq.answer
+                })
               })
-            })
-          }
-        })
+            }
+          })
+          results = userGroup.game.rounds.at(-1).results
+          points = userGroup.game.points
+        } 
 
         excelFormat.push({
           id: user.id,
@@ -229,8 +241,8 @@ export default createStore<RootState>({
           session: user.session,
           ...questions,
           ...gameQuestions,
-          ...userGroup.game.rounds.at(-1).results,
-          points: userGroup.game.points
+          ...results,
+          points: points
         })
       })
 
