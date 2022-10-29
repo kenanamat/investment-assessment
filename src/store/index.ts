@@ -185,6 +185,56 @@ export default createStore<RootState>({
       }
     
       return array;
+    },
+    getExcelFormat: (state: RootState, getters: any) => () => {
+      var excelFormat: any = []
+
+      const users = getters['getUsers']()
+
+      Object.values(users as {[id:string]: UserState}).forEach((user: UserState) => {
+        if (user.id == 'admin') return false
+        var questions = {}
+        var userGroup = getters['getGroup'](user.group)
+
+        if (user.questionnaires){
+          Object.values(user.questionnaires as {[id:string]: QuestionState[]}).forEach(
+            (questionset: QuestionState[]) => questionset.forEach((q: QuestionState) => {
+              if (q.type === 'list-scale') {
+                q.questions.forEach((listq, index) => Object.assign(questions, {
+                  [listq]: q.answers[index]
+                }))
+              } else {
+                Object.assign(questions, {
+                  [q.question]: q.answer
+                })
+              }
+            })
+          )
+        }
+
+        var gameQuestions = {}
+        userGroup.game.rounds.forEach((round: RoundState) => {
+          if (round.questionnaire) {
+            round.questionnaire.forEach((rq: QuestionState) => {
+              Object.assign(gameQuestions, {
+                [round.index + ' ' + rq.question]: rq.answer
+              })
+            })
+          }
+        })
+
+        excelFormat.push({
+          id: user.id,
+          group: userGroup.id,
+          session: user.session,
+          ...questions,
+          ...gameQuestions,
+          ...userGroup.game.rounds.at(-1).results,
+          points: userGroup.game.points
+        })
+      })
+
+      return JSON.parse(JSON.stringify(excelFormat)) ?? false
     }
   },
   mutations: {
