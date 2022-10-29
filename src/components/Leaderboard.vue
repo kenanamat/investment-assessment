@@ -34,14 +34,22 @@
     <div id="group-graphs-wrapper">
       <div id="group-graphs">
         <nav>
-          <button>
-            <h6 @click="selectedGroup = userGroup.id">{{ userGroup.id }}</h6>
-          </button>
-          <button v-for="group in otherGroups" :key="(group as GroupState).id">
-            <h6 @click="selectedGroup = (group as GroupState).id">
+          <div>
+            <h6
+              @click="selectedGroup = userGroup.id"
+              :class="{ active: selectedGroup == userGroup.id }"
+            >
+              {{ userGroup.id }}
+            </h6>
+          </div>
+          <div v-for="group in otherGroups" :key="(group as GroupState).id">
+            <h6
+              @click="selectedGroup = (group as GroupState).id"
+              :class="{active: selectedGroup == (group as GroupState).id}"
+            >
               {{ (group as GroupState).id }}
             </h6>
-          </button>
+          </div>
         </nav>
         <div id="graphs">
           <LineChart
