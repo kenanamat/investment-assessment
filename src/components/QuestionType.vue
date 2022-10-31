@@ -13,6 +13,7 @@
       v-model.number="answer"
       type="number"
       placeholder="..."
+      :max="question.max"
       @input="$emit('update:answer', ($event.target as HTMLInputElement).value)"
       :required="req"
     />
@@ -94,7 +95,7 @@
         type="range"
         :min="0"
         :max="question.max"
-        step="0.5"
+        step="1"
         v-model.number="answer"
         @input="$emit('update:answer', answer)"
       />
@@ -104,7 +105,7 @@
         type="number"
         :min="0"
         :max="question.max"
-        :step="0.5"
+        step="1"
         v-model.number="answer"
         @input="$emit('update:answer', answer)"
       />
@@ -262,7 +263,6 @@
         readonly
       />
     </div>
-    {{ answer }}
     <div class="selections">
       <div
         v-for="selection in shuffledAnswers.filter((answer: string) => ![first, second,third].includes(answer))"
