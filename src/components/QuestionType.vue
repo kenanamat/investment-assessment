@@ -265,8 +265,7 @@
     {{ answer }}
     <div class="selections">
       <div
-        class="border"
-        v-for="selection in shuffledAnswers"
+        v-for="selection in shuffledAnswers.filter((answer: string) => ![first, second,third].includes(answer))"
         @dragstart="startDrag($event, selection)"
         draggable="true"
       >

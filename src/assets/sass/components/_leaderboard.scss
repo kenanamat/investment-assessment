@@ -4,7 +4,7 @@
     }
   }
   #group-graphs-wrapper {
-    padding: 2rem;
+    max-width: 1000px;
     #group-graphs {
       nav {
         display: flex;
@@ -32,6 +32,10 @@
     #graphs {
       padding: 4rem;
       background-color: var(--accent-grey);
+      > div {
+        max-height: 300px;
+        margin-bottom: 3rem;
+      }
     }
   }
 }

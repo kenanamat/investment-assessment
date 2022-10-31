@@ -1,7 +1,6 @@
 <template>
   <h1>Till tomorrow!</h1>
   {{ user.id }}<br />
-  {{ user.group }}<br />
   <h2>Secret code: {{ user.code }}</h2>
 
   <div v-if="nextPathItem.canContinue && pathItem.canContinue">

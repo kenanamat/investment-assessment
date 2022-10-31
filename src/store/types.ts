@@ -61,7 +61,8 @@ export interface GroupState {
   color: string,
   users: {},
   ready: {},
-  leader: string
+  leader: string,
+  treatment: string
 }
 
 export interface SessionState {

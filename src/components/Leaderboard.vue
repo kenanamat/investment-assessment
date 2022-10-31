@@ -1,7 +1,7 @@
 <template>
   <div id="leaderboard">
     <div id="top-5-wrapper">
-      <div id="top-5" class="row">
+      <div id="top-5" class="row mb-5">
         <div class="col-4">
           <div class="scores-list">
             <h4>Profits</h4>
@@ -54,9 +54,10 @@
         <div id="graphs">
           <LineChart
             :chartData="{
-              labels: ['Round' + currentRound],
+              labels: Array.from(Array(currentRound + 1).keys()),
               datasets: [
                 {
+                  label: 'Cumulative profits',
                   data: getDataProfit,
                 },
               ],
@@ -64,9 +65,10 @@
           />
           <LineChart
             :chartData="{
-              labels: ['Round' + currentRound],
+              labels: Array.from(Array(currentRound + 1).keys()),
               datasets: [
                 {
+                  label: 'Cumulative enviromental footprint',
                   data: getDataFE,
                 },
               ],
@@ -74,9 +76,10 @@
           />
           <LineChart
             :chartData="{
-              labels: ['Round' + currentRound],
+              labels: Array.from(Array(currentRound + 1).keys()),
               datasets: [
                 {
+                  label: 'Cumulative social footprint',
                   data: getDataFL,
                 },
               ],
@@ -95,72 +98,72 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "@vue/reactivity"
-import { useStore } from "vuex"
-import { GroupState, ResultState, RoundState } from "@/store/types"
+import { computed, ref } from "@vue/reactivity";
+import { useStore } from "vuex";
+import { GroupState, ResultState, RoundState } from "@/store/types";
 
-import { LineChart } from "vue-chart-3"
-import { Chart, registerables } from "chart.js"
+import { LineChart } from "vue-chart-3";
+import { Chart, registerables } from "chart.js";
 
-const store = useStore()
+const store = useStore();
 
 const props = withDefaults(defineProps<{ display?: boolean }>(), {
   display: false,
-})
+});
 
-const currentUser = localStorage.getItem("userid")
-const activeSession = store.getters["getActiveSession"]()
-const currentRound = computed(() => store.getters["getCurrentRound"]())
+const currentUser = localStorage.getItem("userid");
+const activeSession = store.getters["getActiveSession"]();
+const currentRound = computed(() => store.getters["getCurrentRound"]());
 
-const userGroup = computed(() => store.getters["getUserGroup"](currentUser))
-const groups = computed(() => store.getters["getGroupsFromSession"](activeSession.id))
+const userGroup = computed(() => store.getters["getUserGroup"](currentUser));
+const groups = computed(() => store.getters["getGroupsFromSession"](activeSession.id));
 const otherGroups = computed(() =>
   Object.values(groups.value).filter(
     (group) => (group as GroupState).id !== userGroup.value.id
   )
-)
-const selectedGroup = ref(userGroup.value.id)
+);
+const selectedGroup = ref(userGroup.value.id);
 
 const getDataProfit = computed(() => {
   return Array.from(
     Object.values(groups.value[selectedGroup.value].game.rounds) as RoundState[],
     (round: RoundState) => round.results.tot_profit_post_tax
-  )
-})
+  );
+});
 const getDataFE = computed(() => {
   return Array.from(
     Object.values(groups.value[selectedGroup.value].game.rounds) as RoundState[],
     (round: RoundState) => round.results.tot_footprint_environment
-  )
-})
+  );
+});
 const getDataFL = computed(() => {
   return Array.from(
     Object.values(groups.value[selectedGroup.value].game.rounds) as RoundState[],
     (round: RoundState) => round.results.tot_footprint_labour
-  )
-})
+  );
+});
 
 const rankedProfits = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
       (b as GroupState).game.rounds[0].results.tot_profit_post_tax -
       (a as GroupState).game.rounds[0].results.tot_profit_post_tax
-  )
-})
+  );
+});
 const rankedFE = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
       (b as GroupState).game.rounds[0].results.tot_footprint_environment -
       (a as GroupState).game.rounds[0].results.tot_footprint_environment
-  )
-})
+  );
+});
 const rankedFL = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
       (b as GroupState).game.rounds[0].results.tot_footprint_labour -
       (a as GroupState).game.rounds[0].results.tot_footprint_labour
-  )
-})
+  );
+});
 </script>
 
 <style lang="scss">

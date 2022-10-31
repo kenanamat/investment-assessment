@@ -104,7 +104,7 @@
             transform: scale(1.1);
           }
           &:active {
-            transform: scale(0.9);
+            transform: scale(0.95);
           }
         }
       }
@@ -316,8 +316,31 @@
           &.checked {
             background-color: var(--light-grey);
           }
-          &:active {
-            transform: scale(1) !important;
+          // &:active {
+          //   transform: scale(1) !important;
+          // }
+        }
+      }
+    }
+    &.question-ranking {
+      .ranking {
+        .best {
+
+        }
+        .selections {
+          margin-top: 3rem;
+          display: grid;
+          gap: 1rem;
+          grid-template-columns: 1fr 1fr;
+          div {
+            cursor: pointer;
+            border-radius: 100px;
+            border: solid 2px var(--light-grey);
+            padding: 0.8rem 1rem;
+            transition: all 200ms ease;
+            &:hover {
+              background-color: var(--active-grey);
+            }
           }
         }
       }
@@ -381,7 +404,7 @@
         }
       }
       &:active {
-        transform: scale(0.9);
+        transform: scale(0.95);
       }
       .letter {
         color: var(--grey);
@@ -424,7 +447,7 @@
         }
       }
       &:active {
-        transform: scale(0.9);
+        transform: scale(0.95);
       }
     }
     .prev {

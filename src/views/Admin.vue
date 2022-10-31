@@ -90,7 +90,12 @@
               <div class="amount">
                 <p>Amount of groups {{ currentSession ? "in" : "for" }} session</p>
                 <div class="number" v-if="!currentSession">
-                  <input type="number" min="1" v-model.number="groupAmount" />
+                  <input
+                    type="number"
+                    min="1"
+                    :max="userAmount"
+                    v-model.number="groupAmount"
+                  />
                   <div class="chevrons">
                     <i class="fa-solid fa-chevron-up" @click="groupAmount++"></i>
                     <i class="fa-solid fa-chevron-down" @click="groupAmount--"></i>
@@ -109,6 +114,7 @@
               >
                 Resume
               </button>
+              <button @click="store.dispatch('switchShowPoints')">Point view</button>
               <button @click="download()">Download excel</button>
               <button @click="backup()">Backup database</button>
               <button class="bg-danger border-none" @click="store.dispatch('endSession')">
@@ -181,6 +187,9 @@
             <pre>{{ JSON.stringify(store.state.db.questionnaires, null, 2) }}</pre>
           </div>
         </div>
+      </div>
+      <div id="hidden">
+        <button @click="store.dispatch('reset')">X</button>
       </div>
       <!-- 
       <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />

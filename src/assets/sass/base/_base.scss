@@ -12,6 +12,12 @@ input {
   &:focus-visible { outline: none; }
 }
 
+.box {
+  background: linear-gradient(var(--hover-grey), var(--grey));
+  box-shadow: 1rem 1rem 1rem rgba($color: #000000, $alpha: 0.1);
+  position: relative;
+}
+
 // #values {
 //   display: grid;
 //   grid-template-columns: repeat(12, 1fr);

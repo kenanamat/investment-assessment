@@ -68,7 +68,7 @@
   </div>
   <div v-else id="game">
     <Timer :time="groupGame.time" v-if="groupGame" />
-
+    <div v-show="false" v-if="results.left_over_budget == 0">{{ setValues }}</div>
     <div class="row">
       <div class="col-5">
         <div id="inputs-controller">
@@ -79,7 +79,7 @@
             class="inputs-wrapper d-flex"
           >
             <div class="slider flex-fill">
-              <h4>{{ store.state.translations[input] }}</h4>
+              <h5>{{ store.state.translations[input] }}</h5>
               <input
                 type="range"
                 :min="input === 'w' ? 3 : 0"
@@ -113,50 +113,27 @@
           </div>
         </div>
       </div>
-      <div class="col-7">
-        <BarChart
-          :chartData="{
-            labels: [
-              store.state.translations.A_E,
-              store.state.translations.A_K,
-              store.state.translations.A_L,
-              store.state.translations.p_R_E,
-              store.state.translations.p_R_K,
-              store.state.translations.p_R_L,
-            ],
-            datasets: [
-              {
-                data: [
-                  outputs.A_E,
-                  outputs.A_K,
-                  outputs.A_L,
-                  outputs.p_R_E,
-                  outputs.p_R_K,
-                  outputs.p_R_L,
-                ],
-              },
-            ],
-          }"
-          :options="{
-            responsive: false,
-            indexAxis: 'y',
-            scales: {
-              x: {
-                max: 2,
-                min: 0.8,
-              },
-            },
-          }"
-        />
+      <div class="col-7 mt-4">
+        <table class="mb-4">
+          <tr>
+            <td>Item</td>
+            <td class="ps-3">Amount</td>
+          </tr>
+          <tr
+            v-for="item in ['A_E', 'A_K', 'A_L', 'p_R_E', 'p_R_K', 'p_R_L']"
+            :key="item"
+          >
+            <td>
+              {{ store.state.translations[item] }}
+            </td>
+            <td class="ps-3">{{ outputs[item] }}</td>
+          </tr>
+        </table>
+
         <h3>Left over budget</h3>
-        {{ results.left_over_budget }}
-        <h3>Profit post tax</h3>
-        {{ results.profit_post_tax }}
-        <h3>Total profit post tax</h3>
-        {{ results.tot_profit_post_tax }}
+        <h2>{{ results.left_over_budget }}</h2>
       </div>
     </div>
-    <pre>{{ JSON.stringify(results, null, 2) }}</pre>
     <button
       v-if="userGroup.leader == currentUser"
       @click="
@@ -431,6 +408,8 @@ const setValues = () => {
       ) * 100
     ) / 100;
 };
+setValues();
+
 const getUse = () => {
   // Cost of labour.
   let L = labour(currInputs.value.w);
@@ -465,7 +444,6 @@ const getUse = () => {
     currInputs.value.R_E * p_R_E
   );
 };
-setValues();
 </script>
 
 <style lang="scss">
