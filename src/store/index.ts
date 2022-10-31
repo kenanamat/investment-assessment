@@ -2,7 +2,7 @@ import { createStore, ActionContext, storeKey } from 'vuex'
 import { vuexfireMutations, firebaseAction } from 'vuexfire'
 import { rootDatabase } from '@/data/db'
 import firebase from 'firebase/app'
-import { DbState, GroupState, pathItemState, QuestionState, RootState, RoundState, SessionState, UserState } from './types'
+import { DbState, ResultState, GroupState, pathItemState, QuestionState, RootState, RoundState, SessionState, UserState } from './types'
 import router from '@/router'
 import words from './words'
 import translations from './translations'
@@ -13,8 +13,7 @@ export default createStore<RootState>({
     translations
   },
   state: {
-    db: {},
-    timeLeft: 1
+    db: {}
   } as RootState,
   getters: {
     getDb: (state: RootState) => () => {
@@ -218,7 +217,8 @@ export default createStore<RootState>({
 
         var gameQuestions = {}
         var userGroup = getters['getGroup'](user.group)
-        var results = undefined
+        var results = {}
+        var inputs = {}
         var points = undefined
 
         if ( userGroup ) {
@@ -230,8 +230,22 @@ export default createStore<RootState>({
                 })
               })
             }
+            if (round.results) {
+              Object.assign(results, 
+                Object.fromEntries(
+                  Object.entries(round.results).map(([k, v]) => [round.index + ' ' + k, v])
+                )
+              )
+            }
+            if (round.inputs) {
+              console.log(round.inputs)
+              Object.assign(inputs, 
+                Object.fromEntries(
+                  Object.entries(round.inputs).map(([k, v]) => [round.index + ' ' + k, v])
+                )
+              )
+            }
           })
-          results = userGroup.game.rounds.at(-1).results
           points = userGroup.game.points
         } 
 
@@ -242,6 +256,7 @@ export default createStore<RootState>({
           ...questions,
           ...gameQuestions,
           ...results,
+          ...inputs,
           points: points
         })
       })
@@ -644,7 +659,7 @@ export default createStore<RootState>({
             currentRound: currentRound + 1
           })
         }
-        context.dispatch('setTimerEnd', 0)
+        context.dispatch('setTimerEnd', -100)
       }
     },
     addQuestionnaireToUser(

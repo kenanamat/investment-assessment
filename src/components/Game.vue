@@ -67,11 +67,11 @@
     </div>
   </div>
   <div v-else id="game">
-    <Timer :time="groupGame.time" v-if="groupGame" />
-    <div v-show="false" v-if="results.left_over_budget == 0">{{ setValues }}</div>
+    <Timer v-model:timeLeftGame="timeLeftGame" :time="groupGame.time" v-if="groupGame" />
+
     <div class="row">
       <div class="col-5">
-        <div id="inputs-controller">
+        <div class="box" id="inputs-controller">
           <h2>Your allocations</h2>
           <div
             v-for="input in Object.keys(inputs)"
@@ -126,7 +126,7 @@
             <td>
               {{ store.state.translations[item] }}
             </td>
-            <td class="ps-3">{{ outputs[item] }}</td>
+            <td class="ps-3 fw-bold">{{ Math.round(outputs[item] * 100) / 100 }}</td>
           </tr>
         </table>
 
@@ -144,16 +144,12 @@
             outputs: outputs,
             results: results,
           },
-        });
-        store.state.timeLeft = 10;
+        })
       "
     >
-      Verder
+      Continue
     </button>
-    <div
-      v-show="false"
-      v-if="userGroup.leader == currentUser && store.state.timeLeft < 0"
-    >
+    <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
       {{
         store.dispatch("submitAnswer", {
           groupId: userGroup.id,
@@ -164,8 +160,10 @@
           },
         })
       }}
-      {{ (store.state.timeLeft = 10) }}
     </div>
+    <!-- <div v-show="false" v-if="results.left_over_budget <= 0">
+      {{ setValues }}
+    </div> -->
   </div>
 </template>
 
@@ -183,6 +181,8 @@ import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
 
 const store = useStore();
+
+const timeLeftGame = ref(10);
 
 const currentUser = localStorage.getItem("userid");
 
@@ -407,8 +407,9 @@ const setValues = () => {
         0
       ) * 100
     ) / 100;
+
+  return "Set values";
 };
-setValues();
 
 const getUse = () => {
   // Cost of labour.
@@ -444,6 +445,8 @@ const getUse = () => {
     currInputs.value.R_E * p_R_E
   );
 };
+console.log(getUse());
+console.log(setValues());
 </script>
 
 <style lang="scss">

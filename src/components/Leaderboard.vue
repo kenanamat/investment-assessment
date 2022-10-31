@@ -7,7 +7,7 @@
             <h4>Profits</h4>
             <div v-for="group in rankedProfits.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
-              {{(group[1] as GroupState).game.rounds[currentRound].results.tot_profit_post_tax}}
+              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_profit_post_tax)}}
             </div>
           </div>
         </div>
@@ -16,7 +16,7 @@
             <h4>Footprint Environment</h4>
             <div v-for="group in rankedFE.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
-              {{(group[1] as GroupState).game.rounds[currentRound].results.tot_footprint_environment}}
+              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_footprint_environment)}}
             </div>
           </div>
         </div>
@@ -25,7 +25,7 @@
             <h4>Footprint Labour</h4>
             <div v-for="group in rankedFL.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
-              {{(group[1] as GroupState).game.rounds[currentRound].results.tot_footprint_labour}}
+              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_footprint_labour)}}
             </div>
           </div>
         </div>

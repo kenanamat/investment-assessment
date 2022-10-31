@@ -1,7 +1,10 @@
 <template>
-  <h1>Till tomorrow!</h1>
-  {{ user.id }}<br />
-  <h2>Secret code: {{ user.code }}</h2>
+  <div class="box col-5 p-4">
+    <h1>Till tomorrow!</h1>
+    <hr />
+    <h2>Your username: &nbsp; {{ user.id }}</h2>
+    <h2>Secret code: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ user.code }}</h2>
+  </div>
 
   <div v-if="nextPathItem.canContinue && pathItem.canContinue">
     {{ router.push("/questionnaire") }}

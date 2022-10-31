@@ -15,16 +15,7 @@
     <form
       id="question"
       :class="'question-' + currentQuestion.type"
-      @submit.prevent="
-        store.dispatch('gotoNextQuestion', {
-          userId: user,
-          questionnaire: questionnaire,
-          currentQuestionId: currentQuestion.id,
-          answer: answer,
-          followup: followupAnswer ?? '',
-        });
-        resetQuestion();
-      "
+      @submit.prevent="submitAnswer"
     >
       <QuestionType
         v-model:answer="answer"
@@ -94,6 +85,18 @@ const currentQuestionnaire = computed(() =>
 );
 const answer = ref(currentQuestion.value.answer);
 const followupAnswer = ref(currentQuestion.value.followup?.answer);
+
+const submitAnswer = () => {
+  if (answer.value == "") return alert("Please fill in an answer");
+  store.dispatch("gotoNextQuestion", {
+    userId: props.user,
+    questionnaire: props.questionnaire,
+    currentQuestionId: currentQuestion.value.id,
+    answer: answer.value,
+    followup: followupAnswer.value ?? "",
+  });
+  resetQuestion();
+};
 
 const resetQuestion = () => {
   answer.value = currentQuestion.value.answer;

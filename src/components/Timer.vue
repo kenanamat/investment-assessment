@@ -1,10 +1,12 @@
 <template>
   <div
     id="timer"
+    class="position-fixed"
     :class="{ stressed: timeLeft < stressTime }"
     :style="{ right: shakeRight + 'px', top: shakeTop + 'px' }"
   >
     {{ getTime(timeLeft) }}
+    {{ $emit("update:timeLeftGame", timeLeft) }}
   </div>
 </template>
 
@@ -25,10 +27,15 @@ const getTime = (sec: number) => {
 
 interface Props {
   time?: number;
+  timeLeftGame?: number;
 }
 const props = withDefaults(defineProps<Props>(), {
   time: 30,
+  timeLeftGame: 30,
 });
+const emits = defineEmits<{
+  "update:timeLeftGame": number;
+}>();
 
 const endTime = computed(() => store.getters["getActiveSession"]().timerEnd);
 if (endTime.value <= Date.now() || endTime.value == null) {
@@ -44,7 +51,6 @@ var shakeMoment = 0;
 
 const intervalTimer = setInterval(() => {
   timeLeft.value = Math.round((endTime.value - Date.now()) / 1000);
-  store.state.timeLeft = timeLeft.value;
 
   if (timeLeft.value < stressTime && shakeMoment >= Math.min(10, timeLeft.value / 3)) {
     shakeRight.value = Math.random() * (stressTime - timeLeft.value) * 0.2;

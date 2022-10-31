@@ -13,7 +13,7 @@
     <div class="col-8" v-if="activeSession.showPoints">
       <div class="ms-5 ps-5">
         <div v-for="group in groups" :key="group.id">
-          {{ group.id }} | {{ group.game.points }}
+          {{ group.id }} | {{ Math.round(group.game.points) }}
         </div>
       </div>
     </div>
