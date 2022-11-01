@@ -198,13 +198,16 @@ const prevGroupRound = computed(() =>
 const prevOutput = (variable: string) => {
   return prevGroupRound.value ? prevGroupRound.value.outputs[variable] : 1;
 };
+const prevOutputK = (variable: string) => {
+  return prevGroupRound.value ? prevGroupRound.value.outputs[variable] : 100;
+};
 const prevInvestment = () => {
   return prevGroupRound.value ? prevGroupRound.value.outputs.I : 0;
 };
 const roundInput = (variable: string, index: number) => {
   return groupGame.value.rounds[index]
     ? groupGame.value.rounds[index].inputs[variable]
-    : 1;
+    : 0;
 };
 const roundResult = (variable: string, index: number) => {
   return groupGame.value.rounds[index]
@@ -256,7 +259,7 @@ const payoff_research = (delta: number, R: number, A: number) => {
   return (1 - delta) * A + (Math.sqrt(1.5 * R) / 80) * A;
 };
 const min_wage = (w: number, min_w: number) => {
-  if (w > min_w) return 2 * (w - min_w);
+  if (w < min_w) return 2 * (w - min_w);
   else return 0.1 * (w - min_w);
 };
 const A_benefit = (A_L: number, L: number) => {
@@ -309,10 +312,9 @@ const setValues = () => {
     inputs.value.R_E * outputs.value.p_R_E;
   outputs.value.left_over_budget = constants.budget - outputs.value.use;
 
-  // CHECK DIT KLOPT ROUNDINPUT??????---------------------------------------------
   // Calculation of capital stock
   outputs.value.K =
-    (1 - startValues.delta_K) * prevOutput("K") +
+    (1 - startValues.delta_K) * prevOutputK("K") +
     0.5 * roundInput("q", currentRound.value - constants.M);
 
   // Calculation of Q stock
@@ -355,14 +357,15 @@ const setValues = () => {
   results.value.return = Math.round(startValues.p_Y * outputs.value.Y * 100) / 100;
   results.value.cost =
     Math.round(
-      inputs.value.w * outputs.value.L +
+      (inputs.value.w * outputs.value.L +
         startValues.r_K * outputs.value.K +
         results.value.Ca +
         startValues.p_E * inputs.value.E +
         outputs.value.p_R_L * inputs.value.R_L +
         outputs.value.p_R_K * inputs.value.R_K +
         outputs.value.p_R_E * inputs.value.R_E +
-        outputs.value.I
+        outputs.value.I) *
+        100
     ) /
       100 +
     constants.fixed_costs;
@@ -382,10 +385,9 @@ const setValues = () => {
   results.value.footprint_labour =
     Math.round(
       (min_wage(inputs.value.w, startValues.min_w) * outputs.value.L +
-        A_benefit(outputs.value.A_L, outputs.value.L) * outputs.value.L) *
+        A_benefit(outputs.value.A_L, outputs.value.L)) *
         100
     ) / 100;
-
   results.value.tot_footprint_environment =
     Math.round(
       groupGame.value.rounds.reduce(
