@@ -148,6 +148,9 @@ ul {
             background-color: var(--active-grey);
             border-color: var(--accent-grey);
           }
+          &.hasCode {
+            opacity: 0.5;
+          }
         }
       }
     }

@@ -38,6 +38,7 @@
             <h6
               @click="selectedGroup = userGroup.id"
               :class="{ active: selectedGroup == userGroup.id }"
+              :style="{ border: '2px solid ' + userGroup.color }"
             >
               {{ userGroup.id }}
             </h6>
@@ -46,6 +47,7 @@
             <h6
               @click="selectedGroup = (group as GroupState).id"
               :class="{active: selectedGroup == (group as GroupState).id}"
+              :style="{ border: '2px solid ' + (group as GroupState).color }"
             >
               {{ (group as GroupState).id }}
             </h6>
@@ -54,10 +56,13 @@
         <div id="graphs">
           <LineChart
             :chartData="{
-              labels: Array.from(Array(currentRound + 1).keys()),
+              labels: Array.from(Array(currentRound + 1).keys()).map(
+                (num) => 'Period ' + Number(num + 1)
+              ),
               datasets: [
                 {
                   label: 'Cumulative profits',
+                  backgroundColor: groups[selectedGroup].color,
                   data: getDataProfit,
                 },
               ],
@@ -65,10 +70,13 @@
           />
           <LineChart
             :chartData="{
-              labels: Array.from(Array(currentRound + 1).keys()),
+              labels: Array.from(Array(currentRound + 1).keys()).map(
+                (num) => 'Period ' + Number(num + 1)
+              ),
               datasets: [
                 {
                   label: 'Cumulative enviromental footprint',
+                  backgroundColor: groups[selectedGroup].color,
                   data: getDataFE,
                 },
               ],
@@ -76,10 +84,13 @@
           />
           <LineChart
             :chartData="{
-              labels: Array.from(Array(currentRound + 1).keys()),
+              labels: Array.from(Array(currentRound + 1).keys()).map(
+                (num) => 'Period ' + Number(num + 1)
+              ),
               datasets: [
                 {
                   label: 'Cumulative social footprint',
+                  backgroundColor: groups[selectedGroup].color,
                   data: getDataFL,
                 },
               ],

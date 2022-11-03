@@ -14,6 +14,7 @@
       type="number"
       placeholder="..."
       :max="question.max"
+      :min="question.min"
       @input="$emit('update:answer', ($event.target as HTMLInputElement).value)"
       :required="req"
     />
@@ -93,7 +94,7 @@
     <div class="slider flex-fill">
       <input
         type="range"
-        :min="0"
+        :min="question.min ?? 0"
         :max="question.max"
         step="1"
         v-model.number="answer"
@@ -103,7 +104,7 @@
     <div class="number">
       <input
         type="number"
-        :min="0"
+        :min="question.min ?? 0"
         :max="question.max"
         step="1"
         v-model.number="answer"
@@ -164,7 +165,7 @@
   <div
     class="scale-wrapper"
     v-else-if="question.type == 'list-scale'"
-    v-for="q in question.questions"
+    v-for="(q, idx) in question.questions"
     :key="q"
   >
     <h2>{{ q }}</h2>
@@ -172,7 +173,7 @@
       <label
         class="radio"
         :class="{
-          checked: (answer as {[key:number]: string} )[question.questions.map((qs: string) => qs).indexOf(q)] == question.answers[letter],
+          checked: (answer as string[])[idx] == question.answers[letter],
           negative: key - (Number(question.answers.length) - 1) / 2 < 0,
           positive: key - (Number(question.answers.length) - 1) / 2 > 0,
         }"
@@ -189,7 +190,7 @@
           name="input-multiple"
           :id="letter"
           :value="question.answers[letter]"
-          v-model="(answer as string[])[question.questions.map((qs: string) => qs).indexOf(q)]"
+          v-model="(answer as string[])[idx]"
           @input="$emit('update:answer', answer)"
           :required="req"
         />
@@ -227,7 +228,7 @@
         type="text"
         @drop="
           first = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
-          $emit('update:answer', first + ', ' + second + ', ' + third);
+          $emit('update:answer', [first, second, third]);
         "
         @dragover.prevent
         @dragenter.prevent
@@ -241,7 +242,7 @@
         type="text"
         @drop="
           second = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
-          $emit('update:answer', first + ', ' + second + ', ' + third);
+          $emit('update:answer', [first, second, third]);
         "
         @dragover.prevent
         @dragenter.prevent
@@ -255,7 +256,7 @@
         type="text"
         @drop="
           third = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
-          $emit('update:answer', first + ', ' + second + ', ' + third);
+          $emit('update:answer', [first, second, third]);
         "
         @dragover.prevent
         @dragenter.prevent
@@ -278,11 +279,12 @@
 <script lang="ts" setup>
 import { QuestionState } from "@/store/types";
 import { computed, ref } from "@vue/reactivity";
+import type { Ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
 interface Props {
-  answer?: string | number | string[];
+  answer?: string | number | (string | null)[];
   question: QuestionState;
   req?: boolean;
 }
@@ -292,18 +294,21 @@ const props = withDefaults(defineProps<Props>(), {
   req: true,
 });
 const emits = defineEmits<{
-  "update:answer": string | number | string[];
+  "update:answer": string | number | (string | null)[];
 }>();
 
 const answer = ref(props.answer);
-if (props.question.type == "scale-10" && props.answer == "") {
-  answer.value = Math.round((Number(props.question.answers.length) - 1) / 2);
-}
-if (props.question.type == "range" && props.answer == "") {
-  answer.value = Math.round(props.question.max / 2);
+// if (props.question.type == "scale-10" && props.answer == "") {
+//   answer.value = Math.round((Number(props.question.answers.length) - 1) / 2);
+// }
+if (
+  (props.question.type == "range" || props.question.type == "scale-10") &&
+  props.answer == ""
+) {
+  answer.value = 0;
 }
 if (props.question.type == "list-scale" && props.answer == "") {
-  answer.value = Array(props.question.questions.length);
+  answer.value = new Array(props.question.questions.length).fill(null);
 }
 
 const shuffledAnswers = computed(() =>
@@ -318,9 +323,9 @@ const startDrag = (e: DragEvent, selection: string) => {
     e.dataTransfer.setData("selection", selection);
   }
 };
-const first = ref("");
-const second = ref("");
-const third = ref("");
+const first: Ref<string | null> = ref(null);
+const second: Ref<string | null> = ref(null);
+const third: Ref<string | null> = ref(null);
 const alphabet = [
   "A",
   "B",

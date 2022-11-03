@@ -6,6 +6,7 @@ import { DbState, ResultState, GroupState, pathItemState, QuestionState, RootSta
 import router from '@/router'
 import words from './words'
 import translations from './translations'
+import { capitalize } from 'vue'
 
 export default createStore<RootState>({
   modules: {
@@ -25,7 +26,7 @@ export default createStore<RootState>({
       else return user
     },
     getUsers: (state: RootState) => () => {
-      return state.db.users
+      return state.db?.users ?? false
     },
     getUsersList: (state: RootState, getters: any) => () => {
       return Object.keys(getters['getUsers']())
@@ -54,7 +55,7 @@ export default createStore<RootState>({
       return getters['isValidUser'](userid) && getters['isValidGroup'](groupid) 
     },
     getGroups: (state: RootState) => () => {
-      return state.db.groups
+      return state.db.groups ?? false
     },
     getGroupsFromSession: (state: RootState, getters: any) => (sessionId: string) => {
       const groups = getters['getGroups']()
@@ -166,7 +167,7 @@ export default createStore<RootState>({
       return questionnaire[idx]
     },
     getRandomUserId: (state: any) => () => {
-      return state.words.adjectives[Math.floor(Math.random() * state.words.adjectives.length)] + state.words.nouns[Math.floor(Math.random() * state.words.nouns.length)];
+      return capitalize(state.words.adjectives[Math.floor(Math.random() * state.words.adjectives.length)]) + capitalize(state.words.nouns[Math.floor(Math.random() * state.words.nouns.length)]);
     },
     getShuffled: (state: RootState) => ( array: number[] | string[] ) => {
       let currentIndex = array.length,  randomIndex;
@@ -203,11 +204,11 @@ export default createStore<RootState>({
                 }))
               } else {
                 Object.assign(questions, {
-                  [q.question]: q.answer
+                  [q.question]: q.answer.toString()
                 })
                 if (q.followup) {
                   Object.assign(questions, {
-                    [q.question + '-' + q.followup.question]: q.followup.answer
+                    [q.question + '-' + q.followup.question]: q.followup.answer.toString()
                   })
                 }
               }
@@ -265,6 +266,7 @@ export default createStore<RootState>({
     },
     getTreatmentResult: (state: RootState, getters: any) => (groupId: string) => {
       const group = getters['getGroup'](groupId)
+      const treatmentValues = getters['getGame']().treatmentValues
       const results = group.game.rounds.at(-1).results
       const R_K = group.game.rounds.reduce((acc: number, round: RoundState) => 
         acc + round.inputs.R_K
@@ -276,17 +278,19 @@ export default createStore<RootState>({
         acc + round.inputs.R_L
       , 0);
 
-      const b_P_g = 0.1
-      const b_E_g = 0.2
-      const b_S_g = 0.2
+
+
+      const b_P_g = treatmentValues.b_P_g
+      const b_E_g = treatmentValues.b_E_g
+      const b_S_g = treatmentValues.b_S_g
 
       const points_g = b_P_g * results.tot_profit_post_tax + b_E_g * results.tot_footprint_environment + b_S_g * results.tot_footprint_labour
 
-      const b_P_t = 0.2
-      const b_RD_t = 2
-      const b_RDE_t = 10
-      const b_E_t = 0.2
-      const b_S_t = 1
+      const b_P_t = treatmentValues.b_P_t
+      const b_RD_t = treatmentValues.b_RD_t
+      const b_RDE_t = treatmentValues.b_RDE_t
+      const b_E_t = treatmentValues.b_E_t
+      const b_S_t = treatmentValues.b_S_t
 
       switch (group.treatment) {
         case 'profit':
@@ -905,6 +909,14 @@ export default createStore<RootState>({
     ){
       context.commit('UPDATE_GAME', {
         startValues: startValues
+      })
+    },
+    setTreatmentValues(
+      context,
+      treatmentValues: number[]
+    ){
+      context.commit('UPDATE_GAME', {
+        treatmentValues: treatmentValues
       })
     },
     switchShowPoints(

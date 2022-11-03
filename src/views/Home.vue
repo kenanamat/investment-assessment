@@ -14,7 +14,10 @@
               class="valid"
               v-for="user in usersAvailable"
               @click="userid = user"
-              :class="{ active: userid == user }"
+              :class="{
+                active: userid == user,
+                hasCode: store.getters['getUser'](user).code != undefined,
+              }"
             >
               {{ user }}
             </li>
@@ -46,21 +49,6 @@
             src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg"
           />
         </button>
-      </div>
-      <div v-if="false" id="validIds">
-        <ul>
-          <li v-for="user in users">
-            <p>{{ user }}</p>
-          </li>
-        </ul>
-        <div>
-          <input type="text" v-model="userid" placeholder="Vul je deelnemerscode in" />
-          <input type="text" placeholder="Vul je groepscode in" v-model="groupid" />
-          <br />
-          <button @click="store.dispatch('initiateUser', { userid, groupid })">
-            Check je iD
-          </button>
-        </div>
       </div>
     </div>
   </div>

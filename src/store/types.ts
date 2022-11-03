@@ -29,6 +29,7 @@ export interface QuestionState {
   comment: string,
   followup: QuestionState,
   max: number,
+  min: number,
   questions: string[]
 }
 
