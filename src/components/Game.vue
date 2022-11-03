@@ -9,6 +9,8 @@
             questionnaireId: "Ex-durante",
           })
         }}
+        {{ resetInputs() }}
+        {{ setValues() }}
       </div>
       <div id="question-wrapper" v-if="userGroup.leader == currentUser">
         <div class="header text-center">
@@ -101,12 +103,12 @@
               <div class="chevrons">
                 <i
                   class="fa-solid fa-chevron-up"
-                  @click="currInputs[input as keyof InputState]++;
+                  @click="input === 'w' ? currInputs[input as keyof InputState] = currInputs[input as keyof InputState] + 0.5 : currInputs[input as keyof InputState]++;
                   checkBudget(input)"
                 ></i>
                 <i
                   class="fa-solid fa-chevron-down"
-                  @click="currInputs[input as keyof InputState]--;checkBudget(input)"
+                  @click="input === 'w' ? currInputs[input as keyof InputState] = currInputs[input as keyof InputState] - 0.5 : currInputs[input as keyof InputState]--;checkBudget(input)"
                 ></i>
               </div>
             </div>
@@ -131,25 +133,12 @@
         </table>
 
         <h3>Left over budget</h3>
-        <h2>{{ results.left_over_budget }}</h2>
+        <h2>{{ Math.round((constants.budget - getUse()) * 100) / 100 }}</h2>
       </div>
     </div>
-    <button
-      v-if="userGroup.leader == currentUser"
-      @click="
-        store.dispatch('submitAnswer', {
-          groupId: userGroup.id,
-          values: {
-            inputs: inputs,
-            outputs: outputs,
-            results: results,
-          },
-        })
-      "
-    >
-      Continue
-    </button>
+    <button v-if="userGroup.leader == currentUser" @click="submit()">Continue</button>
     <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
+      {{ setValues }}
       {{
         store.dispatch("submitAnswer", {
           groupId: userGroup.id,
@@ -161,9 +150,6 @@
         })
       }}
     </div>
-    <!-- <div v-show="false" v-if="results.left_over_budget <= 0">
-      {{ setValues }}
-    </div> -->
   </div>
 </template>
 
@@ -192,6 +178,7 @@ const groupGame = computed(() => store.getters["getGroupGame"](userGroup.value.i
 const groupRound = computed(() =>
   store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value)
 );
+
 const prevGroupRound = computed(() =>
   store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value - 1)
 );
@@ -216,10 +203,27 @@ const roundResult = (variable: string, index: number) => {
 };
 const groupSubmitted = computed(() => groupRound.value.completed);
 
+// const inputs = ref(
+//   prevGroupRound.value?.inputs ??
+//     store.getters["getGroupInputs"](userGroup.value.id, currentRound.value)
+// );
 const inputs = ref(
-  prevGroupRound.value?.inputs ??
-    store.getters["getGroupInputs"](userGroup.value.id, currentRound.value)
+  store.getters["getGroupInputs"](userGroup.value.id, currentRound.value)
 );
+const resetInputs = () => {
+  inputs.value.E = 0;
+  inputs.value.R_E = 0;
+  inputs.value.R_K = 0;
+  inputs.value.R_L = 0;
+  inputs.value.q = 0;
+  inputs.value.w = 3;
+  currInputs.value.E = 0;
+  currInputs.value.R_E = 0;
+  currInputs.value.R_K = 0;
+  currInputs.value.R_L = 0;
+  currInputs.value.q = 0;
+  currInputs.value.w = 3;
+};
 const currInputs = ref({
   E: inputs.value.E,
   R_E: inputs.value.R_E,
@@ -270,8 +274,25 @@ const outputs = ref(
   store.getters["getGroupOutputs"](userGroup.value.id, currentRound.value)
 );
 
+const submit = () => {
+  if (confirm("Are your decisions final?")) {
+    setValues();
+    store.dispatch("submitAnswer", {
+      groupId: userGroup.value.id,
+      values: {
+        inputs: inputs.value,
+        outputs: outputs.value,
+        results: results.value,
+      },
+    });
+  }
+};
 const checkBudget = (input: string) => {
-  if (getUse() > constants.budget) {
+  if (
+    getUse() > constants.budget ||
+    currInputs.value[input as keyof InputState] < 0 ||
+    currInputs.value["w"] < 3
+  ) {
     currInputs.value[input as keyof InputState] = inputs.value[input];
   } else {
     inputs.value[input] = currInputs.value[input as keyof InputState];

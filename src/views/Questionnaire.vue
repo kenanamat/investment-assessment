@@ -17,7 +17,7 @@
 
   <div v-else-if="pathItem.type == 'questionnaire'" id="questionnaire">
     <div v-if="!pathItem.completed && isReady && nextPathItem.canContinue">
-      <h1>Please wait enzo</h1>
+      <h1>Please wait</h1>
       <h2>Not ready from your group:</h2>
       <div id="validIds">
         <ul>

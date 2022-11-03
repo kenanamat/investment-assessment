@@ -25,7 +25,10 @@
       <div
         v-if="currentQuestion.followup"
         class="followup"
-        :class="{ valid: currentQuestion.followup && (answer == 'Yes' || answer > 0) }"
+        :class="{
+          valid:
+            currentQuestion.followup && (answer == 'Yes' || answer >= 0) && answer != '',
+        }"
       >
         <div class="title">
           <h4>{{ currentQuestion.followup.question }}</h4>
@@ -36,7 +39,7 @@
           v-model:answer="followupAnswer"
           :question="currentQuestion.followup"
           :key="currentQuestion.id"
-          :req="currentQuestion.followup && (answer == 'Yes' || answer > 0)"
+          :req="currentQuestion.followup && (answer == 'Yes' || answer >= 0)"
         />
       </div>
     </form>
@@ -67,7 +70,10 @@
 </template>
 
 <script lang="ts" setup>
+import { isNumericLiteral } from "@babel/types";
 import { ref, computed } from "@vue/reactivity";
+import { isArray, isString } from "@vue/shared";
+import type { Ref } from "vue";
 import { useStore } from "vuex";
 import QuestionType from "./QuestionType.vue";
 
@@ -83,11 +89,16 @@ const currentQuestion = computed(() =>
 const currentQuestionnaire = computed(() =>
   store.getters["getQuestionnaire"](props.questionnaire)
 );
-const answer = ref(currentQuestion.value.answer);
+const answer: Ref<string | number | (string | null)[]> = ref(
+  currentQuestion.value.answer
+);
 const followupAnswer = ref(currentQuestion.value.followup?.answer);
 
 const submitAnswer = () => {
-  if (answer.value == "") return alert("Please fill in an answer");
+  if (answer.value == "" && isString(answer.value))
+    return alert("Please fill in an answer");
+  if (isArray(answer.value) && answer.value.includes(null))
+    return alert("Please fill in all empty fields");
   store.dispatch("gotoNextQuestion", {
     userId: props.user,
     questionnaire: props.questionnaire,

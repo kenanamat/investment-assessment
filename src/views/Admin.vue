@@ -149,7 +149,7 @@
               <p>THERE IS NO SESSION</p>
             </div>
           </div>
-          <div class="settings" v-else-if="currentSetting == 'values'">
+          <div class="settings h-100" v-else-if="currentSetting == 'values'">
             <h4>Values</h4>
             <table id="values">
               <tr>
@@ -176,9 +176,32 @@
                 </td>
               </tr>
             </table>
+            <div class="w-50 mt-5">
+              <h5>Treatment values</h5>
+              <div
+                class="d-flex align-items-center"
+                v-for="(value, key) in treatmentValues"
+              >
+                <div class="flex-fill">
+                  {{ key }}
+                </div>
+                <div>
+                  <input
+                    class="border"
+                    type="number"
+                    v-model="treatmentValues[key]"
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+              </div>
+            </div>
             <button
               class="position-absolute bottom-0 end-0"
-              @click="store.dispatch('setStartValues', startValues)"
+              @click="
+                store.dispatch('setStartValues', startValues);
+                store.dispatch('setTreatmentValues', treatmentValues);
+              "
             >
               Save Values
             </button>
@@ -245,7 +268,9 @@ const currentSetting = ref("session");
 const userAmount = ref(0);
 const groupAmount = ref(0);
 const password = ref("");
-const startValues = ref(store.getters["getGame"]().startValues);
+const game = computed(() => store.getters["getGame"]());
+const startValues = ref(game.value.startValues);
+const treatmentValues = ref(game.value.treatmentValues);
 
 const download = () => {
   var data = store.getters["getExcelFormat"]();
