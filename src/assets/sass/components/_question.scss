@@ -190,7 +190,7 @@
             }
             &::-webkit-slider-thumb {
               background: var(--hover-green);
-              transform: scale(1.2);
+              transform: scale(1.2) translateY(-0.25rem);
             }
             &::-moz-range-thumb {
               background: var(--hover-green);
@@ -232,7 +232,7 @@
           &::-webkit-slider-thumb {
             -webkit-appearance: none; 
             appearance: none;
-            margin-top: -12px; 
+            margin-top: 0; 
           }
         }
       }
@@ -266,7 +266,7 @@
             }
             &::-webkit-slider-thumb {
               background: var(--hover-green);
-              transform: scale(1.2);
+              transform: scale(1.2) translateY(-0.1rem);
             } 
             &::-moz-range-thumb {
               background: var(--hover-green);
@@ -308,7 +308,7 @@
           &::-webkit-slider-thumb {
             -webkit-appearance: none; 
             appearance: none;
-            margin-top: -12px; 
+            margin-top: 0; 
           }
         }
       }
