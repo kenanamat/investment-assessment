@@ -20,9 +20,12 @@ import { useStore } from "vuex";
 
 const store = useStore();
 
-const currentUser = localStorage.getItem("userid");
+var currentUser = localStorage.getItem("userid");
 const userGroup = computed(() => store.getters["getUserGroup"](currentUser));
-const pathItem = computed(() => store.getters["getPathItem"](currentUser));
+const pathItem = computed(() => {
+  currentUser = localStorage.getItem("userid");
+  return store.getters["getPathItem"](currentUser);
+});
 
 const logoLight =
   "https://www.seo.nl/wp-content/themes/seoeconomics/dist/images/seo-economisch-onderzoek-logo-en-light_99f1efaf.svg";

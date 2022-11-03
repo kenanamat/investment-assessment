@@ -253,6 +253,7 @@ export default createStore<RootState>({
         excelFormat.push({
           id: user.id,
           group: userGroup.id,
+          treatment: userGroup.treatment,
           session: user.session,
           ...questions,
           ...gameQuestions,

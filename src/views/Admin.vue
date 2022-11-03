@@ -141,6 +141,11 @@
               >
                 <p v-if="user != 'admin'">
                   {{ user }} | {{ store.getters["getUser"](user).group }} |
+                  {{
+                    store.getters["getGroup"](store.getters["getUser"](user).group)
+                      .treatment
+                  }}
+                  |
                   {{ store.getters["getUser"](user).code }}
                 </p>
               </div>
