@@ -138,17 +138,7 @@
     </div>
     <button v-if="userGroup.leader == currentUser" @click="submit()">Continue</button>
     <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
-      {{ setValues }}
-      {{
-        store.dispatch("submitAnswer", {
-          groupId: userGroup.id,
-          values: {
-            inputs: inputs,
-            outputs: outputs,
-            results: results,
-          },
-        })
-      }}
+      {{ forceSubmit() }}
     </div>
   </div>
 </template>
@@ -203,10 +193,6 @@ const roundResult = (variable: string, index: number) => {
 };
 const groupSubmitted = computed(() => groupRound.value.completed);
 
-// const inputs = ref(
-//   prevGroupRound.value?.inputs ??
-//     store.getters["getGroupInputs"](userGroup.value.id, currentRound.value)
-// );
 const inputs = ref(
   store.getters["getGroupInputs"](userGroup.value.id, currentRound.value)
 );
@@ -275,17 +261,28 @@ const outputs = ref(
 );
 
 const submit = () => {
-  if (confirm("Are your decisions final?")) {
-    setValues();
-    store.dispatch("submitAnswer", {
-      groupId: userGroup.value.id,
-      values: {
-        inputs: inputs.value,
-        outputs: outputs.value,
-        results: results.value,
-      },
-    });
-  }
+  if (!confirm("Are your decisions final?")) return;
+
+  setValues();
+  store.dispatch("submitAnswer", {
+    groupId: userGroup.value.id,
+    values: {
+      inputs: inputs.value,
+      outputs: outputs.value,
+      results: results.value,
+    },
+  });
+};
+const forceSubmit = () => {
+  setValues();
+  store.dispatch("submitAnswer", {
+    groupId: userGroup.value.id,
+    values: {
+      inputs: inputs.value,
+      outputs: outputs.value,
+      results: results.value,
+    },
+  });
 };
 const checkBudget = (input: string) => {
   if (

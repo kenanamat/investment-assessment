@@ -107,6 +107,7 @@
         :min="question.min ?? 0"
         :max="question.max"
         step="1"
+        placeholder="..."
         v-model.number="answer"
         @input="$emit('update:answer', answer)"
       />
@@ -301,10 +302,7 @@ const answer = ref(props.answer);
 // if (props.question.type == "scale-10" && props.answer == "") {
 //   answer.value = Math.round((Number(props.question.answers.length) - 1) / 2);
 // }
-if (
-  (props.question.type == "range" || props.question.type == "scale-10") &&
-  props.answer == ""
-) {
+if (props.question.type == "scale-10" && props.answer == "") {
   answer.value = 0;
 }
 if (props.question.type == "list-scale" && props.answer == "") {
