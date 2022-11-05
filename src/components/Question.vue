@@ -97,7 +97,10 @@ const followupAnswer = ref(currentQuestion.value.followup?.answer);
 const submitAnswer = () => {
   if (answer.value == "" && isString(answer.value))
     return alert("Please fill in an answer");
-  if (isArray(answer.value) && answer.value.includes(null))
+  if (
+    isArray(answer.value) &&
+    (answer.value.includes(null) || (answer.value as string[]).length < 3)
+  )
     return alert("Please fill in all empty fields");
   store.dispatch("gotoNextQuestion", {
     userId: props.user,
