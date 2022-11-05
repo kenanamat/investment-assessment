@@ -99,7 +99,7 @@ const submitAnswer = () => {
     return alert("Please fill in an answer");
   if (
     isArray(answer.value) &&
-    (answer.value.includes(null) || (answer.value as string[]) < 3)
+    (answer.value.includes(null) || (answer.value as string[]).length < 3)
   )
     return alert("Please fill in all empty fields");
   store.dispatch("gotoNextQuestion", {
