@@ -221,56 +221,73 @@
     />
   </div>
   <div class="ranking" v-else-if="question.type == 'ranking'">
-    <div class="best">
-      <label>1.</label>
-      <input
-        v-model="first"
-        type="text"
-        @drop="
-          first = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
-          $emit('update:answer', [first, second, third]);
-        "
-        @dragover.prevent
-        @dragenter.prevent
-        :required="req"
-        readonly
-      />
-      <br />
-      <label>2.</label>
-      <input
-        v-model="second"
-        type="text"
-        @drop="
-          second = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
-          $emit('update:answer', [first, second, third]);
-        "
-        @dragover.prevent
-        @dragenter.prevent
-        :required="req"
-        readonly
-      />
-      <br />
-      <label>3.</label>
-      <input
-        v-model="third"
-        type="text"
-        @drop="
-          third = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
-          $emit('update:answer', [first, second, third]);
-        "
-        @dragover.prevent
-        @dragenter.prevent
-        :required="req"
-        readonly
-      />
-    </div>
-    <div class="selections">
+    <div
+      class="selections ms-3"
+      @drop="(answer as string[]).splice(currIdx, 1)"
+      @dragover.prevent
+      @dragenter.prevent
+    >
+      <p>Drag options to 'Your ranking'</p>
       <div
-        v-for="selection in shuffledAnswers.filter((answer: string) => ![first, second,third].includes(answer))"
+        v-for="selection in shuffledAnswers.filter((a: string) => !(answer as string[]).includes(a))"
         @dragstart="startDrag($event, selection)"
+        @mouseenter="animate = true"
+        @mouseleave="animate = false"
         draggable="true"
       >
         {{ selection }}
+      </div>
+    </div>
+    <i class="fa-solid fa-arrow-right" :class="{ animate: animate }"></i>
+    <div class="best p-4 shadow me-3">
+      <h3>Your ranking</h3>
+      <div
+        class="rank-box"
+        @drop="
+          showIndicator = false;
+          checkDrop($event.dataTransfer ? $event.dataTransfer.getData('selection') : '');
+          $emit('update:answer', answer);
+        "
+        @dragover.prevent="
+          checkIndicator(
+            $event.dataTransfer ? $event.dataTransfer.getData('selection') : ''
+          )
+        "
+        @mouseout="showIndicator = false"
+        @dragexit="showIndicator = false"
+        @dragenter.prevent
+      >
+        <div
+          class="d-flex align-items-center mt-2"
+          v-for="(a, idx) in answer"
+          :key="(a as string)"
+        >
+          <label>{{ idx + 1 }}.</label>
+          <span
+            class="w-100 border"
+            @dragstart="startDrag($event, (answer as string[])[idx]);currIdx = idx"
+            @dragover.prevent="showIndicator = false"
+            @drop="(answer as string[])[currIdx] = (answer as string[])[idx];
+            (answer as string[])[idx] = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';"
+            draggable="true"
+          >
+            {{ (answer as string[])[idx]}}
+          </span>
+        </div>
+        <div :class="{ show: showIndicator }" class="indicator mt-2"></div>
+        <br />
+        <!-- <input
+          v-model="(answer as string[])[2]"
+          type="text"
+          @drop="
+          (answer as string[])[2] = $event.dataTransfer ? $event.dataTransfer.getData('selection') : '';
+            $emit('update:answer', answer);
+          "
+          @dragover.prevent
+          @dragenter.prevent
+          :required="req"
+          readonly
+        /> -->
       </div>
     </div>
   </div>
@@ -310,12 +327,36 @@ if (
 if (props.question.type == "list-scale" && props.answer == "") {
   answer.value = new Array(props.question.questions.length).fill(null);
 }
+if (props.question.type == "ranking" && props.answer == "") {
+  answer.value = [];
+}
 
-const shuffledAnswers = computed(() =>
+const checkDrop = (selection: string) => {
+  if ((answer.value as (string | null)[]).includes(selection)) return;
+  if ((answer.value as (string | null)[]).length < 3) {
+    (answer.value as (string | null)[]).push(selection);
+  } else {
+    (answer.value as (string | null)[])[
+      (answer.value as (string | null)[]).length - 1
+    ] = selection;
+  }
+};
+const currIdx = ref(0);
+const showIndicator = ref(false);
+const checkIndicator = (selection: string) => {
+  if (
+    (answer.value as (string | null)[]).length < 3 &&
+    !(answer.value as (string | null)[]).includes(selection)
+  )
+    showIndicator.value = true;
+};
+
+const animate = ref(false);
+
+const shuffledAnswers =
   props.question.type == "ranking"
     ? store.getters["getShuffled"](props.question.answers)
-    : []
-);
+    : [];
 const startDrag = (e: DragEvent, selection: string) => {
   if (e.dataTransfer) {
     e.dataTransfer.dropEffect = "move";
@@ -323,9 +364,7 @@ const startDrag = (e: DragEvent, selection: string) => {
     e.dataTransfer.setData("selection", selection);
   }
 };
-const first: Ref<string | null> = ref(null);
-const second: Ref<string | null> = ref(null);
-const third: Ref<string | null> = ref(null);
+
 const alphabet = [
   "A",
   "B",
