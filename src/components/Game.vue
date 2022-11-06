@@ -115,31 +115,67 @@
           </div>
         </div>
       </div>
-      <div class="col-7 mt-4">
+      <div class="col-3 mt-4 position-relative">
         <table class="mb-4">
-          <tr>
-            <td>Item</td>
-            <td class="ps-3">Amount</td>
+          <tr class="border-bottom fw-bold">
+            <td class="pe-3">Information on productivity and R&D</td>
+            <td class="ps-3 border-start">Value</td>
           </tr>
-          <tr
-            v-for="item in ['A_E', 'A_K', 'A_L', 'p_R_E', 'p_R_K', 'p_R_L']"
-            :key="item"
-          >
-            <td>
-              {{ store.state.translations[item] }}
+          <tr>
+            <td class="fw-bold pt-3">Productivity in:</td>
+          </tr>
+          <tr v-for="(item, idx) in ['A_L', 'A_K', 'A_E']" :key="item">
+            <td class="pe-3 ps-3">
+              {{ ["Labour efficiency", "Capital efficiency", "Energy efficiency"][idx] }}
             </td>
-            <td class="ps-3 fw-bold">{{ Math.round(outputs[item] * 100) / 100 }}</td>
+            <td class="ps-3 fw-bold border-start text-end">
+              {{ Math.round(outputs[item] * 100) / 100 }}
+            </td>
+          </tr>
+          <tr>
+            <td class="fw-bold pt-3">Cost of research for:</td>
+          </tr>
+          <tr v-for="(item2, idx2) in ['p_R_L', 'p_R_K', 'p_R_E']" :key="item2">
+            <td class="pe-3 ps-3">
+              {{ ["Labour efficiency", "Capital efficiency", "Energy efficiency"][idx2] }}
+            </td>
+            <td class="ps-3 fw-bold border-start text-end">
+              {{ Math.round(outputs[item2] * 100) / 100 }}
+            </td>
           </tr>
         </table>
 
         <h3>Left over budget</h3>
         <h2>{{ Math.round((constants.budget - getUse()) * 100) / 100 }}</h2>
+        <button
+          class="position-absolute bottom-0 end-0"
+          v-if="userGroup.leader == currentUser"
+          @click="submit()"
+        >
+          Continue
+        </button>
       </div>
     </div>
-    <button v-if="userGroup.leader == currentUser" @click="submit()">Continue</button>
-    <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
-      {{ forceSubmit() }}
+    <div v-if="currentRound != 0">
+      <h4 class="mt-5">Previous allocations</h4>
+      <table class="mb-4">
+        <thead class="border-bottom">
+          <td class="p-3 border-end">Period</td>
+          <td class="p-3" v-for="input in Object.keys(inputs)" :key="input">
+            {{ store.state.translations[input] }}
+          </td>
+        </thead>
+        <tr v-for="round in groupGame.rounds.slice(0, currentRound)" :key="round.index">
+          <td class="p-3 border-end">Period {{ round.index + 1 }}</td>
+          <td class="text-end p-3" v-for="input in Object.keys(inputs)" :key="input">
+            {{ round.inputs[input] }}
+          </td>
+        </tr>
+      </table>
     </div>
+    <!-- <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
+      {{ forceSubmit() }}
+    </div> -->
   </div>
 </template>
 
@@ -147,6 +183,7 @@
 import { RoundState, InputState } from "@/store/types";
 import { computed } from "@vue/reactivity";
 import { ref } from "vue";
+import type { Ref } from "vue";
 import { useStore } from "vuex";
 import Leaderboard from "./Leaderboard.vue";
 import Timer from "./Timer.vue";
@@ -193,9 +230,14 @@ const roundResult = (variable: string, index: number) => {
 };
 const groupSubmitted = computed(() => groupRound.value.completed);
 
-const inputs = ref(
-  store.getters["getGroupInputs"](userGroup.value.id, currentRound.value)
-);
+const inputs: Ref<{ [id: string]: number }> = ref({
+  w: 3,
+  q: 0,
+  E: 0,
+  R_L: 0,
+  R_K: 0,
+  R_E: 0,
+});
 const resetInputs = () => {
   inputs.value.E = 0;
   inputs.value.R_E = 0;
@@ -211,12 +253,12 @@ const resetInputs = () => {
   currInputs.value.w = 3;
 };
 const currInputs = ref({
-  E: inputs.value.E,
-  R_E: inputs.value.R_E,
-  R_K: inputs.value.R_K,
-  R_L: inputs.value.R_L,
-  q: inputs.value.q,
   w: inputs.value.w,
+  q: inputs.value.q,
+  E: inputs.value.E,
+  R_L: inputs.value.R_L,
+  R_K: inputs.value.R_K,
+  R_E: inputs.value.R_E,
 });
 const getMax = (input: string) => {
   switch (input) {
@@ -396,27 +438,27 @@ const setValues = () => {
     results.value.profit_pre_tax > 0
       ? Math.round(results.value.profit_pre_tax * (1 - constants.tax_rate) * 100) / 100
       : results.value.profit_pre_tax;
-  results.value.footprint_environment =
+  results.value.environmental_impact =
     Math.round(
       (-(constants.omega_E * inputs.value.E) - constants.omega_K * outputs.value.K) * 100
     ) / 100;
-  results.value.footprint_labour =
+  results.value.social_impact =
     Math.round(
       (min_wage(inputs.value.w, startValues.min_w) * outputs.value.L +
         A_benefit(outputs.value.A_L, outputs.value.L)) *
         100
     ) / 100;
-  results.value.tot_footprint_environment =
+  results.value.tot_environmental_impact =
     Math.round(
       groupGame.value.rounds.reduce(
-        (sum: number, obj: RoundState) => obj.results.footprint_environment + sum,
+        (sum: number, obj: RoundState) => obj.results.environmental_impact + sum,
         0
       ) * 100
     ) / 100;
-  results.value.tot_footprint_labour =
+  results.value.tot_social_impact =
     Math.round(
       groupGame.value.rounds.reduce(
-        (sum: number, obj: RoundState) => obj.results.footprint_labour + sum,
+        (sum: number, obj: RoundState) => obj.results.social_impact + sum,
         0
       ) * 100
     ) / 100;

@@ -114,6 +114,9 @@
               >
                 Resume
               </button>
+              <button v-if="pathItem.type == 'game'" @click="store.dispatch('readyAll')">
+                Ready all
+              </button>
               <button @click="store.dispatch('switchShowPoints')">Point view</button>
               <button @click="download()">Download excel</button>
               <button @click="backup()">Backup database</button>

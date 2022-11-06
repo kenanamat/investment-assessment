@@ -13,19 +13,19 @@
         </div>
         <div class="col-4">
           <div class="scores-list">
-            <h4>Footprint Environment</h4>
+            <h4>Environmental Impact</h4>
             <div v-for="group in rankedFE.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
-              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_footprint_environment)}}
+              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_environmental_impact)}}
             </div>
           </div>
         </div>
         <div class="col-4">
           <div class="scores-list">
-            <h4>Footprint Labour</h4>
+            <h4>Social Impact</h4>
             <div v-for="group in rankedFL.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
-              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_footprint_labour)}}
+              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_social_impact)}}
             </div>
           </div>
         </div>
@@ -144,13 +144,13 @@ const getDataProfit = computed(() => {
 const getDataFE = computed(() => {
   return Array.from(
     Object.values(groups.value[selectedGroup.value].game.rounds) as RoundState[],
-    (round: RoundState) => round.results.tot_footprint_environment
+    (round: RoundState) => round.results.tot_environmental_impact
   );
 });
 const getDataFL = computed(() => {
   return Array.from(
     Object.values(groups.value[selectedGroup.value].game.rounds) as RoundState[],
-    (round: RoundState) => round.results.tot_footprint_labour
+    (round: RoundState) => round.results.tot_social_impact
   );
 });
 
@@ -164,17 +164,19 @@ const rankedProfits = computed(() => {
 const rankedFE = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
-      (b as GroupState).game.rounds[0].results.tot_footprint_environment -
-      (a as GroupState).game.rounds[0].results.tot_footprint_environment
+      (b as GroupState).game.rounds[0].results.tot_environmental_impact -
+      (a as GroupState).game.rounds[0].results.tot_environmental_impact
   );
 });
 const rankedFL = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
-      (b as GroupState).game.rounds[0].results.tot_footprint_labour -
-      (a as GroupState).game.rounds[0].results.tot_footprint_labour
+      (b as GroupState).game.rounds[0].results.tot_social_impact -
+      (a as GroupState).game.rounds[0].results.tot_social_impact
   );
 });
+
+Chart.register(...registerables);
 </script>
 
 <style lang="scss">

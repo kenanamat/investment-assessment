@@ -285,7 +285,7 @@ export default createStore<RootState>({
       const b_E_g = treatmentValues.b_E_g
       const b_S_g = treatmentValues.b_S_g
 
-      const points_g = b_P_g * results.tot_profit_post_tax + b_E_g * results.tot_footprint_environment + b_S_g * results.tot_footprint_labour
+      const points_g = b_P_g * results.tot_profit_post_tax + b_E_g * results.tot_environmental_impact + b_S_g * results.tot_social_impact
 
       const b_P_t = treatmentValues.b_P_t
       const b_RD_t = treatmentValues.b_RD_t
@@ -299,7 +299,7 @@ export default createStore<RootState>({
         case 'r&d':
           return points_g + b_RD_t * (R_K+R_L+R_E)
         case 'footprint':
-          return points_g + b_RDE_t* (R_E) + b_E_t * results.tot_footprint_environment + b_S_t * results.tot_footprint_labour
+          return points_g + b_RDE_t* (R_E) + b_E_t * results.tot_environmental_impact + b_S_t * results.tot_social_impact
         default:
           return 0
       }
@@ -570,19 +570,41 @@ export default createStore<RootState>({
         date: dateToday,
         currentRound: 0,
         timerEnd: null,
+        // path: {
+        //   0: {
+        //     index: 0,
+        //     canContinue: true,
+        //     completed: false,
+        //     type: 'questionnaire',
+        //     id: 'Ex-ante'
+        //   },
+        //   1: {
+        //     index: 1,
+        //     canContinue: false,
+        //     completed: false,
+        //     type: 'game',
+        //   },
+        //   2: {
+        //     index: 2,
+        //     completed: false,
+        //     canContinue: true,
+        //     type: 'questionnaire',
+        //     id: 'Ex-post'
+        //   }
+        // }
         path: {
           0: {
             index: 0,
             canContinue: true,
             completed: false,
-            type: 'questionnaire',
-            id: 'Ex-ante'
+            type: 'game',
           },
           1: {
             index: 1,
-            canContinue: false,
+            canContinue: true,
             completed: false,
-            type: 'game',
+            type: 'questionnaire',
+            id: 'Ex-post'
           },
           2: {
             index: 2,
@@ -830,6 +852,15 @@ export default createStore<RootState>({
         })
       })
       context.dispatch('checkRound')
+    },
+    readyAll(
+      context
+    ) {
+      const activeSession = context.getters['getActiveSession']()
+      const groups = context.getters['getGroupsInSession'](activeSession.id)
+      groups.forEach((g: string) => {
+        context.dispatch("readyUp", g)
+      });
     },
     continueSession(
       context
