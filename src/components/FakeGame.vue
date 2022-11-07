@@ -64,22 +64,13 @@
     </div>
     <div v-else>
       <div id="leaderboard">
-        {{ (timeLeftGame = 10) }}
-        <Leaderboard :key="currentRound" />
+        <Leaderboard />
       </div>
     </div>
   </div>
   <div v-else id="game">
-    <Timer
-      v-model:timeLeftGame="timeLeftGame"
-      :time="groupGame.time[currentRound]"
-      v-if="groupGame"
-      :key="currentRound"
-    />
-    <div class="box col-3 p-3 mb-4">
-      <h4>Your group: {{ userGroup.id }}</h4>
-      <h4>Your treatment: {{ userGroup.treatment }}</h4>
-    </div>
+    <Timer v-model:timeLeftGame="timeLeftGame" :time="groupGame.time" v-if="groupGame" />
+
     <div class="row">
       <div class="col-5">
         <div class="box" id="inputs-controller">
@@ -182,9 +173,9 @@
         </tr>
       </table>
     </div>
-    <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
+    <!-- <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
       {{ forceSubmit() }}
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -325,8 +316,6 @@ const submit = () => {
   });
 };
 const forceSubmit = () => {
-  console.log("force");
-  timeLeftGame.value = 100;
   setValues();
   store.dispatch("submitAnswer", {
     groupId: userGroup.value.id,

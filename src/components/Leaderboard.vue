@@ -100,11 +100,16 @@
       </div>
     </div>
     <button
-      v-if="userGroup.leader == currentUser && !display"
+      v-if="
+        userGroup.leader == currentUser && !display && !Object.values(userGroup.ready)[0]
+      "
       @click="store.dispatch('readyUp', userGroup.id)"
     >
       Ready
     </button>
+    <h4 v-if="Object.values(userGroup.ready)[0]">
+      Please wait until the other groups are also ready, then the next round will start
+    </h4>
   </div>
 </template>
 
@@ -157,22 +162,22 @@ const getDataFL = computed(() => {
 const rankedProfits = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
-      (b as GroupState).game.rounds[0].results.tot_profit_post_tax -
-      (a as GroupState).game.rounds[0].results.tot_profit_post_tax
+      (b as GroupState).game.rounds[currentRound.value].results.tot_profit_post_tax -
+      (a as GroupState).game.rounds[currentRound.value].results.tot_profit_post_tax
   );
 });
 const rankedFE = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
-      (b as GroupState).game.rounds[0].results.tot_environmental_impact -
-      (a as GroupState).game.rounds[0].results.tot_environmental_impact
+      (b as GroupState).game.rounds[currentRound.value].results.tot_environmental_impact -
+      (a as GroupState).game.rounds[currentRound.value].results.tot_environmental_impact
   );
 });
 const rankedFL = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
-      (b as GroupState).game.rounds[0].results.tot_social_impact -
-      (a as GroupState).game.rounds[0].results.tot_social_impact
+      (b as GroupState).game.rounds[currentRound.value].results.tot_social_impact -
+      (a as GroupState).game.rounds[currentRound.value].results.tot_social_impact
   );
 });
 

@@ -1,24 +1,5 @@
 <template>
   <div v-if="currentUser == 'admin'" id="admin">
-    <!-- <div v-if="currentSession">
-      <button @click="store.dispatch('endSession')">End Session</button>
-      <button @click="store.dispatch('removeLocalUser', currentUser)">done</button>
-      <button @click="download()">Download excel</button>
-      <button @click="backup()">backup database</button>
-      <button
-        v-if="nextPathItem && !nextPathItem.canContinue"
-        @click="store.dispatch('continueSession')"
-      >
-        Resume
-      </button>
-      <h3>Users in session:</h3>
-      <div
-        v-for="user in store.getters['getUsersInSession'](currentSession.id)"
-        :key="user.id"
-      >
-        <p>{{ user }} | {{ store.getters["getUser"](user).code }}</p>
-      </div>
-    </div> -->
     <div id="settings">
       <div class="d-flex align-items-center">
         <h1 class="mb-4 flex-fill">Settings</h1>
@@ -108,9 +89,18 @@
             </form>
 
             <div v-if="currentSession" class="position-absolute bottom-0 end-0">
+              <button v-if="!currentSession.code" @click="store.dispatch('setCode')">
+                Set code
+              </button>
               <button
-                v-if="nextPathItem && !nextPathItem.canContinue"
+                v-if="nextPathItem && !nextPathItem.canContinue && currentSession.code"
                 @click="store.dispatch('continueSession')"
+              >
+                Resume
+              </button>
+              <button
+                v-if="pathItem.type == 'pre-game' && currentSession.code"
+                @click="store.dispatch('nextPath')"
               >
                 Resume
               </button>
@@ -136,7 +126,10 @@
             </button>
           </div>
           <div class="settings" v-else-if="currentSetting == 'users'">
-            <h4 class="mb-4">Users in session</h4>
+            <h4 class="mb-4">
+              Users in session:
+              {{ store.getters["getUsersInSession"](currentSession.id).length }}
+            </h4>
             <div v-if="currentSession">
               <div
                 v-for="user in store.getters['getUsersInSession'](currentSession.id)"
@@ -148,8 +141,6 @@
                     store.getters["getGroup"](store.getters["getUser"](user).group)
                       .treatment
                   }}
-                  |
-                  {{ store.getters["getUser"](user).code }}
                 </p>
               </div>
             </div>
