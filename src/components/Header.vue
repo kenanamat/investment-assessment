@@ -2,13 +2,13 @@
   <header>
     <div class="header-container d-flex">
       <img :src="logoLight" />
-      <div
+      <!-- <div
         class="d-flex flex-column ms-5 fw-bold"
         v-if="userGroup && pathItem.type == 'game'"
       >
         <span>Your group: {{ userGroup.id }}</span>
         <span>Your treatment: {{ capitalize(userGroup.treatment) }}</span>
-      </div>
+      </div> -->
     </div>
   </header>
 </template>
@@ -20,12 +20,12 @@ import { useStore } from "vuex";
 
 const store = useStore();
 
-var currentUser = localStorage.getItem("userid");
-const userGroup = computed(() => store.getters["getUserGroup"](currentUser));
-const pathItem = computed(() => {
-  currentUser = localStorage.getItem("userid");
-  return store.getters["getPathItem"](currentUser);
-});
+// var currentUser = localStorage.getItem("userid");
+// const userGroup = computed(() => store.getters["getUserGroup"](currentUser));
+// const pathItem = computed(() => {
+//   currentUser = localStorage.getItem("userid");
+//   return store.getters["getPathItem"](currentUser);
+// });
 
 const logoLight =
   "https://www.seo.nl/wp-content/themes/seoeconomics/dist/images/seo-economisch-onderzoek-logo-en-light_99f1efaf.svg";

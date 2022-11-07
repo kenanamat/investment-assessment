@@ -6,7 +6,7 @@
         <h3>Welcome</h3>
         <h1>Choose an available username and join a group</h1>
       </div>
-      <div class="col-lg-3 availables">
+      <!-- <div class="col-lg-3 availables">
         <div>
           <h4>Available usernames:</h4>
           <ul>
@@ -24,7 +24,7 @@
           </ul>
           <hr />
         </div>
-      </div>
+      </div> -->
       <div class="col-lg-4 selected d-flex">
         <form @submit.prevent="store.dispatch('initiateUser', userid)" id="login">
           <h4>Your selected username:</h4>
@@ -34,17 +34,16 @@
             placeholder="Select a username"
             :class="{ notEmpty: userid != '' }"
             required
-            readonly
           />
-          <input
+          <!-- <input
             v-if="userCode"
             type="text"
             v-model="code"
             placeholder="Enter your code"
             required
-          />
+          /> -->
         </form>
-        <button type="submit" form="login" v-if="!userCode || code == userCode">
+        <button type="submit" form="login" v-if="users.includes(userid)">
           <img
             src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg"
           />

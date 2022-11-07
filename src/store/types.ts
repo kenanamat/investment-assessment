@@ -93,25 +93,25 @@ export interface ResultState {
   Q: number,
   Y: number,
   cost: number,
-  footprint_environment: number,
-  footprint_labour: number,
+  environmental_impact: number,
+  social_impact: number,
   left_over_budget: number,
   profit_post_tax: number,
   profit_pre_tax: number,
   q: number,
   return: number,
-  tot_footprint_environment: number,
-  tot_footprint_labour: number,
+  tot_environmental_impact: number,
+  tot_social_impact: number,
   tot_profit_post_tax: number
 }
 
 export interface InputState {
-  E: number, 
-  R_E: number, 
-  R_K: number, 
-  R_L: number, 
-  q: number, 
-  w: number
+  w: number,
+  q: number,
+  E: number,
+  R_L: number,
+  R_K: number,
+  R_E: number,
 }
 
 export interface OutputState {

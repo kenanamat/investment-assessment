@@ -285,7 +285,7 @@ export default createStore<RootState>({
       const b_E_g = treatmentValues.b_E_g
       const b_S_g = treatmentValues.b_S_g
 
-      const points_g = b_P_g * results.tot_profit_post_tax + b_E_g * results.tot_footprint_environment + b_S_g * results.tot_footprint_labour
+      const points_g = b_P_g * results.tot_profit_post_tax + b_E_g * results.tot_environmental_impact + b_S_g * results.tot_social_impact
 
       const b_P_t = treatmentValues.b_P_t
       const b_RD_t = treatmentValues.b_RD_t
@@ -299,7 +299,7 @@ export default createStore<RootState>({
         case 'r&d':
           return points_g + b_RD_t * (R_K+R_L+R_E)
         case 'footprint':
-          return points_g + b_RDE_t* (R_E) + b_E_t * results.tot_footprint_environment + b_S_t * results.tot_footprint_labour
+          return points_g + b_RDE_t* (R_E) + b_E_t * results.tot_environmental_impact + b_S_t * results.tot_social_impact
         default:
           return 0
       }
@@ -341,6 +341,9 @@ export default createStore<RootState>({
     },
     UPDATE_GROUP(state: RootState, payload) {
       firebase.database().ref('db/groups/' + payload.id).update(payload);
+    },
+    REMOVE_ONHOLD(state: RootState) {
+      firebase.database().ref('db/groups').update({'onHold': null});
     },
     UPDATE_GROUPREADY(state: RootState, payload) {
       if ( payload.id != undefined ) firebase.database().ref('db/groups/' + payload.id + '/ready').update(payload.user);
@@ -431,43 +434,9 @@ export default createStore<RootState>({
         userId = context.getters['getRandomUserId']()
       }
 
-      // get max per group
-      const groupsInSession = context.getters['getGroupsInSession'](sessionId)
-      const usersInSessionLen = context.getters['getUsersInSession'](sessionId).length
-
-      var maxUsersPerGroup = Math.floor(usersInSessionLen / groupsInSession.length)
-      var usersInGroupInSession = 0
-      groupsInSession.forEach((g: string) => {
-        usersInGroupInSession += Object.keys(context.getters['getGroup'](g).users ?? []).length
-      });
-      // if uneven groups, allow additional player
-      if ( usersInGroupInSession >= maxUsersPerGroup * groupsInSession.length ) maxUsersPerGroup += 1
-      
-      // add to shuffled group
-      const shuffledGroups = context.getters['getShuffled'](groupsInSession)
-      var gid = shuffledGroups.pop()
-      if ( gid && context.getters['getGroup'](gid).users != undefined ) {
-        while ( context.getters['getGroup'](gid).users != undefined && Object.keys(context.getters['getGroup'](gid).users).length >= maxUsersPerGroup ) {
-          gid = shuffledGroups.pop()
-        }
-      }
-
-      // create leader
-      if (context.getters['getGroup'](gid).leader == '') context.commit('UPDATE_GROUP', {id: gid, leader: userId})
-
-      // add user to group
-      context.commit('UPDATE_GROUPUSERS', {
-        id: gid,
-        user: {[userId]: true}
-      })
-      context.commit('UPDATE_GROUPREADY', {
-        id: gid,
-        user: {[userId]: false}
-      })
-
       // add user
       context.commit('ADD_USER', {
-        group: gid,
+        group: 'onHold',
         id: userId,
         active: false,
         session: sessionId,
@@ -502,7 +471,91 @@ export default createStore<RootState>({
         color: payload.color,
         session: payload.sessionId,
         leader: '',
-        treatment: treatments[Math.floor(Math.random()*treatments.length)]
+        treatment: treatments[groupNumber % 3]
+      })
+    },
+    createOnHold(
+      context
+    ) {
+      const game = context.getters['getGame']()
+      const sessionId = context.getters['getActiveSession']().id
+      const usersInSession = context.getters['getUsersInSession'](sessionId)
+
+      context.commit('ADD_GROUP', {
+        id: 'onHold',
+        users: {},
+        ready: {},
+        game: game,
+        color: "#000",
+        session: sessionId,
+        leader: '',
+        treatment: ''
+      })
+
+      usersInSession.forEach((u: string) => {
+              // add user to group
+        context.commit('UPDATE_GROUPUSERS', {
+          id: 'onHold',
+          user: {[u]: true}
+        })
+        context.commit('UPDATE_GROUPREADY', {
+          id: 'onHold',
+          user: {[u]: false}
+        })
+      });
+    },
+    addUserToGroup(
+      context,
+      userId: string
+    ) {
+      // get max per group
+      const sessionId = context.getters['getActiveSession']().id
+      const groupsInSession = context.getters['getGroupsInSession'](sessionId).filter((g: GroupState) => g.id != 'onHold')
+      const usersInSessionLen = context.getters['getUsersInSession'](sessionId).length
+
+      var maxUsersPerGroup = Math.floor(usersInSessionLen / groupsInSession.length)
+      var usersInGroupInSession = 0
+      groupsInSession.forEach((g: string) => {
+        usersInGroupInSession += Object.keys(context.getters['getGroup'](g).users ?? []).length
+      });
+      // if uneven groups, allow additional player
+      if ( usersInGroupInSession >= maxUsersPerGroup * groupsInSession.length ) maxUsersPerGroup += 1
+      
+      // add to shuffled group
+      const shuffledGroups = context.getters['getShuffled'](groupsInSession)
+      var gid = shuffledGroups.pop()
+      if ( gid && context.getters['getGroup'](gid).users != undefined ) {
+        while ( context.getters['getGroup'](gid).users != undefined && Object.keys(context.getters['getGroup'](gid).users).length >= maxUsersPerGroup ) {
+          gid = shuffledGroups.pop()
+        }
+      }
+
+      // create leader
+      if (context.getters['getGroup'](gid).leader == '') context.commit('UPDATE_GROUP', {id: gid, leader: userId})
+
+      // add user to group
+      context.commit('UPDATE_GROUPUSERS', {
+        id: gid,
+        user: {[userId]: true}
+      })
+      context.commit('UPDATE_GROUPREADY', {
+        id: gid,
+        user: {[userId]: true}
+      })
+      //remove from onHold
+      context.commit('UPDATE_GROUPUSERS', {
+        id: 'onHold',
+        user: {[userId]: null}
+      })
+      context.commit('UPDATE_GROUPREADY', {
+        id: 'onHold',
+        user: {[userId]: null}
+      })
+
+      // update user
+      context.commit('UPDATE_USER', {
+        group: gid,
+        id: userId,
       })
     },
     startSession(
@@ -545,7 +598,7 @@ export default createStore<RootState>({
 
       // create groups and users
       for (let i = 0; i < payload.groupAmount; i++) {
-        context.dispatch('createGroup', {sessionId: sessionId, color: colors.pop()})
+        context.dispatch('createGroup', {sessionId: sessionId, color: colors.pop() ?? '#000'})
       }
       for (let i = 0; i < payload.userAmount; i++) {
         context.dispatch('createUser', sessionId)
@@ -570,6 +623,7 @@ export default createStore<RootState>({
         date: dateToday,
         currentRound: 0,
         timerEnd: null,
+        code: null,
         path: {
           0: {
             index: 0,
@@ -580,19 +634,48 @@ export default createStore<RootState>({
           },
           1: {
             index: 1,
-            canContinue: false,
             completed: false,
-            type: 'game',
+            canContinue: false,
+            type: 'pre-game'
           },
           2: {
             index: 2,
+            canContinue: true,
+            completed: false,
+            type: 'game',
+          },
+          3: {
+            index: 3,
             completed: false,
             canContinue: true,
             type: 'questionnaire',
             id: 'Ex-post'
           }
         }
+        // path: {
+        //   0: {
+        //     index: 0,
+        //     canContinue: true,
+        //     completed: false,
+        //     type: 'game',
+        //   },
+        //   1: {
+        //     index: 1,
+        //     canContinue: true,
+        //     completed: false,
+        //     type: 'questionnaire',
+        //     id: 'Ex-post'
+        //   },
+        //   2: {
+        //     index: 2,
+        //     completed: false,
+        //     canContinue: true,
+        //     type: 'questionnaire',
+        //     id: 'Ex-post'
+        //   }
+        // }
       })
+      context.dispatch("createOnHold")
     },
     endSession(
       context
@@ -640,6 +723,17 @@ export default createStore<RootState>({
         } 
       }
     },
+    nextPath(
+      context
+    ){
+      const activeSession = context.getters['getActiveSession']()
+      const pathItem = context.getters['getPathItem']()
+      context.commit('UPDATE_SESSIONPATH', {
+        id: activeSession.id,
+        pathItem: pathItem.index,
+        object: {completed: true}
+      })
+    },
     checkRound(
       context
     ){
@@ -649,6 +743,7 @@ export default createStore<RootState>({
 
       if ( context.getters['getGroupsReady']() && activeSession ) {
         context.dispatch('unreadyAll')
+        context.dispatch('setTimerEnd', -100)
         if (currentRound >= maxRounds) {
           const pathItem = context.getters['getPathItem']()
           if ( pathItem ) {
@@ -664,7 +759,6 @@ export default createStore<RootState>({
             currentRound: currentRound + 1
           })
         }
-        context.dispatch('setTimerEnd', -100)
       }
     },
     addQuestionnaireToUser(
@@ -831,6 +925,16 @@ export default createStore<RootState>({
       })
       context.dispatch('checkRound')
     },
+    readyAll(
+      context
+    ) {
+      const activeSession = context.getters['getActiveSession']()
+      const groups = context.getters['getGroupsInSession'](activeSession.id)
+      groups.forEach((g: string) => {
+        context.dispatch("readyUp", g)
+      });
+      context.dispatch('checkRound')
+    },
     continueSession(
       context
     ){
@@ -841,6 +945,8 @@ export default createStore<RootState>({
         pathItem: nextPathItem.index,
         object: {canContinue: true}
       })
+      context.commit('REMOVE_ONHOLD')
+
       context.dispatch('checkPath')
     },
     submitInterview(
@@ -861,37 +967,12 @@ export default createStore<RootState>({
       })
     },
     setCode(
-      context,
-      userId: string
+      context
     ){
-      const words = [
-        'People',
-        'History',
-        'Way',
-        'Art',
-        'World',
-        'Information',
-        'Map',
-        'Two',
-        'Family',
-        'Government',
-        'Health',
-        'System',
-        'Computer',
-        'Meat',
-        'Year',
-        'Thanks',
-        'Music',
-        'Person',
-        'Reading',
-        'Method',
-        'Data',
-        'Food'
-      ]
-      const code = words[Math.floor(Math.random() * words.length)]
-      context.commit('UPDATE_USER', {
-        id: userId,
-        code: code
+      const sessionId = context.getters['getActiveSession']().id
+      context.commit('UPDATE_SESSION', {
+        id: sessionId,
+        code: 1402
       })
     },
     setTimerEnd(

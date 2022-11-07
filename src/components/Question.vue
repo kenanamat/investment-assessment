@@ -26,8 +26,7 @@
         v-if="currentQuestion.followup"
         class="followup"
         :class="{
-          valid:
-            currentQuestion.followup && (answer == 'Yes' || answer >= 0) && answer != '',
+          valid: currentQuestion.followup && (answer == 'Yes' || Number.isFinite(answer)),
         }"
       >
         <div class="title">
@@ -39,7 +38,7 @@
           v-model:answer="followupAnswer"
           :question="currentQuestion.followup"
           :key="currentQuestion.id"
-          :req="currentQuestion.followup && (answer == 'Yes' || answer >= 0)"
+          :req="currentQuestion.followup && (answer == 'Yes' || Number.isFinite(answer))"
         />
       </div>
     </form>
@@ -92,6 +91,7 @@ const currentQuestionnaire = computed(() =>
 const answer: Ref<string | number | (string | null)[]> = ref(
   currentQuestion.value.answer
 );
+if (currentQuestion.value.type == "range") answer.value = 0;
 const followupAnswer = ref(currentQuestion.value.followup?.answer);
 
 const submitAnswer = () => {
