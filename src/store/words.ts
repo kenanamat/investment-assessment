@@ -38,7 +38,6 @@ export default {
       'coral',
       'corn',
       'cornflower',
-      'cream',
       'crimson',
       'cyan',
       'dandelion',

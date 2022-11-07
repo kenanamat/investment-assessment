@@ -64,7 +64,6 @@
     </div>
     <div v-else>
       <div id="leaderboard">
-        {{ (timeLeftGame = 10) }}
         <Leaderboard :key="currentRound" />
       </div>
     </div>

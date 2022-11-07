@@ -65,7 +65,7 @@
                   </div>
                 </div>
                 <div v-else>
-                  {{ Object.keys(currentSession.groups).length }}
+                  {{ Object.keys(currentSession.users).length }}
                 </div>
               </div>
               <div class="amount">
@@ -83,7 +83,7 @@
                   </div>
                 </div>
                 <div v-else>
-                  {{ Object.keys(currentSession.users).length }}
+                  {{ Object.keys(currentSession.groups).length }}
                 </div>
               </div>
             </form>
