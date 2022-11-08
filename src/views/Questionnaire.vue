@@ -1,4 +1,8 @@
 <template>
+  <div v-show="false" v-if="!currentSession">
+    {{ router.push("/") }}
+  </div>
+
   <div v-show="false">
     {{
       store.dispatch("addQuestionnaireToUser", {

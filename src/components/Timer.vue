@@ -16,6 +16,8 @@ import { useStore } from "vuex";
 
 const store = useStore();
 
+window.scrollTo(0, 0);
+
 const zeroPadded = (num: number) => {
   return num < 10 ? `0${num}` : num;
 };

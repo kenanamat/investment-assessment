@@ -213,7 +213,7 @@
   <div class="text" v-else-if="question.type == 'text'">
     <h4 class="my-4 mt-5">{{ question.question }}</h4>
     <textarea
-      v-model="answer"
+      v-model="(answer as string)"
       @input="$emit('update:answer', answer)"
       type="text"
       maxlength="1250"
@@ -301,6 +301,9 @@ import type { Ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
+
+window.scrollTo(0, 0);
+
 interface Props {
   answer?: string | number | (string | null)[];
   question: QuestionState;
@@ -318,6 +321,10 @@ const emits = defineEmits<{
 const answer = ref(props.answer);
 // if (props.question.type == "scale-10" && props.answer == "") {
 //   answer.value = Math.round((Number(props.question.answers.length) - 1) / 2);
+// }
+// if (props.question.type == "range" && props.answer == "") {
+//   answer.value = 0;
+//   emits["update:answer"] = answer.value;
 // }
 if (props.question.type == "scale-10" && props.answer == "") {
   answer.value = 0;

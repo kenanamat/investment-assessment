@@ -1,7 +1,8 @@
 <template>
+  <img id="grclogo" src="@/assets/img/GRC.png" />
   <div v-if="groupSubmitted">
-    <div v-if="groupGame.interview && groupRound.interviewAnswered == false">
-      <div v-show="false">
+    <div v-if="groupRound.interviewAnswered == false">
+      <div v-show="false" v-if="!groupRound.questionnaire">
         {{
           store.dispatch("addQuestionnaireToGroupRound", {
             groupId: userGroup.id,
@@ -9,6 +10,8 @@
             questionnaireId: "Ex-durante",
           })
         }}
+      </div>
+      <div v-show="false">
         {{ resetInputs() }}
         {{ setValues() }}
       </div>
@@ -19,43 +22,42 @@
           <p></p>
         </div>
         <hr />
-        <form
-          id="question"
-          class="d-block px-5"
-          @submit.prevent="
-            store.dispatch('submitInterview', {
-              groupId: userGroup.id,
-              questionnaire: groupRound.questionnaire,
-              currentRound: currentRound,
-            })
-          "
-        >
+        <form id="question" class="d-block px-5" @submit.prevent="submitInterview()">
           <QuestionType
             v-if="currentRound === 0"
-            v-model:answer="groupRound.questionnaire[1].answer"
+            v-model:answer="answers[0]"
             :question="groupRound.questionnaire[1]"
             :key="groupRound.questionnaire[1].id"
           />
           <QuestionType
-            v-model:answer="groupRound.questionnaire[2].answer"
+            v-if="currentRound == groupGame.rounds.length - 1 || currentRound === 0"
+            v-model:answer="answers[1]"
             :question="groupRound.questionnaire[2]"
             :key="groupRound.questionnaire[2].id"
           />
           <QuestionType
-            v-model:answer="groupRound.questionnaire[3].answer"
+            v-if="currentRound == groupGame.rounds.length - 1 || currentRound === 0"
+            v-model:answer="answers[2]"
             :question="groupRound.questionnaire[3]"
             :key="groupRound.questionnaire[3].id"
           />
           <QuestionType
-            v-model:answer="groupRound.questionnaire[4].answer"
+            v-if="currentRound == groupGame.rounds.length - 1 || currentRound === 0"
+            v-model:answer="answers[3]"
             :question="groupRound.questionnaire[4]"
             :key="groupRound.questionnaire[4].id"
           />
           <QuestionType
             v-if="currentRound == groupGame.rounds.length - 1"
-            v-model:answer="groupRound.questionnaire[5].answer"
+            v-model:answer="answers[4]"
             :question="groupRound.questionnaire[5]"
             :key="groupRound.questionnaire[5].id"
+          />
+          <QuestionType
+            v-if="currentRound != 0 && currentRound != groupGame.rounds.length - 1"
+            v-model:answer="answers[5]"
+            :question="groupRound.questionnaire[6]"
+            :key="groupRound.questionnaire[6].id"
           />
         </form>
         <button type="submit" form="question" class="next">Submit answers</button>
@@ -68,7 +70,7 @@
       </div>
     </div>
   </div>
-  <div v-else id="game">
+  <div class="mb-5 pb-5" v-else id="game">
     <Timer
       v-model:timeLeftGame="timeLeftGame"
       :time="groupGame.time[currentRound]"
@@ -214,6 +216,23 @@ const groupRound = computed(() =>
   store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value)
 );
 
+const answers = ref(["", "", "", "", "", ""]);
+
+const submitInterview = () => {
+  groupRound.value.questionnaire[1].answer = answers.value[0];
+  groupRound.value.questionnaire[2].answer = answers.value[1];
+  groupRound.value.questionnaire[3].answer = answers.value[2];
+  groupRound.value.questionnaire[4].answer = answers.value[3];
+  groupRound.value.questionnaire[5].answer = answers.value[4];
+  groupRound.value.questionnaire[6].answer = answers.value[5];
+
+  store.dispatch("submitInterview", {
+    groupId: userGroup.value.id,
+    questionnaire: groupRound.value.questionnaire,
+    currentRound: currentRound.value,
+  });
+};
+
 const prevGroupRound = computed(() =>
   store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value - 1)
 );
@@ -324,7 +343,6 @@ const submit = () => {
   });
 };
 const forceSubmit = () => {
-  console.log("force");
   timeLeftGame.value = 100;
   setValues();
   store.dispatch("submitAnswer", {

@@ -3,6 +3,9 @@
     <div id="settings">
       <div class="d-flex align-items-center">
         <h1 class="mb-4 flex-fill">Settings</h1>
+        <button class="bg-danger border-0 shadow" @click="store.dispatch('reset')">
+          Delete all <i class="fa-solid fa-triangle-exclamation"></i>
+        </button>
         <button @click="store.dispatch('removeLocalUser', currentUser)">Log out</button>
       </div>
       <div id="settings-block-wrapper">
@@ -94,17 +97,20 @@
               </button>
               <button
                 v-if="nextPathItem && !nextPathItem.canContinue && currentSession.code"
-                @click="store.dispatch('continueSession')"
+                @click="confirmUsers()"
               >
-                Resume
+                Confirm users
               </button>
               <button
                 v-if="pathItem.type == 'pre-game' && currentSession.code"
                 @click="store.dispatch('nextPath')"
               >
-                Resume
+                Start game
               </button>
-              <button v-if="pathItem.type == 'game'" @click="store.dispatch('readyAll')">
+              <button
+                v-if="pathItem.type == 'game' || pathItem.type == 'fakeGame'"
+                @click="ready()"
+              >
                 Ready all
               </button>
               <button @click="store.dispatch('switchShowPoints')">Point view</button>
@@ -143,6 +149,9 @@
                   }}
                 </p>
               </div>
+              <button class="position-absolute bottom-0 end-0" @click="downloadUsers()">
+                Download user list
+              </button>
             </div>
             <div v-else>
               <p>THERE IS NO SESSION</p>
@@ -279,12 +288,35 @@ const download = () => {
   if (data) exportFromJSON({ data, fileName, exportType });
   else throw "DATA DOES NOT EXIST";
 };
+
+const formattedusers = computed(() =>
+  store.getters["getUsersInSession"](currentSession.value.id).map(
+    (u: string, index: number) => {
+      return { users: u };
+    }
+  )
+);
+const downloadUsers = () => {
+  var data = formattedusers.value;
+  var fileName = "users-" + Date.now();
+  var exportType = exportFromJSON.types.xls;
+
+  if (data) exportFromJSON({ data, fileName, exportType });
+  else throw "DATA DOES NOT EXIST";
+};
 const backup = () => {
   var data = JSON.parse(JSON.stringify(store.state));
   var fileName = "np-data" + Date.now() + "bak";
   var exportType = exportFromJSON.types.json;
 
   if (data) exportFromJSON({ data, fileName, exportType });
+};
+
+const ready = () => {
+  if (confirm("Ready all groups?")) store.dispatch("readyAll");
+};
+const confirmUsers = () => {
+  if (confirm("All groups in session?")) store.dispatch("continueSession");
 };
 </script>
 

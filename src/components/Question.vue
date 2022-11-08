@@ -2,7 +2,9 @@
   <div id="question-wrapper">
     <div
       id="progress-bar"
-      :style="{ width: (currentQuestion.id / currentQuestionnaire.length) * 100 + '%' }"
+      :style="{
+        width: (currentQuestion.id / (currentQuestionnaire.length - 1)) * 100 + '%',
+      }"
     ></div>
     <div class="header text-center">
       <small

@@ -1,4 +1,5 @@
 <template>
+  <img id="grclogo" src="@/assets/img/GRC.png" />
   <div v-if="groupSubmitted">
     <div v-if="groupGame.interview && groupRound.interviewAnswered == false">
       <div v-show="false">
@@ -64,13 +65,21 @@
     </div>
     <div v-else>
       <div id="leaderboard">
-        <Leaderboard />
+        <FakeLeaderboard :key="currentRound" />
       </div>
     </div>
   </div>
-  <div v-else id="game">
-    <Timer v-model:timeLeftGame="timeLeftGame" :time="groupGame.time" v-if="groupGame" />
-
+  <div class="mb-5 pb-5" v-else id="game">
+    <Timer
+      v-model:timeLeftGame="timeLeftGame"
+      :time="groupGame.time[currentRound]"
+      v-if="groupGame"
+      :key="currentRound"
+    />
+    <div class="box col-3 p-3 mb-4">
+      <h4>Your group: {{ userGroup.id }}</h4>
+      <h4>Your treatment: Not available</h4>
+    </div>
     <div class="row">
       <div class="col-5">
         <div class="box" id="inputs-controller">
@@ -190,9 +199,11 @@ import Timer from "./Timer.vue";
 import QuestionType from "./QuestionType.vue";
 import { BarChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
+import FakeLeaderboard from "./FakeLeaderboard.vue";
 
 Chart.register(...registerables);
 
+window.scrollTo(0, 0);
 const store = useStore();
 
 const timeLeftGame = ref(10);
@@ -201,13 +212,13 @@ const currentUser = localStorage.getItem("userid");
 
 const currentRound = computed(() => store.getters["getCurrentRound"]());
 const userGroup = computed(() => store.getters["getUserGroup"](currentUser));
-const groupGame = computed(() => store.getters["getGroupGame"](userGroup.value.id));
+const groupGame = computed(() => store.getters["getGroupFakeGame"](userGroup.value.id));
 const groupRound = computed(() =>
-  store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value)
+  store.getters["getGroupFakeGameRound"](userGroup.value.id, currentRound.value)
 );
 
 const prevGroupRound = computed(() =>
-  store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value - 1)
+  store.getters["getGroupFakeGameRound"](userGroup.value.id, currentRound.value - 1)
 );
 const prevOutput = (variable: string) => {
   return prevGroupRound.value ? prevGroupRound.value.outputs[variable] : 1;
@@ -272,7 +283,7 @@ const getMax = (input: string) => {
 };
 
 const results = computed(() =>
-  store.getters["getGroupResults"](userGroup.value.id, currentRound.value)
+  store.getters["getGroupFakeResults"](userGroup.value.id, currentRound.value)
 );
 const constants = Object.assign(groupGame.value.constants, {
   phi: 1 / groupGame.value.constants.M,
@@ -299,14 +310,14 @@ const A_benefit = (A_L: number, L: number) => {
 };
 
 const outputs = ref(
-  store.getters["getGroupOutputs"](userGroup.value.id, currentRound.value)
+  store.getters["getGroupFakeOutputs"](userGroup.value.id, currentRound.value)
 );
 
 const submit = () => {
   if (!confirm("Are your decisions final?")) return;
 
   setValues();
-  store.dispatch("submitAnswer", {
+  store.dispatch("submitFakeAnswer", {
     groupId: userGroup.value.id,
     values: {
       inputs: inputs.value,
@@ -316,8 +327,9 @@ const submit = () => {
   });
 };
 const forceSubmit = () => {
+  timeLeftGame.value = 100;
   setValues();
-  store.dispatch("submitAnswer", {
+  store.dispatch("submitFakeAnswer", {
     groupId: userGroup.value.id,
     values: {
       inputs: inputs.value,

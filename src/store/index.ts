@@ -75,6 +75,10 @@ export default createStore<RootState>({
       const groups = getters['getGroups']()
       return Object.keys(groups ?? []).filter((s:any) => groups[s].session == sessionId)
     },
+    getGroupsNoUsers: (state: RootState, getters: any) => (sessionId: string) => {
+      const groups = getters['getGroups']()
+      return Object.keys(groups ?? []).filter((s:any) => !groups[s].users)
+    },
     getGroupInputs: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
       return getters['getGroup'](groupId).game.rounds[currentRound].inputs
     },
@@ -86,6 +90,21 @@ export default createStore<RootState>({
     },
     getGroupProfits: (state: RootState, getters: any) => (groupId: string) => {
       return getters['getGroup'](groupId).game.rounds.reduce((profits: Array<number>, round: RoundState) => {
+        profits.push(round.profit)
+        return profits
+      }, [])
+    },
+    getGroupFakeInputs: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
+      return getters['getGroup'](groupId).fakeGame.rounds[currentRound].inputs
+    },
+    getGroupFakeOutputs: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
+      return getters['getGroup'](groupId).fakeGame.rounds[currentRound].outputs
+    },
+    getGroupFakeResults: (state: RootState, getters: any) => (groupId: string, currentRound: number) => {
+      return getters['getGroup'](groupId).fakeGame.rounds[currentRound].results
+    },
+    getGroupFakeProfits: (state: RootState, getters: any) => (groupId: string) => {
+      return getters['getGroup'](groupId).fakeGame.rounds.reduce((profits: Array<number>, round: RoundState) => {
         profits.push(round.profit)
         return profits
       }, [])
@@ -148,11 +167,20 @@ export default createStore<RootState>({
     getGame: (state: RootState) => () => {
       return state.db.game
     },
+    getFakeGame: (state: RootState) => () => {
+      return state.db.fakeGame
+    },
     getGroupGame: (state: RootState, getters: any) => ( groupId: string ) => {
       return getters['getGroup'](groupId)['game'] ?? false
     },
+    getGroupFakeGame: (state: RootState, getters: any) => ( groupId: string ) => {
+      return getters['getGroup'](groupId)['fakeGame'] ?? false
+    },
     getGroupGameRound: (state: RootState, getters: any) => ( groupId: string, roundNumber: number ) => {
       return getters['getGroupGame'](groupId).rounds[roundNumber] ?? false
+    },
+    getGroupFakeGameRound: (state: RootState, getters: any) => ( groupId: string, roundNumber: number ) => {
+      return getters['getGroupFakeGame'](groupId).rounds[roundNumber] ?? false
     },
     getCurrentRound: (state: RootState, getters: any) => () => {
       return getters['getActiveSession']()['currentRound'] ?? false
@@ -250,6 +278,36 @@ export default createStore<RootState>({
           points = userGroup.game.points
         } 
 
+        var fakeResults = {}
+        var fakeInputs = {}
+        var fakeGameQuestions = {}
+        if ( userGroup ) {
+          userGroup.fakeGame.rounds.forEach((round: RoundState) => {
+            if (round.questionnaire) {
+              round.questionnaire.forEach((rq: QuestionState) => {
+                Object.assign(fakeGameQuestions, {
+                  [round.index + ' ' + rq.question]: rq.answer
+                })
+              })
+            }
+            if (round.results) {
+              Object.assign(fakeResults, 
+                Object.fromEntries(
+                  Object.entries(round.results).map(([k, v]) => [round.index + 'Fake ' + k, v])
+                )
+              )
+            }
+            if (round.inputs) {
+              console.log(round.inputs)
+              Object.assign(fakeInputs, 
+                Object.fromEntries(
+                  Object.entries(round.inputs).map(([k, v]) => [round.index + 'Fake ' + k, v])
+                )
+              )
+            }
+          })
+        } 
+
         excelFormat.push({
           id: user.id,
           group: userGroup.id,
@@ -259,6 +317,9 @@ export default createStore<RootState>({
           ...gameQuestions,
           ...results,
           ...inputs,
+          ...fakeGameQuestions,
+          ...fakeResults,
+          ...fakeInputs,
           points: points
         })
       })
@@ -342,8 +403,8 @@ export default createStore<RootState>({
     UPDATE_GROUP(state: RootState, payload) {
       firebase.database().ref('db/groups/' + payload.id).update(payload);
     },
-    REMOVE_ONHOLD(state: RootState) {
-      firebase.database().ref('db/groups').update({'onHold': null});
+    REMOVE_GROUP(state: RootState, groupId: string) {
+      firebase.database().ref('db/groups').update({[groupId]: null});
     },
     UPDATE_GROUPREADY(state: RootState, payload) {
       if ( payload.id != undefined ) firebase.database().ref('db/groups/' + payload.id + '/ready').update(payload.user);
@@ -368,6 +429,9 @@ export default createStore<RootState>({
     },
     UPDATE_GROUPROUND(state: RootState, payload: {groupId: string, currentRound: number, object: {}}){
       firebase.database().ref('db/groups/' + payload.groupId + '/game/rounds/' + payload.currentRound).update(payload.object);
+    },
+    UPDATE_GROUPFAKEROUND(state: RootState, payload: {groupId: string, currentRound: number, object: {}}){
+      firebase.database().ref('db/groups/' + payload.groupId + '/fakeGame/rounds/' + payload.currentRound).update(payload.object);
     },
     UPDATE_GROUPVALUE(state: RootState, payload: {groupId: string, currentRound: number, value: number, type: string}){
       firebase.database().ref('db/groups/' + payload.groupId + '/game/rounds/' + payload.currentRound + '/values').update({[payload.type]: payload.value});
@@ -461,6 +525,7 @@ export default createStore<RootState>({
       const groupId = 'group_' + groupNumber
 
       const game = context.getters['getGame']()
+      const fakeGame = context.getters['getFakeGame']()
       const treatments = ['profit', 'r&d', 'footprint']
 
       context.commit('ADD_GROUP', {
@@ -468,6 +533,7 @@ export default createStore<RootState>({
         users: {},
         ready: {},
         game: game,
+        fakeGame: fakeGame,
         color: payload.color,
         session: payload.sessionId,
         leader: '',
@@ -636,16 +702,22 @@ export default createStore<RootState>({
             index: 1,
             completed: false,
             canContinue: false,
-            type: 'pre-game'
+            type: 'fakeGame'
           },
           2: {
             index: 2,
+            completed: false,
+            canContinue: true,
+            type: 'pre-game'
+          },
+          3: {
+            index: 3,
             canContinue: true,
             completed: false,
             type: 'game',
           },
-          3: {
-            index: 3,
+          4: {
+            index: 4,
             completed: false,
             canContinue: true,
             type: 'questionnaire',
@@ -739,11 +811,18 @@ export default createStore<RootState>({
     ){
       const activeSession = context.getters['getActiveSession']()
       const currentRound = activeSession['currentRound']
-      const maxRounds = context.getters['getGroup'](context.getters['getGroupsInSession'](context.getters['getActiveSession']().id)[0]).game.rounds.length - 1
+      
 
       if ( context.getters['getGroupsReady']() && activeSession ) {
         context.dispatch('unreadyAll')
         context.dispatch('setTimerEnd', -100)
+
+        const pathItem = context.getters['getPathItem']()
+        var maxRounds = 1
+        pathItem.type == 'game' ? 
+          maxRounds = context.getters['getGroup'](context.getters['getGroupsInSession'](context.getters['getActiveSession']().id)[0]).game.rounds.length - 1 : 
+          maxRounds = context.getters['getGroup'](context.getters['getGroupsInSession'](context.getters['getActiveSession']().id)[0]).fakeGame.rounds.length - 1
+
         if (currentRound >= maxRounds) {
           const pathItem = context.getters['getPathItem']()
           if ( pathItem ) {
@@ -751,6 +830,10 @@ export default createStore<RootState>({
               id: activeSession.id,
               pathItem: pathItem.index,
               object: {completed: true}
+            })
+            context.commit('UPDATE_SESSION', {
+              id: activeSession.id,
+              currentRound: 0
             })
           }
         } else {
@@ -889,6 +972,30 @@ export default createStore<RootState>({
         type: payload.type
       })
     },
+    submitFakeAnswer(
+      context,
+      payload: {
+        groupId: string,
+        values: {
+          inputs: Object,
+          outputs: Object,
+          results: Object
+        }
+      }
+    ){
+      const currentRound = context.getters['getCurrentRound']()
+
+      context.commit('UPDATE_GROUPFAKEROUND', {
+        groupId: payload.groupId,
+        currentRound: currentRound,
+        object: {completed: true}
+      })
+      context.commit('UPDATE_GROUPFAKEROUND', {
+        groupId: payload.groupId,
+        currentRound: currentRound,
+        object: payload.values
+      })
+    },
     submitAnswer(
       context,
       payload: {
@@ -945,7 +1052,11 @@ export default createStore<RootState>({
         pathItem: nextPathItem.index,
         object: {canContinue: true}
       })
-      context.commit('REMOVE_ONHOLD')
+
+      context.getters['getGroupsNoUsers']().forEach((g:string) => {
+        context.commit('REMOVE_GROUP', g)
+      });
+      context.commit('REMOVE_GROUP', 'onHold')
 
       context.dispatch('checkPath')
     },
