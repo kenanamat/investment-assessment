@@ -6,8 +6,11 @@
   #group-graphs-wrapper {
     max-width: 1000px;
     #group-graphs {
+      display: grid;
+      grid-template-columns: 80px 1fr;
       nav {
         display: flex;
+        flex-direction: column;
         align-items: end;
         div {position: relative;}
         h6 {
@@ -15,10 +18,10 @@
           height: 100%;
           width: 100%;
           margin: 0;
-          padding: 0.4rem;
+          padding: 0.8rem;
           color: var(--grey);
           font-weight: 700;
-          border-radius: 16px 16px 0 0;
+          border-radius: 16px 0 0 16px;
           border: solid 2px var(--subtitle-grey);
           font-size: 12px;
           cursor: pointer;

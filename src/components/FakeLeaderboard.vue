@@ -7,7 +7,7 @@
             <h4>Profits</h4>
             <div v-for="group in rankedProfits.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
-              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_profit_post_tax)}}
+              {{Math.round((group[1] as GroupState).fakeGame.rounds[currentRound].results.tot_profit_post_tax)}}
             </div>
           </div>
         </div>
@@ -16,7 +16,7 @@
             <h4>Environmental Impact</h4>
             <div v-for="group in rankedFE.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
-              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_environmental_impact)}}
+              {{Math.round((group[1] as GroupState).fakeGame.rounds[currentRound].results.tot_environmental_impact)}}
             </div>
           </div>
         </div>
@@ -25,7 +25,7 @@
             <h4>Social Impact</h4>
             <div v-for="group in rankedFL.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
-              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_social_impact)}}
+              {{Math.round((group[1] as GroupState).fakeGame.rounds[currentRound].results.tot_social_impact)}}
             </div>
           </div>
         </div>
@@ -121,9 +121,8 @@ import { GroupState, ResultState, RoundState } from "@/store/types";
 import { LineChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
 
+window.scrollTo(0, 0);
 const store = useStore();
-
-console.log(window.scrollTo(0, 0));
 
 const props = withDefaults(defineProps<{ display?: boolean }>(), {
   display: false,
@@ -144,19 +143,19 @@ const selectedGroup = ref(userGroup.value.id);
 
 const getDataProfit = computed(() => {
   return Array.from(
-    Object.values(groups.value[selectedGroup.value].game.rounds) as RoundState[],
+    Object.values(groups.value[selectedGroup.value].fakeGame.rounds) as RoundState[],
     (round: RoundState) => round.results.tot_profit_post_tax
   );
 });
 const getDataFE = computed(() => {
   return Array.from(
-    Object.values(groups.value[selectedGroup.value].game.rounds) as RoundState[],
+    Object.values(groups.value[selectedGroup.value].fakeGame.rounds) as RoundState[],
     (round: RoundState) => round.results.tot_environmental_impact
   );
 });
 const getDataFL = computed(() => {
   return Array.from(
-    Object.values(groups.value[selectedGroup.value].game.rounds) as RoundState[],
+    Object.values(groups.value[selectedGroup.value].fakeGame.rounds) as RoundState[],
     (round: RoundState) => round.results.tot_social_impact
   );
 });
@@ -164,22 +163,24 @@ const getDataFL = computed(() => {
 const rankedProfits = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
-      (b as GroupState).game.rounds[currentRound.value].results.tot_profit_post_tax -
-      (a as GroupState).game.rounds[currentRound.value].results.tot_profit_post_tax
+      (b as GroupState).fakeGame.rounds[currentRound.value].results.tot_profit_post_tax -
+      (a as GroupState).fakeGame.rounds[currentRound.value].results.tot_profit_post_tax
   );
 });
 const rankedFE = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
-      (b as GroupState).game.rounds[currentRound.value].results.tot_environmental_impact -
-      (a as GroupState).game.rounds[currentRound.value].results.tot_environmental_impact
+      (b as GroupState).fakeGame.rounds[currentRound.value].results
+        .tot_environmental_impact -
+      (a as GroupState).fakeGame.rounds[currentRound.value].results
+        .tot_environmental_impact
   );
 });
 const rankedFL = computed(() => {
   return Object.entries(groups.value).sort(
     ([, a], [, b]) =>
-      (b as GroupState).game.rounds[currentRound.value].results.tot_social_impact -
-      (a as GroupState).game.rounds[currentRound.value].results.tot_social_impact
+      (b as GroupState).fakeGame.rounds[currentRound.value].results.tot_social_impact -
+      (a as GroupState).fakeGame.rounds[currentRound.value].results.tot_social_impact
   );
 });
 

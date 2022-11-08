@@ -7,6 +7,7 @@ export interface DbState {
   users: { [id: string]: UserState },
   questionnaires: { id: { id: QuestionState } },
   game: GameState,
+  fakeGame: GameState,
   groups: { [id: string]: GroupState },
   sessions: { id: SessionState }
 }
@@ -57,6 +58,7 @@ export interface RoundState {
 export interface GroupState {
   id: string,
   game: GameState,
+  fakeGame: GameState,
   number: number,
   session: string,
   color: string,

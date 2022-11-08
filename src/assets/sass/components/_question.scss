@@ -47,9 +47,9 @@
   #question {
     display: flex;
     justify-content: center;
-    input, label {
-      user-select: none; 
-    }
+    // input, label {
+    //   user-select: none; 
+    // }
     input:focus-visible { outline: none; }
     input[type=text] {
       width: 550px;
@@ -432,12 +432,13 @@
               font-size: 1.3rem;
             }
             span {
-              cursor: pointer;
+              cursor: grab;
               display: flex;
               font-size: 24px;
               text-align: start;
               padding: 0.5rem;
               background-color: var(--active-grey);
+              &:active {cursor: grabbing;}
             }
             input {
               border: solid 2px var(--light-grey);
@@ -464,7 +465,10 @@
             border: 1px solid var(--accent-grey);
             padding: 0.8rem 0.5rem;
             transition: all 0.3s ease;
-            cursor: pointer;
+            cursor: grab;
+            &:active {
+              cursor: grabbing;
+            }
             &:hover {
               background-color: var(--hover-grey);
             }
