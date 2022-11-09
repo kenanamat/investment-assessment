@@ -254,7 +254,7 @@ export default createStore<RootState>({
           userGroup.game.rounds.forEach((round: RoundState) => {
             if (round.questionnaire) {
               round.questionnaire.forEach((rq: QuestionState) => {
-                Object.assign(gameQuestions, {
+                if (rq.answer != "") Object.assign(gameQuestions, {
                   [round.index + ' ' + rq.question]: rq.answer
                 })
               })
@@ -262,7 +262,7 @@ export default createStore<RootState>({
             if (round.results) {
               Object.assign(results, 
                 Object.fromEntries(
-                  Object.entries(round.results).map(([k, v]) => [round.index + ' ' + k, v])
+                  Object.entries(round.results).map(([k, v]) => [round.index + ' ' + k, v.toFixed(2)])
                 )
               )
             }
@@ -270,7 +270,7 @@ export default createStore<RootState>({
               console.log(round.inputs)
               Object.assign(inputs, 
                 Object.fromEntries(
-                  Object.entries(round.inputs).map(([k, v]) => [round.index + ' ' + k, v])
+                  Object.entries(round.inputs).map(([k, v]) => [round.index + ' ' + k, v.toFixed(2)])
                 )
               )
             }
@@ -285,7 +285,7 @@ export default createStore<RootState>({
           userGroup.fakeGame.rounds.forEach((round: RoundState) => {
             if (round.questionnaire) {
               round.questionnaire.forEach((rq: QuestionState) => {
-                Object.assign(fakeGameQuestions, {
+                if (rq.answer != "") Object.assign(fakeGameQuestions, {
                   [round.index + ' ' + rq.question]: rq.answer
                 })
               })
@@ -293,7 +293,7 @@ export default createStore<RootState>({
             if (round.results) {
               Object.assign(fakeResults, 
                 Object.fromEntries(
-                  Object.entries(round.results).map(([k, v]) => [round.index + 'Fake ' + k, v])
+                  Object.entries(round.results).map(([k, v]) => [round.index + 'Fake ' + k, v.toFixed(2)])
                 )
               )
             }
@@ -301,7 +301,7 @@ export default createStore<RootState>({
               console.log(round.inputs)
               Object.assign(fakeInputs, 
                 Object.fromEntries(
-                  Object.entries(round.inputs).map(([k, v]) => [round.index + 'Fake ' + k, v])
+                  Object.entries(round.inputs).map(([k, v]) => [round.index + 'Fake ' + k, v.toFixed(2)])
                 )
               )
             }
@@ -696,7 +696,7 @@ export default createStore<RootState>({
             canContinue: true,
             completed: false,
             type: 'questionnaire',
-            id: 'Ex-ante'
+            id: 'test'
           },
           1: {
             index: 1,

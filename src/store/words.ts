@@ -286,8 +286,6 @@ export default {
       "Ram",
       "Rat",
       "Raven",
-      "Red deer",
-      "Red panda",
       "Reindeer",
       "Rhinoceros",
       "Rook",

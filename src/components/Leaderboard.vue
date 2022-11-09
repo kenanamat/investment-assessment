@@ -4,7 +4,7 @@
       <div id="top-5" class="row mb-5">
         <div class="col-4">
           <div class="scores-list">
-            <h4>Profits</h4>
+            <h4>Cumulative Profits</h4>
             <div v-for="group in rankedProfits.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
               {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_profit_post_tax)}}
@@ -13,7 +13,7 @@
         </div>
         <div class="col-4">
           <div class="scores-list">
-            <h4>Environmental Impact</h4>
+            <h4>Cumulative Environmental Impact</h4>
             <div v-for="group in rankedFE.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
               {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_environmental_impact)}}
@@ -22,7 +22,7 @@
         </div>
         <div class="col-4">
           <div class="scores-list">
-            <h4>Social Impact</h4>
+            <h4>Cumulative Social Impact</h4>
             <div v-for="group in rankedFL.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
               {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_social_impact)}}

@@ -80,6 +80,7 @@
     <div class="box col-3 p-3 mb-4">
       <h4>Your group: {{ userGroup.id }}</h4>
       <h4>Your treatment: {{ userGroup.treatment }}</h4>
+      <h4>Current period: {{ currentRound + 1 }}</h4>
     </div>
     <div class="row">
       <div class="col-5">
@@ -322,7 +323,7 @@ const min_wage = (w: number, min_w: number) => {
   else return 0.1 * (w - min_w);
 };
 const A_benefit = (A_L: number, L: number) => {
-  return 0.01 * A_L * L;
+  return 0.1 * A_L * L;
 };
 
 const outputs = ref(
@@ -403,7 +404,7 @@ const setValues = () => {
   // Calculation of capital stock
   outputs.value.K =
     (1 - startValues.delta_K) * prevOutputK("K") +
-    0.5 * roundInput("q", currentRound.value - constants.M);
+    0.5 * roundInput("q", currentRound.value - (constants.M - 1));
 
   // Calculation of Q stock
   outputs.value.Q =
@@ -429,9 +430,9 @@ const setValues = () => {
   // The calculation of capital adjustment costs
   results.value.Ca =
     0.5 *
-    roundResult("q", currentRound.value - constants.M) *
+    roundInput("q", currentRound.value - (constants.M - 1)) *
     ((startValues.eta / 2) *
-      (roundResult("q", currentRound.value - constants.M) / outputs.value.K -
+      (roundInput("q", currentRound.value - (constants.M - 1)) / outputs.value.K -
         startValues.delta_C) **
         2);
 
@@ -439,8 +440,8 @@ const setValues = () => {
   results.value.K = outputs.value.K;
   results.value.L = outputs.value.L;
   results.value.E = inputs.value.E;
-  results.value.Q = outputs.value.Q;
-  results.value.Y = outputs.value.Y;
+  results.value.Q = Math.round(outputs.value.Q * 100) / 100;
+  results.value.Y = Math.round(outputs.value.Y * 100) / 100;
 
   results.value.return = Math.round(startValues.p_Y * outputs.value.Y * 100) / 100;
   results.value.cost =
