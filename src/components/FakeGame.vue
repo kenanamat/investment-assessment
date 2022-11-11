@@ -15,9 +15,13 @@
       </div>
       <div id="question-wrapper" v-if="userGroup.leader == currentUser">
         <div class="header text-center">
-          <small>Strategy </small>
-          <h2 class="mt-2">Explain yourself</h2>
-          <p></p>
+          <p>
+            Please answer the following questions to explain your decision making process.
+            We kindly ask you to co-operate with the other board members when answering
+            the questions. Please note that the leader has to submit the answers you have
+            formulated as the board of The Giant Rubber Corporation. There is a limit of
+            250 words for each question.
+          </p>
         </div>
         <hr />
         <form
@@ -61,7 +65,13 @@
         </form>
         <button type="submit" form="question" class="next">Submit answers</button>
       </div>
-      <div v-else>Discuss with group leader</div>
+      <div v-else>
+        Please answer the following questions to explain your decision making process. We
+        kindly ask you to co-operate with the other board members when answering the
+        questions. Please note that the leader has to submit the answers you have
+        formulated as the board of The Giant Rubber Corporation. There is a limit of 250
+        words for each question.
+      </div>
     </div>
     <div v-else>
       <div id="leaderboard">
@@ -342,7 +352,8 @@ const checkBudget = (input: string) => {
   if (
     getUse() > constants.budget ||
     currInputs.value[input as keyof InputState] < 0 ||
-    currInputs.value["w"] < 3
+    currInputs.value["w"] < 3 ||
+    currInputs.value[input as keyof InputState] > getMax(input)
   ) {
     currInputs.value[input as keyof InputState] = inputs.value[input];
   } else {

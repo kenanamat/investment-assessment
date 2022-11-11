@@ -696,7 +696,7 @@ export default createStore<RootState>({
             canContinue: true,
             completed: false,
             type: 'questionnaire',
-            id: 'test'
+            id: 'Ex-ante'
           },
           1: {
             index: 1,

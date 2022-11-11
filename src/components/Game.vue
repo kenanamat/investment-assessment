@@ -17,11 +17,18 @@
       </div>
       <div id="question-wrapper" v-if="userGroup.leader == currentUser">
         <div class="header text-center">
-          <small>Strategy </small>
-          <h2 class="mt-2">Explain yourself</h2>
-          <p></p>
+          <p>
+            Please answer the following questions to explain your decision making process.
+            We kindly ask you to co-operate with the other board members when answering
+            the questions. Please note that the leader has to submit the answers you have
+            formulated as the board of The Giant Rubber Corporation. There is a limit of
+            250 words for each question.
+          </p>
         </div>
         <hr />
+        <div v-show="false" v-if="isReady">
+          {{ submitInterview() }}
+        </div>
         <form id="question" class="d-block px-5" @submit.prevent="submitInterview()">
           <QuestionType
             v-if="currentRound === 0"
@@ -62,7 +69,13 @@
         </form>
         <button type="submit" form="question" class="next">Submit answers</button>
       </div>
-      <div v-else>Discuss with group leader</div>
+      <div v-else>
+        Please answer the following questions to explain your decision making process. We
+        kindly ask you to co-operate with the other board members when answering the
+        questions. Please note that the leader has to submit the answers you have
+        formulated as the board of The Giant Rubber Corporation. There is a limit of 250
+        words for each question.
+      </div>
     </div>
     <div v-else>
       <div id="leaderboard">
@@ -71,6 +84,17 @@
     </div>
   </div>
   <div class="mb-5 pb-5" v-else id="game">
+    <div v-show="false" v-if="!prevGroupRound.interviewAnswered">
+      <div v-show="false" v-if="!groupRound.questionnaire">
+        {{
+          store.dispatch("addQuestionnaireToGroupRound", {
+            groupId: userGroup.id,
+            currentRound: currentRound,
+            questionnaireId: "Ex-durante",
+          })
+        }}
+      </div>
+    </div>
     <Timer
       v-model:timeLeftGame="timeLeftGame"
       :time="groupGame.time[currentRound]"
@@ -217,6 +241,8 @@ const groupRound = computed(() =>
   store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value)
 );
 
+const isReady = computed(() => userGroup.value.ready[currentUser ?? ""]);
+
 const answers = ref(["", "", "", "", "", ""]);
 
 const submitInterview = () => {
@@ -359,7 +385,8 @@ const checkBudget = (input: string) => {
   if (
     getUse() > constants.budget ||
     currInputs.value[input as keyof InputState] < 0 ||
-    currInputs.value["w"] < 3
+    currInputs.value["w"] < 3 ||
+    currInputs.value[input as keyof InputState] > getMax(input)
   ) {
     currInputs.value[input as keyof InputState] = inputs.value[input];
   } else {

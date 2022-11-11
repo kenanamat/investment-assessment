@@ -46,6 +46,14 @@
     </label>
   </div>
   <div class="scale-10" v-else-if="question.type == 'scale-10'">
+    <div class="d-flex justify-content-between outer-labels">
+      <span class="label text-start">{{
+        question.minText ?? "Completely unwilling"
+      }}</span>
+      <span class="label text-end">
+        {{ question.maxText ?? "Very willing" }}
+      </span>
+    </div>
     <input
       type="range"
       min="0"

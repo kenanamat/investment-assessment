@@ -128,6 +128,15 @@
       }
       .scale-10{
         width: 90%;
+        position: relative;
+        .outer-labels {
+          width: calc(100% + 4rem);
+          margin-left: -2rem;
+        }
+        .label {
+          font-size: 12px;
+          width: 220px;
+        }
         label {
           width: 102.3%;
           margin-left: -1.3%;

@@ -31,6 +31,8 @@ export interface QuestionState {
   followup: QuestionState,
   max: number,
   min: number,
+  minText: string,
+  maxText: string,
   questions: string[]
 }
 

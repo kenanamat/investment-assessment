@@ -3,12 +3,7 @@
     <div class="box col-4 p-4">
       <h1>Discussion</h1>
       <hr />
-      <p>
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Veniam laboriosam
-        praesentium pariatur error? Tenetur dolor repellat dignissimos quasi harum
-        impedit! Quis harum optio vero, accusamus voluptatum aperiam. Doloribus,
-        reprehenderit voluptas?
-      </p>
+      <p></p>
     </div>
     <div class="col-8" v-if="activeSession.showPoints">
       <div class="ms-5 ps-5">
