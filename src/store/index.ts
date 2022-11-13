@@ -469,23 +469,33 @@ export default createStore<RootState>({
     initiateAdmin(
       context
     ){
-      localStorage.setItem('userid', 'admin')
-      context.commit('UPDATE_USER', {
-        id: 'admin',
-        active: true
+      rootDatabase.app.auth().signInAnonymously().then(() => {
+        localStorage.setItem('userid', 'admin')
+        context.commit('UPDATE_USER', {
+          id: 'admin',
+          active: true
+        })
+        router.go(0)
+      }).catch((error) => {
+        console.log(error.code)
+        console.log(error.message)  
       })
-      router.go(0)
     },
     initiateUser( 
       context: ActionContext<RootState, RootState>,
       userid: string
     ){
-      localStorage.setItem('userid', userid)
-      context.commit('UPDATE_USER', {
-        id: userid,
-        active: true
+      rootDatabase.app.auth().signInAnonymously().then(() => {  
+        localStorage.setItem('userid', userid)
+        context.commit('UPDATE_USER', {
+          id: userid,
+          active: true
+        })
+        router.push('/questionnaire')
+      }).catch((error) => {
+        console.log(error.code)
+        console.log(error.message)  
       })
-      router.push('/questionnaire')
     },
     createUser(
       context,
