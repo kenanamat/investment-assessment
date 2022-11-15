@@ -42,15 +42,83 @@
     <FakeGame />
   </div>
   <div
-    class="w-100 h-100 d-flex align-items-center justify-content-center"
+    class="h-100 mx-auto d-flex align-items-center justify-content-center w-50 m-5 p-5 box"
     v-else-if="pathItem.type == 'pre-game'"
   >
-    <h2>Your treatment: {{ userGroup.treatment }}</h2>
+    <div v-if="userGroup.treatment == 'esg'">
+      <h2 class="fw-bold">{{ userGroup.treatment.toUpperCase() }} target</h2>
+      <br /><br />
+      <p>
+        Dear board members,<br /><br />
+        The supervisory board of The Giant Rubber Corporation is thrilled you have been
+        selected as one of our potential board members. Next to running the company
+        effectively and efficiently, the board wants you to pay specific attention to our
+        environmental and social impact. <br /><br />
+        We have therefore decided to set a board specific target for your board.
+        <br /><br />
+        Your board has a specific <strong>ESG target</strong>, next to making profits and
+        paying sufficient attention to our environmental and social impact. Your specific
+        target implies that you earn additional points for your social and environmental
+        impact, compared to the impact of other rubber corporations. Every unit of
+        environmental impact comes with a cost of an additional 0.2 points. Every unit of
+        negative social impact comes with a cost of an additional 0.5 point. If the social
+        impact is positive you earn additional points. Finally, you receive 2 points for
+        every unit R&D for increased energy efficiency in production you invested in.
+        <br /><br />
+        All the best,<br /><br />
+        Joe Bicycletire <br /><br />
+        Chairman of the Supervisory Board of The Giant Rubber Corporation
+      </p>
+    </div>
+    <div v-if="userGroup.treatment == 'profit'">
+      <h2 class="fw-bold">{{ capitalize(userGroup.treatment) }} target</h2>
+      <br /><br />
+      <p>
+        Dear board members, <br /><br />
+        The supervisory board of The Giant Rubber Corporation is thrilled you have been
+        selected as one of our potential board members. Next to running the company
+        effectively and efficiently, the board wants you to pay specific attention to our
+        profitability during your term of eight years. <br /><br />
+        We have therefore decided to set a board specific target for your board.
+        <br /><br />
+        Your board has a specific <strong>profit target</strong>, next to making profits
+        and paying sufficient attention to our environmental and social impact. This
+        implies that you earn additional points for every dollar of after-tax profits,
+        compared to the profits of other rubber corporations. For every dollar of
+        additional profits, you earn 0.01 extra points. <br /><br />
+        All the best,<br /><br />
+        Joe Bicycletire<br /><br />
+        Chairman of the Supervisory Board of The Giant Rubber Corporation
+      </p>
+    </div>
+    <div v-if="userGroup.treatment == 'r&d'">
+      <h2 class="fw-bold">{{ userGroup.treatment.toUpperCase() }} target</h2>
+      <br /><br />
+      <p>
+        Dear board members, <br /><br />
+        The supervisory board of The Giant Rubber Corporation is thrilled you have been
+        selected as one of our potential board members. Next to running the company
+        effectively and efficiently, the board wants you to pay specific attention to our
+        ability to innovate and become more productive during your term of eight years.<br /><br />
+
+        We have therefore decided to set a board specific target for your board.<br /><br />
+
+        Your board has a <strong>R&D target</strong>, next to making profits and paying
+        sufficient attention to our innovative potential. This implies that you earn
+        additional points for investing in R&D, compared to the R&D investment of other
+        rubber corporations. You earn an additional 1.5 points for every unit in the three
+        types of R&D you invested in. <br /><br />
+        All the best,<br /><br />
+        Joe Bicycletire<br /><br />
+        Chairman of the Supervisory Board of The Giant Rubber Corporation
+      </p>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import router from "@/router";
+import { capitalize } from "vue";
 import { computed } from "@vue/reactivity";
 import { useStore } from "vuex";
 import Question from "../components/Question.vue";

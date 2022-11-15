@@ -356,11 +356,11 @@ export default createStore<RootState>({
 
       switch (group.treatment) {
         case 'profit':
-          return points_g + b_P_t * results.tot_profit_post_tax
+          return points_g + b_P_t * (results.tot_profit_post_tax - 9621)
         case 'r&d':
-          return points_g + b_RD_t * (R_K+R_L+R_E)
-        case 'footprint':
-          return points_g + b_RDE_t* (R_E) + b_E_t * results.tot_environmental_impact + b_S_t * results.tot_social_impact
+          return points_g + b_RD_t * (R_K+R_L+R_E - 1280)
+        case 'esg':
+          return points_g + b_RDE_t* (R_E - 320) + b_E_t * (results.tot_environmental_impact + 653) + b_S_t * (results.tot_social_impact - 50)
         default:
           return 0
       }
@@ -536,7 +536,7 @@ export default createStore<RootState>({
 
       const game = context.getters['getGame']()
       const fakeGame = context.getters['getFakeGame']()
-      const treatments = ['profit', 'r&d', 'footprint']
+      const treatments = ['profit', 'r&d', 'esg']
 
       context.commit('ADD_GROUP', {
         id: groupId,

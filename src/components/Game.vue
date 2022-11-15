@@ -103,7 +103,7 @@
     />
     <div class="box col-3 p-3 mb-4">
       <h4>Your group: {{ userGroup.id }}</h4>
-      <h4>Your treatment: {{ userGroup.treatment }}</h4>
+      <h4>Your target: {{ userGroup.treatment.toUpperCase() }}</h4>
       <h4>Current period: {{ currentRound + 1 }}</h4>
     </div>
     <div class="row">
