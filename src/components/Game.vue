@@ -101,6 +101,9 @@
       v-if="groupGame"
       :key="currentRound"
     />
+    <div v-once v-show="false">
+      {{ store.dispatch("unreadyUser", currentUser) }}
+    </div>
     <div class="box col-3 p-3 mb-4">
       <h4>Your group: {{ userGroup.id }}</h4>
       <h4>Your target: {{ userGroup.treatment.toUpperCase() }}</h4>
@@ -502,6 +505,18 @@ const setValues = () => {
     Math.round(
       (min_wage(inputs.value.w, startValues.min_w) * outputs.value.L +
         A_benefit(outputs.value.A_L, outputs.value.L)) *
+        100
+    ) / 100;
+  results.value.tot_rd =
+    Math.round(
+      (groupGame.value.rounds.reduce(
+        (sum: number, obj: RoundState) =>
+          obj.inputs.R_E + obj.inputs.R_L + obj.inputs.R_K + sum,
+        0
+      ) +
+        inputs.value.R_E +
+        inputs.value.R_L +
+        inputs.value.R_K) *
         100
     ) / 100;
   results.value.tot_environmental_impact =

@@ -474,6 +474,18 @@ const setValues = () => {
         A_benefit(outputs.value.A_L, outputs.value.L)) *
         100
     ) / 100;
+  results.value.tot_rd =
+    Math.round(
+      (groupGame.value.rounds.reduce(
+        (sum: number, obj: RoundState) =>
+          obj.inputs.R_E + obj.inputs.R_L + obj.inputs.R_K + sum,
+        0
+      ) +
+        inputs.value.R_E +
+        inputs.value.R_L +
+        inputs.value.R_K) *
+        100
+    ) / 100;
   results.value.tot_environmental_impact =
     Math.round(
       groupGame.value.rounds.reduce(

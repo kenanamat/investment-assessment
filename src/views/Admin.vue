@@ -97,7 +97,7 @@
               </button>
               <button
                 v-if="nextPathItem && !nextPathItem.canContinue && currentSession.code"
-                @click="confirmUsers()"
+                @click="confirmUsers();store.dispatch('unreadyAll')"
               >
                 Confirm users
               </button>
@@ -147,6 +147,14 @@
                     store.getters["getGroup"](store.getters["getUser"](user).group)
                       .treatment
                   }}
+                  <p class="d-inline" v-if="pathItem.type == 'game' && store.getters['getGroup'](store.getters['getUser'](user).group).game"> | Answered: 
+                    <div class="d-inline" >
+                      <i
+                      :class="store.getters['getGroup'](store.getters['getUser'](user).group)
+                            .game.rounds[currentSession.currentRound].interviewAnswered ? 'text-success' : 'text-danger'" class="fa-solid fa-square"></i>
+                    </div>
+                  </p>
+                
                 </p>
               </div>
               <button class="position-absolute bottom-0 end-0" @click="downloadUsers()">
@@ -249,7 +257,7 @@
       <div class="col-lg-5 d-flex align-items-center login">
         <input type="password" v-model="password" />
         <img
-          src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg"
+          src="https://cdn-icons-png.flaticon.com/512/3916/3916800.png"
           v-if="password == 'wachtwoord1234'"
           @click="store.dispatch('initiateAdmin')"
         />

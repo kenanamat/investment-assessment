@@ -104,6 +104,7 @@ export interface ResultState {
   profit_pre_tax: number,
   q: number,
   return: number,
+  tot_rd: number,
   tot_environmental_impact: number,
   tot_social_impact: number,
   tot_profit_post_tax: number

@@ -2,7 +2,7 @@
   <div id="leaderboard">
     <div id="top-5-wrapper">
       <div id="top-5" class="row mb-5">
-        <div class="col-4">
+        <div class="col-3">
           <div class="scores-list">
             <h4>Cumulative Profits</h4>
             <div v-for="group in rankedProfits.slice(0, 5)" :key="group[0]">
@@ -11,7 +11,7 @@
             </div>
           </div>
         </div>
-        <div class="col-4">
+        <div class="col-3">
           <div class="scores-list">
             <h4>Cumulative Environmental Impact</h4>
             <div v-for="group in rankedFE.slice(0, 5)" :key="group[0]">
@@ -20,12 +20,21 @@
             </div>
           </div>
         </div>
-        <div class="col-4">
+        <div class="col-3">
           <div class="scores-list">
             <h4>Cumulative Social Impact</h4>
             <div v-for="group in rankedFL.slice(0, 5)" :key="group[0]">
               {{ group[0] }}:
               {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_social_impact)}}
+            </div>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="scores-list">
+            <h4>Cumulative R&D</h4>
+            <div v-for="group in rankedRD.slice(0, 5)" :key="group[0]">
+              {{ group[0] }}:
+              {{Math.round((group[1] as GroupState).game.rounds[currentRound].results.tot_rd)}}
             </div>
           </div>
         </div>
@@ -96,6 +105,20 @@
               ],
             }"
           />
+          <LineChart
+            :chartData="{
+              labels: Array.from(Array(currentRound + 1).keys()).map(
+                (num) => 'Period ' + Number(num + 1)
+              ),
+              datasets: [
+                {
+                  label: 'Cumulative R&D',
+                  backgroundColor: groups[selectedGroup].color,
+                  data: getDataRD,
+                },
+              ],
+            }"
+          />
         </div>
       </div>
     </div>
@@ -160,6 +183,12 @@ const getDataFL = computed(() => {
     (round: RoundState) => round.results.tot_social_impact
   );
 });
+const getDataRD = computed(() => {
+  return Array.from(
+    Object.values(groups.value[selectedGroup.value].game.rounds) as RoundState[],
+    (round: RoundState) => round.results.tot_rd
+  );
+});
 
 const rankedProfits = computed(() => {
   return Object.entries(groups.value).sort(
@@ -180,6 +209,13 @@ const rankedFL = computed(() => {
     ([, a], [, b]) =>
       (b as GroupState).game.rounds[currentRound.value].results.tot_social_impact -
       (a as GroupState).game.rounds[currentRound.value].results.tot_social_impact
+  );
+});
+const rankedRD = computed(() => {
+  return Object.entries(groups.value).sort(
+    ([, a], [, b]) =>
+      (b as GroupState).game.rounds[currentRound.value].results.tot_rd -
+      (a as GroupState).game.rounds[currentRound.value].results.tot_rd
   );
 });
 
