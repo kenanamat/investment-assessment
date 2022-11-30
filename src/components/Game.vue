@@ -69,7 +69,7 @@
         </form>
         <button type="submit" form="question" class="next">Submit answers</button>
       </div>
-      <div v-else>
+      <div class="box p-5 w-50 mx-auto" v-else>
         Please answer the following questions to explain your decision making process. We
         kindly ask you to co-operate with the other board members when answering the
         questions. Please note that the leader has to submit the answers you have
@@ -211,7 +211,7 @@
         </tr>
       </table>
     </div>
-    <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
+    <div v-show="false" v-if="(userGroup.leader == currentUser && timeLeftGame <= 0 && endTime != null)">
       {{ forceSubmit() }}
     </div>
   </div>
@@ -232,8 +232,9 @@ import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
 
 const store = useStore();
+store.dispatch("unreadyAll");
 
-const timeLeftGame = ref(10);
+const timeLeftGame = ref(180);
 
 const currentUser = localStorage.getItem("userid");
 
@@ -243,6 +244,11 @@ const groupGame = computed(() => store.getters["getGroupGame"](userGroup.value.i
 const groupRound = computed(() =>
   store.getters["getGroupGameRound"](userGroup.value.id, currentRound.value)
 );
+
+const endTime = computed(() => store.getters["getActiveSession"]().timerEnd);
+if (endTime.value <= Date.now() || endTime.value == null) {
+  store.dispatch("setTimerEnd", groupGame.value.time[currentRound.value]);
+}
 
 const isReady = computed(() => userGroup.value.ready[currentUser ?? ""]);
 
@@ -373,7 +379,7 @@ const submit = () => {
   });
 };
 const forceSubmit = () => {
-  timeLeftGame.value = 100;
+  timeLeftGame.value = 180;
   setValues();
   store.dispatch("submitAnswer", {
     groupId: userGroup.value.id,
@@ -509,15 +515,10 @@ const setValues = () => {
     ) / 100;
   results.value.tot_rd =
     Math.round(
-      (groupGame.value.rounds.reduce(
-        (sum: number, obj: RoundState) =>
-          obj.inputs.R_E + obj.inputs.R_L + obj.inputs.R_K + sum,
-        0
-      ) +
-        inputs.value.R_E +
-        inputs.value.R_L +
-        inputs.value.R_K) *
-        100
+      ((prevGroupRound.value ? prevGroupRound.value.results.tot_rd : 0) + 
+      inputs.value.R_L +
+      inputs.value.R_K +
+      inputs.value.R_E) * 100
     ) / 100;
   results.value.tot_environmental_impact =
     Math.round(

@@ -827,22 +827,26 @@ export default createStore<RootState>({
       const sessionId = context.getters["getActiveSession"]().id
       const groupsInSession = context.getters["getGroupsInSession"](
         sessionId
-      ).filter((g: GroupState) => g.id != "onHold")
-      const usersInSessionLen =
-        context.getters["getUsersInSession"](sessionId).length
+      ).filter((g: string) => g != "onHold")
 
-      var maxUsersPerGroup = Math.floor(
-        usersInSessionLen / groupsInSession.length
-      )
       var usersInGroupInSession = 0
       groupsInSession.forEach((g: string) => {
+        if (g === "onHold") return
         usersInGroupInSession += Object.keys(
           context.getters["getGroup"](g).users ?? []
         ).length
       })
-      // if uneven groups, allow additional player
-      if (usersInGroupInSession >= maxUsersPerGroup * groupsInSession.length)
-        maxUsersPerGroup += 1
+
+      // const usersInSessionLen =
+      // context.getters["getUsersInSession"](sessionId).length
+      // var maxUsersPerGroup = Math.floor(
+      //   usersInSessionLen / groupsInSession.length
+      // )
+      // // if uneven groups, allow additional player
+      // if (usersInGroupInSession >= maxUsersPerGroup * groupsInSession.length)
+      //   maxUsersPerGroup += 1    
+      
+      var maxUsersPerGroup = Math.floor(usersInGroupInSession / groupsInSession.length) + 1
 
       // add to shuffled group
       const shuffledGroups = context.getters["getShuffled"](groupsInSession)
@@ -997,7 +1001,7 @@ export default createStore<RootState>({
             canContinue: true,
             completed: false,
             type: "questionnaire",
-            id: "Ex-ante",
+            id: "test",
           },
           1: {
             index: 1,
@@ -1110,7 +1114,12 @@ export default createStore<RootState>({
 
       if (context.getters["getGroupsReady"]() && activeSession) {
         context.dispatch("unreadyAll")
-        context.dispatch("setTimerEnd", -100)
+
+        const session = context.getters["getActiveSession"]()
+        context.commit("UPDATE_SESSION", {
+          id: session.id,
+          timerEnd: null,
+        })
 
         const pathItem = context.getters["getPathItem"]()
         var maxRounds = 1

@@ -32,8 +32,8 @@ interface Props {
   timeLeftGame?: number;
 }
 const props = withDefaults(defineProps<Props>(), {
-  time: 30,
-  timeLeftGame: 30,
+  time: 180,
+  timeLeftGame: 180,
 });
 const emits = defineEmits<{
   "update:timeLeftGame": number;

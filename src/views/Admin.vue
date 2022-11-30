@@ -134,7 +134,7 @@
           <div class="settings" v-else-if="currentSetting == 'users'">
             <h4 class="mb-4">
               Users in session:
-              {{ store.getters["getUsersInSession"](currentSession.id).length }}
+              {{ store.getters["getActiveSession"]() ? store.getters["getUsersInSession"](currentSession.id).length : 'N/A' }}
             </h4>
             <div v-if="currentSession">
               <div

@@ -6,7 +6,7 @@
         <h3>Welcome</h3>
         <h1>Choose an available username and join a group</h1>
       </div>
-      <!-- <div class="col-lg-3 availables">
+      <div class="col-lg-3 availables">
         <div>
           <h4>Available usernames:</h4>
           <ul>
@@ -24,9 +24,12 @@
           </ul>
           <hr />
         </div>
-      </div> -->
+      </div>
       <div class="col-lg-4 selected d-flex">
-        <form @submit.prevent="store.dispatch('initiateUser', userid)" id="login">
+        <form
+          @submit.prevent="store.dispatch('initiateUser', userid)"
+          id="login"
+        >
           <h4>Your selected username:</h4>
           <input
             type="text"
@@ -44,9 +47,7 @@
           /> -->
         </form>
         <button type="submit" form="login" v-if="users.includes(userid)">
-          <img
-            src="https://25cjk227xfsu3mkyfg1m9xb7-wpengine.netdna-ssl.com/wp-content/themes/seoeconomics/dist/images/arrow-right_058a4869.svg"
-          />
+          <img src="https://cdn-icons-png.flaticon.com/512/3916/3916800.png" />
         </button>
       </div>
     </div>
@@ -69,42 +70,48 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "@vue/reactivity";
-import { useStore } from "vuex";
-import { ref } from "vue";
-import router from "@/router";
-import Timer from "@/components/Timer.vue";
+import { computed } from "@vue/reactivity"
+import { useStore } from "vuex"
+import { ref } from "vue"
+import router from "@/router"
+import Timer from "@/components/Timer.vue"
 
-const store = useStore();
-await store.dispatch("bindDatabase");
+const store = useStore()
+await store.dispatch("bindDatabase")
 
-const currentUser = localStorage.getItem("userid");
-const sessionId = computed(() => store.getters["getActiveSession"]().id);
-const user = computed(() => store.getters["getUser"](currentUser));
+const currentUser = localStorage.getItem("userid")
+const sessionId = computed(() => store.getters["getActiveSession"]().id)
+const user = computed(() => store.getters["getUser"](currentUser))
 const userInSession = store.getters["getUsersInSession"](sessionId).find(
   (u: string) => u == user.value
 )
   ? true
-  : false;
+  : false
 
 // remove local user if no session or user doesnt exist in session
 if (
   (sessionId.value == undefined && currentUser != null) ||
   (!userInSession && currentUser != null)
 )
-  store.dispatch("removeLocalUser", currentUser);
+  store.dispatch("removeLocalUser", currentUser)
 
-const users = computed(() => store.getters["getUsersInSession"](sessionId.value));
+const users = computed(() =>
+  store.getters["getUsersInSession"](sessionId.value)
+)
 const usersAvailable = computed(() =>
   users.value.filter((u: string) => {
-    const user = store.getters["getUser"](u);
-    return (user.active == true && user.code != undefined) || user.active == false;
+    const user = store.getters["getUser"](u)
+    return (
+      (user.active == true && user.code != undefined) || user.active == false
+    )
   })
-);
+)
 
-const userid = ref("");
-const groupid = ref("");
+const userid = ref("")
+const groupid = ref("")
 
-const userCode = computed(() => store.getters["getUser"](userid.value).code ?? false);
-const code = ref("");
+const userCode = computed(
+  () => store.getters["getUser"](userid.value).code ?? false
+)
+const code = ref("")
 </script>
