@@ -6,7 +6,7 @@
         <h3>Welcome</h3>
         <h1>Choose an available username and join a group</h1>
       </div>
-      <div class="col-lg-3 availables">
+      <!-- <div class="col-lg-3 availables">
         <div>
           <h4>Available usernames:</h4>
           <ul>
@@ -24,7 +24,7 @@
           </ul>
           <hr />
         </div>
-      </div>
+      </div> -->
       <div class="col-lg-4 selected d-flex">
         <form
           @submit.prevent="store.dispatch('initiateUser', userid)"
