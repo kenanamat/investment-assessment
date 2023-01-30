@@ -1,14 +1,15 @@
 <template>
   <div class="row">
-    <div class="box col-4 p-4">
+    <div class="box col-4 p-4" style="max-height: 120px">
       <h1>Discussion</h1>
-      <hr />
-      <p></p>
     </div>
-    <div class="col-8" v-if="activeSession.showPoints">
-      <div class="ms-5 ps-5">
-        <div v-for="group in sortedGroups()" :key="group.id">
-          {{ group.id }} | {{ Math.round(group.game.points) }}
+    <div class="col-1"></div>
+    <div class="col-7 p-5 box" v-if="activeSession.showPoints">
+      <div class="">
+        <h2>Points</h2>
+        <hr>
+        <div v-for="group in sortedGroups()" :key="group.id" class="border-bottom mb-3">
+          <span class="d-inline fw-bold fs-6 p-1 shadow" :style="`background-color:${group.color}c5`">{{ group.id }}</span>: {{ Math.round(group.game.points) }}
         </div>
       </div>
     </div>

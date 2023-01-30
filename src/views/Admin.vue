@@ -8,6 +8,14 @@
         </button>
         <button @click="store.dispatch('removeLocalUser', currentUser)">Log out</button>
       </div>
+      <button
+        v-if="pathItem.type == 'game' || pathItem.type == 'fakeGame'"
+        @click="ready()"
+        class="position-absolute end-0 bottom-0 bg-success fs-2 shadow border-0"
+      >
+        Ready all
+      </button>
+      <button @click="store.dispatch('switchShowPoints')" class="position-absolute start-0 bottom-0 fs-6 shadow border-0" :class="[currentSession.showPoints ? 'bg-info' : 'bg-dark']">Point view {{ currentSession.showPoints ? '(openend)' : '(closed)' }}</button>
       <div id="settings-block-wrapper">
         <div id="settings-block">
           <nav>
@@ -107,13 +115,6 @@
               >
                 Start game
               </button>
-              <button
-                v-if="pathItem.type == 'game' || pathItem.type == 'fakeGame'"
-                @click="ready()"
-              >
-                Ready all
-              </button>
-              <button @click="store.dispatch('switchShowPoints')">Point view</button>
               <button @click="download()">Download excel</button>
               <button @click="backup()">Backup database</button>
               <button class="bg-danger border-none" @click="store.dispatch('endSession')">
@@ -227,9 +228,9 @@
           </div>
         </div>
       </div>
-      <div id="hidden">
+      <!-- <div id="hidden">
         <button @click="store.dispatch('reset')">X</button>
-      </div>
+      </div> -->
       <!-- 
       <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
       <button type="submit" form="amounts">Start Session</button>

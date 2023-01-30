@@ -192,9 +192,9 @@
         </tr>
       </table>
     </div>
-    <!-- <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
+    <div v-show="false" v-if="userGroup.leader == currentUser && timeLeftGame <= 0">
       {{ forceSubmit() }}
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -349,6 +349,7 @@ const forceSubmit = () => {
   });
 };
 const checkBudget = (input: string) => {
+  if (typeof currInputs.value[input as keyof InputState] !== 'number') return currInputs.value[input as keyof InputState] = 0;
   if (
     getUse() > constants.budget ||
     currInputs.value[input as keyof InputState] < 0 ||
@@ -358,6 +359,7 @@ const checkBudget = (input: string) => {
     currInputs.value[input as keyof InputState] = inputs.value[input];
   } else {
     inputs.value[input] = currInputs.value[input as keyof InputState];
+    if(!inputs.value[input]) inputs.value[input] = 0;
     setValues();
   }
 };
@@ -477,9 +479,9 @@ const setValues = () => {
     results.value.tot_rd =
     Math.round(
       ((prevGroupRound.value ? prevGroupRound.value.results.tot_rd : 0) + 
-      inputs.value.R_L +
-      inputs.value.R_K +
-      inputs.value.R_E) * 100
+      Number(inputs.value.R_L) +
+      Number(inputs.value.R_K) +
+      Number(inputs.value.R_E)) * 100
     ) / 100;
   results.value.tot_environmental_impact =
     Math.round(
