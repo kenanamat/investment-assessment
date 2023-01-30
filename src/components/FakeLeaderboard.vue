@@ -146,7 +146,7 @@
       v-if="
         userGroup.leader == currentUser &&
         !display &&
-        !Object.values(userGroup.ready)[0]
+        !Object.values(userGroup.ready)[0] && false
       "
       @click="store.dispatch('readyUp', userGroup.id)"
     >
