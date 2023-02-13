@@ -204,10 +204,8 @@ import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 import type { Ref } from "vue";
 import { useStore } from "vuex";
-import Leaderboard from "./Leaderboard.vue";
 import Timer from "./Timer.vue";
 import QuestionType from "./QuestionType.vue";
-import { BarChart } from "vue-chart-3";
 import { Chart, registerables } from "chart.js";
 import FakeLeaderboard from "./FakeLeaderboard.vue";
 

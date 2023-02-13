@@ -844,9 +844,10 @@ export default createStore<RootState>({
       // )
       // // if uneven groups, allow additional player
       // if (usersInGroupInSession >= maxUsersPerGroup * groupsInSession.length)
-      //   maxUsersPerGroup += 1    
-      
-      var maxUsersPerGroup = Math.floor(usersInGroupInSession / groupsInSession.length) + 1
+      //   maxUsersPerGroup += 1
+
+      var maxUsersPerGroup =
+        Math.floor(usersInGroupInSession / groupsInSession.length) + 1
 
       // add to shuffled group
       const shuffledGroups = context.getters["getShuffled"](groupsInSession)
@@ -1029,28 +1030,6 @@ export default createStore<RootState>({
             id: "Ex-post",
           },
         },
-        // path: {
-        //   0: {
-        //     index: 0,
-        //     canContinue: true,
-        //     completed: false,
-        //     type: 'game',
-        //   },
-        //   1: {
-        //     index: 1,
-        //     canContinue: true,
-        //     completed: false,
-        //     type: 'questionnaire',
-        //     id: 'Ex-post'
-        //   },
-        //   2: {
-        //     index: 2,
-        //     completed: false,
-        //     canContinue: true,
-        //     type: 'questionnaire',
-        //     id: 'Ex-post'
-        //   }
-        // }
       })
       context.dispatch("createOnHold")
     },
@@ -1091,11 +1070,16 @@ export default createStore<RootState>({
           router.push("/waiting")
         } else if (pathItem) {
           if (!nextpathItem) context.dispatch("unreadyAll")
-          context.commit("UPDATE_SESSIONPATH", {
-            id: activeSession.id,
-            pathItem: pathItem.index,
-            object: { completed: true },
-          })
+          if (
+            pathItem.type != "fakeGame" ||
+            (pathItem.type == "fakeGame" && activeSession.timerEnd)
+          ) {
+            context.commit("UPDATE_SESSIONPATH", {
+              id: activeSession.id,
+              pathItem: pathItem.index,
+              object: { completed: true },
+            })
+          }
         }
       }
     },
@@ -1123,19 +1107,21 @@ export default createStore<RootState>({
 
         const pathItem = context.getters["getPathItem"]()
         var maxRounds = 1
-        pathItem.type == "game"
-          ? (maxRounds =
-              context.getters["getGroup"](
-                context.getters["getGroupsInSession"](
-                  context.getters["getActiveSession"]().id
-                )[0]
-              ).game.rounds.length - 1)
-          : (maxRounds =
-              context.getters["getGroup"](
-                context.getters["getGroupsInSession"](
-                  context.getters["getActiveSession"]().id
-                )[0]
-              ).fakeGame.rounds.length - 1)
+        if (pathItem.type == "game") {
+          maxRounds =
+            context.getters["getGroup"](
+              context.getters["getGroupsInSession"](
+                context.getters["getActiveSession"]().id
+              )[0]
+            ).game.rounds.length - 1
+        } else if (pathItem.type == "fakeGame") {
+          maxRounds =
+            context.getters["getGroup"](
+              context.getters["getGroupsInSession"](
+                context.getters["getActiveSession"]().id
+              )[0]
+            ).fakeGame.rounds.length - 1
+        }
 
         if (currentRound >= maxRounds) {
           const pathItem = context.getters["getPathItem"]()
