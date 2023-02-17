@@ -214,7 +214,7 @@ Chart.register(...registerables);
 window.scrollTo(0, 0);
 const store = useStore();
 
-const timeLeftGame = ref(10);
+const timeLeftGame = ref(180);
 
 const currentUser = localStorage.getItem("userid");
 
