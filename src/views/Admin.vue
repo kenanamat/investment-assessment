@@ -105,7 +105,7 @@
               </button>
               <button
                 v-if="nextPathItem && !nextPathItem.canContinue && currentSession.code"
-                @click="confirmUsers();store.dispatch('unreadyAll')"
+                @click="confirmUsers()"
               >
                 Confirm users
               </button>

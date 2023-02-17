@@ -1002,7 +1002,7 @@ export default createStore<RootState>({
             canContinue: true,
             completed: false,
             type: "questionnaire",
-            id: "Ex-ante",
+            id: "test",
           },
           1: {
             index: 1,
@@ -1060,7 +1060,7 @@ export default createStore<RootState>({
       })
     },
     checkPath(context) {
-      const activeSession = context.getters["getActiveSession"]()
+      const activeSession = context.getters["getActiveSession"]()                                                
       const pathItem = context.getters["getPathItem"]()
       const nextpathItem = context.getters["getNextPathItem"]()
 
@@ -1070,16 +1070,12 @@ export default createStore<RootState>({
           router.push("/waiting")
         } else if (pathItem) {
           if (!nextpathItem) context.dispatch("unreadyAll")
-          if (
-            pathItem.type != "fakeGame" ||
-            (pathItem.type == "fakeGame" && activeSession.timerEnd)
-          ) {
-            context.commit("UPDATE_SESSIONPATH", {
-              id: activeSession.id,
-              pathItem: pathItem.index,
-              object: { completed: true },
-            })
-          }
+          context.commit("UPDATE_SESSIONPATH", {
+            id: activeSession.id,
+            pathItem: pathItem.index,
+            object: { completed: true },
+          })
+          context.dispatch("unreadyAll")
         }
       }
     },
@@ -1363,13 +1359,16 @@ export default createStore<RootState>({
         pathItem: nextPathItem.index,
         object: { canContinue: true },
       })
-
+      
       context.getters["getGroupsNoUsers"]().forEach((g: string) => {
         context.commit("REMOVE_GROUP", g)
       })
       context.commit("REMOVE_GROUP", "onHold")
 
-      context.dispatch("checkPath")
+      // context.dispatch("checkPath").then(() => {
+      //   context.dispatch("unreadyAll")
+      // })
+
     },
     submitInterview(
       context,
