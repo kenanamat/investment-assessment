@@ -59,6 +59,9 @@ This Vue.js application, integrated with TypeScript and Firebase, is designed as
 ### Running the Application
 Execute `npm run serve` to start the application on a local development server. Visit `http://localhost:8080/` to view the application.
 
+### Deploying the Application
+Execute `npm run deploy` to deploy the application to the hosting URLs
+
 ### Project Structure
 - `src/components`: Reusable Vue components.
 - `src/views`: Vue components representing different pages.
