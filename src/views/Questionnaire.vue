@@ -22,8 +22,9 @@
     {{ router.push("/waiting") }}
   </div>
 
+  <!-- CHECK DIT, COMMENT DIT UIT EN DOE ALLEEN <question> AND IT MIGHT WORK -->
   <div v-else-if="pathItem.type == 'questionnaire'" id="questionnaire">
-    <div v-if="!pathItem.completed && isReady && nextPathItem.canContinue">
+    <!-- <div v-if="!pathItem.completed && isReady && nextPathItem.canContinue">
       <h1>Please wait</h1>
       <h2>Not ready from your group:</h2>
       <div id="validIds">
@@ -36,7 +37,8 @@
     </div>
     <div v-else>
       <Question :questionnaire="pathItem.id" :user="currentUser" />
-    </div>
+    </div> -->
+    <Question :questionnaire="pathItem.id" :user="currentUser" />
   </div>
   <div v-else-if="pathItem.type == 'game'">
     <Game :key="currentSession.currentRound" />
